@@ -1,32 +1,35 @@
 import numpy as np
-import random
 
 class Sudoku:
-    def __init__(self, size=9):
-        self.size = size
-        self.grid = np.zeros((9, 9), dtype=int)
-
-    def generate_full_grid(self):
-        """Sinh bảng Sudoku hoàn chỉnh (đang dùng số ngẫu nhiên, cần cải thiện)."""
+    def __init__(self, board=None):
+        if board is None:
+            self.board = np.zeros((9, 9), dtype=int)
+            self.fixed_cells = set()
+        else:
+            self.board = np.array(board, dtype=int)
+            # Đánh dấu các ô có giá trị ban đầu là cố định
+            self.fixed_cells = {(i, j) for i in range(9) for j in range(9) if board[i][j] != 0}
+    
+    def generate_puzzle(self, difficulty=0.5):
+        # Chỉ chạy nếu bảng ban đầu là rỗng
+        if np.all(self.board == 0):
+            for i in range(0, 9, 3):
+                nums = np.random.permutation(range(1, 10))
+                self.board[i:i+3, i:i+3] = nums.reshape(3, 3)
+            # Cập nhật fixed_cells sau khi tạo puzzle
+            self.fixed_cells = {(i, j) for i in range(9) for j in range(9) if self.board[i][j] != 0}
+    
+    def get_board(self):
+        return self.board
+    
+    def is_editable(self, row, col):
+        return (row, col) not in self.fixed_cells
+    
+    def is_valid(self):
+        # Kiểm tra hàng và cột, bỏ qua số 0
         for i in range(9):
-            for j in range(9):
-                self.grid[i][j] = random.randint(1, 9)
-
-    def difficulty(self, level):
-        """Tạo đề bài theo cấp độ khó"""
-        self.generate_full_grid()
-
-        difficulties = {"easy": 30, "medium": 40, "hard": 50}
-        empty_cells = difficulties.get(level, 30)  # Nếu không tìm thấy level, mặc định là 30 ô trống
-
-        while empty_cells > 0:
-            i, j = random.randint(0, 8), random.randint(0, 8)
-            if self.grid[i][j] != 0:
-                self.grid[i][j] = 0
-                empty_cells -= 1
-
-        return self  # Trả về chính đối tượng Sudoku để có thể gọi .board
-
-    @property
-    def board(self):
-        return self.grid
+            row_values = [x for x in self.board[i] if x != 0]
+            col_values = [self.board[j][i] for j in range(9) if self.board[j][i] != 0]
+            if len(set(row_values)) != len(row_values) or len(set(col_values)) != len(col_values):
+                return False
+        return True

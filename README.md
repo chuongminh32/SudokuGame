@@ -19,25 +19,38 @@
 ```
 README.md
 |   requirements.txt  # Danh sách thư viện cần thiết
+|   config.json  # Cấu hình tham số (tùy chọn)
+|   .gitignore  # Bỏ qua tệp không cần thiết khi commit
+|
++---assets  # Chứa hình ảnh, icon, v.v.
 |
 +---data  # Chứa dữ liệu liên quan (nếu có)
 |
 +---src  # Thư mục chứa mã nguồn chính
-|   |   gui.py  # Giao diện đồ họa sử dụng Pygame
-|   |   hill_climbing.py  # Triển khai thuật toán Hill Climbing
 |   |   main.py  # Điểm bắt đầu để chạy chương trình
+|   |   hill_climbing.py  # Triển khai thuật toán Hill Climbing
 |   |   solver.py  # Hàm điều phối giải thuật Sudoku
 |   |   sudoku.py  # Lớp Sudoku để tạo và kiểm tra bảng
 |   |
-|   \---__pycache__  # Tệp bytecode được tạo bởi Python
-|           gui.cpython-312.pyc
-|           hill_climbing.cpython-312.pyc
-|           solver.cpython-312.pyc
-|           sudoku.cpython-312.pyc
+|   +---gui  # Chứa các thành phần giao diện
+|   |   |   __init__.py  # Đánh dấu thư mục là module
+|   |   |   main_screen.py  # Màn hình chính của game
+|   |   |   game_screen.py  # Màn hình chơi game Sudoku
+|   |   |   menu_screen.py  # Màn hình menu chính
+|   |   |   result_screen.py  # Màn hình hiển thị kết quả
+|   |
+|   +---utils  # Chứa các hàm tiện ích dùng chung
+|   |       helpers.py  # Các hàm hỗ trợ như in bảng, kiểm tra trạng thái
+|   |       logger.py  # Ghi log chương trình
 |
-\---tests  # Thư mục chứa các bài kiểm thử
-        test_solver.py  # Kiểm thử thuật toán giải Sudoku
-```
++---tests  # Thư mục chứa các bài kiểm thử
+|       test_solver.py  # Kiểm thử thuật toán giải Sudoku
+|       test_sudoku.py  # Kiểm thử lớp Sudoku
+|
++---docs  # Tài liệu dự án
+        usage_guide.md  # Hướng dẫn sử dụng
+        algorithm.md  # Giải thích thuật toán
+
 
 
 ## 🔧 Cách cài đặt và chạy chương trình
@@ -53,8 +66,6 @@ python src/gui.py
 ```
 
 ## 👥 Thành viên và phân công công việc
-| STT |        Họ và Tên       | Công việc                                              |
-|-----|-----------|------------|--------------------------------------------------------|
-|  1  | Nguyễn Thị Thanh Thùy  | Phát triển thuật toán Hill Climbing & Xử lý dữ liệu    |
-|  2  |  Phạm Hàn Minh Chương  | Xây dựng giao diện đồ họa với Pygame                   |
-|  3  | Nguyễn Thanh Bình Minh | Xây dựng hệ thống Sudoku và kết nối GUI với thuật toán |
+| **Phạm Hàn Minh Chương (Giao diện - Frontend)** | Xây dựng UI với Pygame | - Phát triển màn hình chính, menu, game, kết quả trong `gui/`.  <br> - Viết code để vẽ Sudoku lên màn hình. <br> - Xử lý sự kiện người chơi (chuột, bàn phím). |
+| **Nguyễn Thanh Bình Minh(Thuật toán & Logic - Backend)** | Cài đặt thuật toán Hill-Climbing | - Viết `hill_climbing.py` để giải Sudoku. <br> - Cải tiến thuật toán để tối ưu hiệu suất. <br> - Xây dựng `solver.py` để điều phối thuật toán. |
+| **Nguyễn Thị Thanh Thùy (Kiểm thử, tài liệu, tối ưu)** | Viết test case & tối ưu code | - Tạo `tests/` để kiểm thử Sudoku & thuật toán. <br> - Viết log & ghi lỗi (logger.py). <br> - Cải thiện tốc độ thuật toán & UI. <br> - Viết tài liệu hướng dẫn (`docs/`). |
