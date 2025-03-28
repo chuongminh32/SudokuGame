@@ -188,7 +188,7 @@ class HomeScreen:
             self.screen.fill(self.mau_nen)  # Làm mới màn hình
             self.ve_tieu_de()
             self.ve_nut()
-            self.ve_chan_trang()
+            self.ve_chan_trang  ()
             pygame.display.update()  # Cập nhật màn hình
             clock.tick(60)  # Giới hạn FPS
 
