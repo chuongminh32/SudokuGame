@@ -39,6 +39,51 @@ class khoiDongManHinhHuongDan():
         self.khung_thanh_cuon = None 
         self.dang_keo = False 
 
+    def tao_noi_dung(self):
+            return [
+                {"kieu": "tieude", "noidung": "Cách Chơi Sudoku"},
+                {"kieu": "noidung", "noidung": "Điền số 1-9 vào lưới 9x9 sao cho mỗi hàng, cột, ô 3x3 không lặp số. Số màu xanh là số có sẵn."},
+                
+                {"kieu": "tieude", "noidung": "Hướng Dẫn Chơi"},
+                {"kieu": "noidung", "noidung": "- Chọn 'Chơi Game' để tự giải."},
+                {"kieu": "noidung", "noidung": "- Nhấn ô trống, nhập số 1-9."},
+                {"kieu": "noidung", "noidung": "- Xóa số bằng phím Delete."},
+                {"kieu": "noidung", "noidung": "- Dùng 'Gợi Ý' nếu cần."},
+                {"kieu": "noidung", "noidung": "- Chọn 'Máy Giải' để xem máy giải tự động."},
+                
+                {"kieu": "tieude", "noidung": "Mẹo Giải Sudoku"},
+                {"kieu": "noidung", "noidung": "- Bắt đầu từ ô có nhiều số sẵn."},
+                {"kieu": "noidung", "noidung": "- Loại trừ để tìm số đúng."},
+                {"kieu": "noidung", "noidung": "- Tìm vị trí số theo từng số (1, 2, 3...)."},
+                {"kieu": "noidung", "noidung": "- Chỉ điền khi chắc chắn."},
+                
+                {"kieu": "tieude", "noidung": "Cách AI Giải Sudoku"},
+                {"kieu": "noidung", "noidung": "AI dùng nhiều thuật toán để giải Sudoku. Dưới đây là 4 thuật toán phổ biến:"},
+                
+                {"kieu": "tieude", "noidung": "1. Quay Lui (Backtracking)"},
+                {"kieu": "noidung", "noidung": "- Tìm ô trống, thử số 1-9."},
+                {"kieu": "noidung", "noidung": "- Kiểm tra hợp lệ (không lặp số)."},
+                {"kieu": "noidung", "noidung": "- Nếu sai, quay lại thử số khác."},
+                {"kieu": "noidung", "noidung": "- Lặp lại đến khi xong."},
+                
+                {"kieu": "tieude", "noidung": "2. Leo Đồi (Hill Climbing)"},
+                {"kieu": "noidung", "noidung": "- Bắt đầu với lưới ngẫu nhiên."},
+                {"kieu": "noidung", "noidung": "- Đánh giá số lỗi (lặp số)."},
+                {"kieu": "noidung", "noidung": "- Thay đổi một ô để giảm lỗi."},
+                {"kieu": "noidung", "noidung": "- Lặp lại đến khi không còn lỗi hoặc kẹt."},
+                
+                {"kieu": "tieude", "noidung": "3. Leo Đồi với Bước Ngang (Sideway Move)"},
+                {"kieu": "noidung", "noidung": "- Như Leo Đồi, nhưng cho phép chọn bước ngang."},
+                {"kieu": "noidung", "noidung": "- Nếu không giảm lỗi, thử thay đổi khác mà lỗi không tăng."},
+                {"kieu": "noidung", "noidung": "- Giúp tránh kẹt ở giải pháp không tối ưu."},
+                
+                {"kieu": "tieude", "noidung": "4. Ủ Nóng (Simulated Annealing)"},
+                {"kieu": "noidung", "noidung": "- Bắt đầu với lưới ngẫu nhiên."},
+                {"kieu": "noidung", "noidung": "- Thay đổi ngẫu nhiên, chấp nhận cả bước xấu (tăng lỗi) lúc đầu."},
+                {"kieu": "noidung", "noidung": "- Dần dần chỉ chọn bước tốt khi 'nguội đi'."},
+                {"kieu": "noidung", "noidung": "- Tìm giải pháp tối ưu qua nhiều lần thử."}
+            ]
+    
     def ve_nut_quay_lai(self):
         """Vẽ nút quay lại (hình tròn có mũi tên)"""
         
