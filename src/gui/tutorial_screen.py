@@ -27,7 +27,7 @@ class khoiDongManHinhHuongDan():
 
         # Nút quay lại 
         self.nut_quay_lai = pygame.Rect(15, 15, 40, 40)
-        self.di_chuot_quay_lai = False 
+        self.hover_nutquaylai = False 
 
         # Vị trí cố định cho tiêu đề và nội dung 
         self.tieude_y = 40 
@@ -84,11 +84,91 @@ class khoiDongManHinhHuongDan():
                 {"kieu": "noidung", "noidung": "- Tìm giải pháp tối ưu qua nhiều lần thử."}
             ]
     
+    def ve_noidung(self):
+        
+        self.screen.fill(TRANG) 
+
+        # Tiêu đề 
+        tieude = self.font_tieu_de.render("Hướng Dẫn", True, XANH)
+
+        # Hàm vẽ tiêu đề lên giao diện chính 
+        self.screen.blit(tieude, tieude.get_rect(center = (RONG_GAME//2, self.tieude_y)))
+
+        # Tính toán vị trí nội dung 
+        noidung = self.tao_noi_dung()
+        vitri_y = self.vitri_batdau_noidung_y - self.cuon_y
+
+        # Giới hạn vị trí cuộn để không vượt qua vitri_batdau_noidung_y khi cuộn lên 
+        if self.cuon_y < 0:
+            self.cuon_y = 0
+            vitri_y = self.vitri_batdau_noidung_y
+
+        # Vẽ nội dung 
+        for nd in noidung:
+            if nd["kieu"] == "tieude":
+                vitri_y += 20 
+                # tiêu đề nội dung 
+                chu_tieu_de = self.font_tieu_de_noi_dung.render(nd["noidung"], True, DEN)
+                # kiểm tra vị trí nếu nằm trong vùng hiển thị nd 
+                if vitri_y >= self.vitri_batdau_noidung_y - 30 and vitri_y < CAO_GAME - DEM_GAME:
+                    self.screen.blit(chu_tieu_de, (DEM_GAME, vitri_y)) # vẽ chữ lên màn hình nd(x,y)
+                vitri_y += 40
+            else:
+                # chia các dòng trong phạm vi chiều rộng game 
+                ds_dong = self.dong_goi_chu(nd["noidung"], RONG_GAME - 2 * DEM_GAME)
+                # hiển thị các dong nd lên màn hình 
+                for dong in ds_dong: 
+                    # chuyen vb -> hinh anh (True-< khu rang cua -> chu muot hon)   
+                    chu_nd = self.font_chu_noi_dung.render(dong, True, DEN)
+                    # kt vi tri hop le de hien thi vb
+                    # vitriNoidung_y >= self.vitri_batdau_noidung_y - 30: Đảm bảo dòng văn bản không bị hiển thị quá sớm (giữ khoảng cách ban đầu).
+                    if vitri_y >= self.vitri_batdau_noidung_y - 30 and vitri_y < CAO_GAME - DEM_GAME:
+                        self.screen.blit(chu_nd, (DEM_GAME ,vitri_y))
+                        # k/c cac dong 
+                    vitri_y += 25
+                    # k/c doan van 
+                vitri_y += 10 
+            self.cuon_max = max(0, vitri_y - CAO_GAME + DEM_GAME)
+
+        # thanh cuộn 
+        if self.cuon_max > 0:
+            chieucao_thanhcuon = CAO_GAME * (CAO_GAME - DEM_GAME) / (vitri_y + DEM_GAME)
+
+            vitri_y_thanhcuon = DEM_GAME + (CAO_GAME - chieucao_thanhcuon - 2 * DEM_GAME) * self.cuon_y / self.cuon_max
+
+            self.khung_thanh_cuon = pygame.Rect(RONG_GAME - 15, vitri_y_thanhcuon, 10, chieucao_thanhcuon)
+
+            mau = XAM_DEN if self.dang_keo else XAM
+
+            # ve thanh cuon
+            pygame.draw.rect(self.screen, mau, self.khung_thanh_cuon, border_bottom_left_radius=5)
+
+
+    def dong_goi_chu(self, chuoi, do_rong_toi_da):
+        """Chia nhỏ văn bản thành nhiều dòng"""
+        ds_cac_tu = chuoi.split() # ds luu cac tu cua chuoi
+        ds_dong = [] # ds luu cac dong 
+        dong_hien_tai = "" # chuoi tam de ghep tu 
+        for tu in ds_cac_tu:
+            x = dong_hien_tai + tu + " "
+            # len dòng hiện tại + với từ đang xét vượt quá chiều rộng 
+            if self.font_chu_noi_dung.size(x)[0] <=  do_rong_toi_da:
+                dong_hien_tai = x # chap nhan dong hien tai hop le 
+            else:
+                # vuot qua chieu rong screen 
+                ds_dong.append(dong_hien_tai.strip())
+                # tu nay phai xuong dong -> bat dau dong moi voi tu hien tai 
+                dong_hien_tai = tu + " "
+            # neu con tu trong dong -> them vao ds dong
+        if dong_hien_tai:
+            ds_dong.append(dong_hien_tai.strip())
+        return ds_dong
+
     def ve_nut_quay_lai(self):
         """Vẽ nút quay lại (hình tròn có mũi tên)"""
         
         # Chọn màu cho nút (màu xanh nhạt nếu di chuột vào, ngược lại màu xanh đậm)
-        mau_nut = XANH_SANG if self.di_chuot_quay_lai else XANH
+        mau_nut = XANH_SANG if self.hover_nutquaylai else XANH
 
         # Vẽ hình tròn làm nền cho nút
         pygame.draw.circle(self.screen, mau_nut, self.nut_quay_lai.center, 20)
@@ -114,7 +194,7 @@ class khoiDongManHinhHuongDan():
             # Sự kiện di chuyển chuột
             elif event.type == pygame.MOUSEMOTION:
                 # Kiểm tra xem chuột có đang ở trên nút quay lại không
-                self.di_chuot_quay_lai = self.nut_quay_lai.collidepoint(event.pos)
+                self.hover_nutquaylai = self.nut_quay_lai.collidepoint(event.pos)
                 
                 # Nếu đang kéo thanh cuộn
                 if self.dang_keo and self.cuon_max > 0:
@@ -146,10 +226,12 @@ class khoiDongManHinhHuongDan():
     def run(self):
         while True:
             self.xu_ly_su_kien()
-            # self.ve_noidung()
+            self.ve_noidung()
             self.ve_nut_quay_lai()
             pygame.display.flip()
             pygame.time.Clock().tick(60)
+
+
 
 def KhoiDongManHinhHD():
     hd = khoiDongManHinhHuongDan()
