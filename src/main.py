@@ -2,7 +2,7 @@ import pygame, sys, os
 # Thêm đường dẫn gốc vào sys.path để có thể import module từ thư mục cha
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from Sudoku_Test.src.gui.main_screen import main_player
-from src.gui.tutorial_screen import show_tutorial
+from src.gui.tutorial_screen import KhoiDongManHinhHD
 
 def khoiDongManHinhChoiGame():
     """Khởi động game ở chế độ người chơi"""
@@ -10,7 +10,7 @@ def khoiDongManHinhChoiGame():
 
 def khoiDongManHinhHuongDan():
     """ Khởi động hướng dẫn chơi """
-    show_tutorial()
+    KhoiDongManHinhHD()
 
 def main():
     """
