@@ -1,4 +1,45 @@
-# Bước 1: Lấy dữ liệu Sudoku từ generate_sudoku.py
-# Bước 2: Vẽ lưới Sudoku trên màn hình
-# Bước 3: Cho phép người chơi nhập số vào ô trống
-# Bước 4: Gửi bảng Sudoku đến AI để giải (nếu cần)
+import pygame
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from src.utils.gui_common import RONG, CAO  # Đảm bảo đã có RONG, CAO
+
+class SudokuGame:
+    def __init__(self):
+        pygame.init()
+        pygame.display.set_caption("Game Screen Sudoku Demo")
+        self.screen = pygame.display.set_mode((RONG, CAO))
+        self.clock = pygame.time.Clock()
+
+        # Khởi tạo font chữ
+        self.font = pygame.font.SysFont("verdana", 48)
+
+    def draw_title(self):
+        title_surface = self.font.render("Game Sudoku", True, (0, 0, 128))
+        title_rect = title_surface.get_rect(center=(RONG // 2, 60))
+        self.screen.blit(title_surface, title_rect)
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            self.screen.fill((255, 255, 255))  # Nền trắng
+
+            self.draw_title()  # Gọi hàm vẽ tiêu đề
+
+            pygame.display.flip()
+            self.clock.tick(60)
+
+        pygame.quit()
+        sys.exit()
+
+def KhoiDongManHinhChoiGame():
+    game = SudokuGame()
+    game.run()
+
+if __name__ == "__main__":
+    KhoiDongManHinhChoiGame()

@@ -119,8 +119,15 @@ class HomeScreen:
                 'mau_di_chuot': MAU_NEN_NUT_HOVER,
                 'hanh_dong': self.huong_dan_btn_click
             },
-            # Nút thoát 
+            # Nút AI
             {'vitri': pygame.Rect((RONG_HOME - RONG_NUT) // 2, vi_tri_nut_y + CAO_NUT*2 + DEM_NUT*2, RONG_NUT, CAO_NUT),
+                'noi_dung': 'AI',
+                'mau': MAU_NEN_NUT,
+                'mau_di_chuot': MAU_NEN_NUT_HOVER,
+                'hanh_dong': self.ai_btn_click
+            },
+            # Nút thoát 
+            {'vitri': pygame.Rect((RONG_HOME - RONG_NUT) // 2, vi_tri_nut_y + CAO_NUT*3 + DEM_NUT*3, RONG_NUT, CAO_NUT),
                 'noi_dung': 'Thoát',
                 'mau': MAU_NEN_NUT,
                 'mau_di_chuot': MAU_NEN_NUT_HOVER,
@@ -154,18 +161,23 @@ class HomeScreen:
     
     # Hàm bắt sự kiện click nút chơi game 
     def bat_dau_choi_btn_click(self):
-        from src.main import khoiDongManHinhChoiGame
-        khoiDongManHinhChoiGame()
+        from src.gui import game_screen
+        game_screen.KhoiDongManHinhChoiGame()
     
     # Hàm bắt sự kiện click nút hướng dẫn  
     def huong_dan_btn_click(self):
-        from src.main import khoiDongManHinhHuongDan
-        khoiDongManHinhHuongDan()
+        from src.gui import tutorial_screen
+        tutorial_screen.KhoiDongManHinhHD()
 
     # Hàm bắt sự kiện click thoát game 
     def thoat_btn_click(self):
-        pygame.quit() # Tắt Pygame 
-        sys.exit() # Thoát chương trình 
+        pygame.quit()
+        sys.exit()
+
+    # Hàm click nút ai 
+    def ai_btn_click(self):
+        from src.gui import ai_screen
+        ai_screen.KhoiDongManHinhAI()
 
     # Hàm xử lí sự kiện click chuột 
     def xu_li_su_kien(self):

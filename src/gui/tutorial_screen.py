@@ -14,7 +14,7 @@ XANH_SANG = (100, 150, 255)
 XAM = (200, 200, 200)
 XAM_DEN = (150, 150, 150)  # Màu khi kéo thanh cuộn
 
-class khoiDongManHinhHuongDan():
+class Tutorial_Screen():
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((RONG_GAME, CAO_GAME))
@@ -234,7 +234,7 @@ class khoiDongManHinhHuongDan():
 
 
 def KhoiDongManHinhHD():
-    hd = khoiDongManHinhHuongDan()
+    hd = Tutorial_Screen()
     hd.run()
 
 if __name__ == "__main__":
