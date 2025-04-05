@@ -6,7 +6,8 @@ class SudokuGame:
     def __init__(self):
         self.screen = init_pygame()
         pygame.display.set_caption("Sudoku - Chơi Game")
-        self.font = pygame.font.SysFont("verdana", 25)  
+        self.font = pygame.font.SysFont("verdana", 25)
+        self.font_text = pygame.font.SysFont("verdana", 20)  
         self.bang_goc = layBangSuDoKuTheoCapDo()
         self.bang = [row[:] for row in self.bang_goc]
         self.bang_giai = [row[:] for row in self.bang_goc]
@@ -45,13 +46,13 @@ class SudokuGame:
     def reset_game(self):
         self.bang = [row[:] for row in self.bang_goc]
         self.o_chon = None
-        self.hints_left = 3
+        self.so_goi_y = 3
         self.thua_game = False
         self.errors = 0
         self.start_time = time.time()
         self.o_sai = []
         self.o_dung = []
-        # self.veCauTrucBang()
+      
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
@@ -160,9 +161,13 @@ class SudokuGame:
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font)
+        
     def run(self):
         while self.running:
             self.screen.fill(TRANG)
+
+            # Vẽ icon gợi ý 
+            ve_icon_goi_y(self.screen, self.font_text, self.so_goi_y)
 
             # Vẽ nền, lưới và số
             self.veCauTrucBang()

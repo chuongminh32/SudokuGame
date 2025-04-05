@@ -373,3 +373,23 @@ def viTriHopLe(board, row, col, num):
                 invalid_positions.append((i, j))
 
     return invalid_positions  # Trả về danh sách các ô sai
+
+# Vẽ icon gợi ý 
+
+def ve_icon_goi_y(screen, font, soGoiY):
+
+    goi_y_text = font.render(f"Gợi ý: {soGoiY}", True, DEN)
+    screen.blit(goi_y_text, (RONG - 430, 20))
+     
+    icon_color = (255, 215, 0)  # Màu vàng sáng cho biểu tượng gợi ý
+
+    # Vẽ phần bóng đèn tròn (hình tròn)
+    pygame.draw.circle(screen, icon_color, (RONG - 445, 30), 10)  
+
+    # Vẽ phần đế của bóng đèn (hình chữ nhật)
+    pygame.draw.rect(screen, icon_color, (RONG - 450, 40, 10, 5))
+
+    # Vẽ tia sáng (3 tia)
+    pygame.draw.line(screen, icon_color, (RONG - 445, 15), (RONG - 445, 5), 2)
+    pygame.draw.line(screen, icon_color, (RONG - 455, 20), (RONG - 465, 15), 2)
+    pygame.draw.line(screen, icon_color, (RONG - 435, 20), (RONG - 425, 15), 2)
