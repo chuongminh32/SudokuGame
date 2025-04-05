@@ -89,73 +89,46 @@ def ve_luoi(screen):  # Vẽ lưới Sudoku
 
 
 
-def sinh_bang_giai_sudoku():
-    """Tạo một bảng Sudoku hoàn chỉnh."""
-    base = 3  # Kích thước của khu vực 3x3 (tức là Sudoku 9x9)
-    side = base * base  # Tổng số hàng và cột là 9
-
-    # Hàm này tính toán vị trí của mỗi số trong bảng Sudoku
-    def pattern(r, c):
-        return (base * (r % base) + r // base + c) % side
-
-    # Hàm xáo trộn các danh sách, giúp tạo ra sự ngẫu nhiên
-    def shuffle(s):
-        return random.sample(s, len(s))  # Trả về danh sách xáo trộn ngẫu nhiên
-
-    r_base = range(base)  # Dãy số từ 0 đến base-1 (từ 0 đến 2)
-    
-    # Tạo danh sách các hàng và cột ngẫu nhiên dựa trên các số từ r_base
-    rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
-    cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
-
-    # Xáo trộn các số từ 1 đến 9 để sử dụng trong bảng
-    nums = shuffle(range(1, side + 1))
-
-    # Tạo bảng Sudoku hoàn chỉnh bằng cách áp dụng hàm pattern cho từng hàng, cột
-    sudoku = []
-    for r in rows:
-        sudoku_row = []
-        for c in cols:
-            sudoku_row.append(nums[pattern(r, c)])  # Sắp xếp các số vào bảng
-        sudoku.append(sudoku_row)
-
-    return sudoku
-
-
-def singNgauNhienBangSudoKu():
-    """Tạo một bảng Sudoku hoàn chỉnh."""
-    base = 3  # Kích thước của khu vực 3x3 (tức là Sudoku 9x9)
-    side = base * base  # Tổng số hàng và cột là 9
-
-    # Hàm này tính toán vị trí của mỗi số trong bảng Sudoku
-    def pattern(r, c):
-        return (base * (r % base) + r // base + c) % side
-
-    # Hàm xáo trộn các danh sách, giúp tạo ra sự ngẫu nhiên
-    def shuffle(s):
-        return random.sample(s, len(s))  # Trả về danh sách xáo trộn ngẫu nhiên
-
-    r_base = range(base)  # Dãy số từ 0 đến base-1 (từ 0 đến 2)
-    
-    # Tạo danh sách các hàng và cột ngẫu nhiên dựa trên các số từ r_base
-    rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
-    cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
-
-    # Xáo trộn các số từ 1 đến 9 để sử dụng trong bảng
-    nums = shuffle(range(1, side + 1))
-
-    # Tạo bảng Sudoku hoàn chỉnh bằng cách áp dụng hàm pattern cho từng hàng, cột
-    sudoku = []
-    for r in rows:
-        sudoku_row = []
-        for c in cols:
-            sudoku_row.append(nums[pattern(r, c)])  # Sắp xếp các số vào bảng
-        sudoku.append(sudoku_row)
-
-    return sudoku
-
-
 # phan chia cấp ____________
+def sinh_bang_sudoku_ngau_nhien():
+    """Tạo một bảng Sudoku hoàn chỉnh.
+    Được dùng để tính toán vị trí số cho từng ô trong bảng Sudoku, đảm bảo tuân thủ các quy tắc Sudoku. Cụ thể:
+    base * (r % base): Tính vị trí của hàng trong mỗi khối 3x3 (chỉ lấy phần dư khi chia hàng cho base).
+    r // base: Xác định khối (block) mà hàng thuộc về.
+    c: Cộng cột vào để xác định vị trí chính xác của số.
+    % side: Đảm bảo kết quả nằm trong phạm vi 9x9 bằng cách lấy phần dư với side (tức 9).
+    Công thức này giúp đảm bảo các số được sắp xếp hợp lý theo các khối và quy tắc của Sudoku.
+    """
+    base = 3  # Kích thước của khu vực 3x3 (tức là Sudoku 9x9)
+    side = base * base  # Tổng số hàng và cột là 9
+
+    # Hàm này tính toán vị trí của mỗi số trong bảng Sudoku
+    def pattern(r, c):
+        return (base * (r % base) + r // base + c) % side
+
+    # Hàm xáo trộn các danh sách, giúp tạo ra sự ngẫu nhiên
+    def shuffle(s):
+        return random.sample(s, len(s))  # Trả về danh sách xáo trộn ngẫu nhiên
+
+    r_base = range(base)  # Dãy số từ 0 đến base-1 (từ 0 đến 2)
+    
+    # Tạo danh sách các hàng và cột ngẫu nhiên dựa trên các số từ r_base
+    rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
+    cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
+
+    # Xáo trộn các số từ 1 đến 9 để sử dụng trong bảng
+    nums = shuffle(range(1, side + 1))
+
+    # Tạo bảng Sudoku hoàn chỉnh bằng cách áp dụng hàm pattern cho từng hàng, cột
+    sudoku = []
+    for r in rows:
+        sudoku_row = []
+        for c in cols:
+            sudoku_row.append(nums[pattern(r, c)])  # Sắp xếp các số vào bảng
+        sudoku.append(sudoku_row)
+
+    return sudoku
+
 def xoaSoNgauNhien(board, num_to_remove):
     """Xóa một số lượng ô khỏi bảng Sudoku."""
     positions = [(i, j) for i in range(9) for j in range(9)]
@@ -171,7 +144,7 @@ def xoaSoNgauNhien(board, num_to_remove):
 
 def layBangSuDoKuTheoCapDo(level="easy"):
     """Tạo bảng Sudoku theo cấp độ."""
-    bangDaGiai = singNgauNhienBangSudoKu()
+    bangDaGiai = sinh_bang_sudoku_ngau_nhien()
 
     CapDo = {
         "easy": 20,
@@ -252,28 +225,6 @@ def ve_bang_chia_cap_do(screen):
         
     return bang_cap_do
 # phân chia cấp ______________
-
-
-def draw_mode_submenu(screen, small_font, selected_mode):  # Vẽ menu phụ chọn cấp độ
-    submenu_rect = pygame.Rect(RONG - 550, KT_NUT_CAIDAT + DEM_NUT_CAIDAT * 2 + 60, 250, 180)  # Tạo hình chữ nhật cho menu phụ
-    pygame.draw.rect(screen, TRANG, submenu_rect, border_radius=10)  # Vẽ nền trắng cho menu phụ
-    pygame.draw.rect(screen, XAM, submenu_rect, 2, border_radius=10)  # Vẽ viền xám cho menu phụ
-    screen.blit(small_font.render("Chọn cấp độ", True, DEN), 
-                (submenu_rect.centerx - small_font.size("Chọn cấp độ")[0] // 2, submenu_rect.y + 10))  # Vẽ tiêu đề menu phụ
-
-    difficulty_options = [{"text": "Dễ", "value": "easy", "y_offset": 60}, 
-                          {"text": "Trung bình", "value": "medium", "y_offset": 100}, 
-                          {"text": "Khó", "value": "hard", "y_offset": 140}]  # Định nghĩa các tùy chọn cấp độ
-    option_rects = []  # Danh sách để lưu thông tin về các tùy chọn
-    for option in difficulty_options:
-        option_rect = pygame.Rect(submenu_rect.x + 10, submenu_rect.y + option["y_offset"] - 15, submenu_rect.RONG - 20, 30)  # Tạo hình chữ nhật cho mỗi tùy chọn
-        pygame.draw.rect(screen, MAU_KHI_DUOC_CHON if option["value"] == selected_mode else XAM_SANG, option_rect, border_radius=5)  # Vẽ nền cho tùy chọn
-        screen.blit(small_font.render(option["text"], True, DEN), 
-                    (option_rect.centerx - small_font.size(option["text"])[0] // 2, option_rect.centery - small_font.size(option["text"])[1] // 2))  # Vẽ văn bản
-        option_rects.append({"rect": option_rect, "value": option["value"]})  # Thêm thông tin về tùy chọn vào danh sách
-    return option_rects  # Trả về danh sách thông tin về các tùy chọn
-
-
 
 def ve_highlight_cho_o(screen, row, col, grid):
 
@@ -425,8 +376,6 @@ def ve_icon_pause(screen, is_paused):
     
     return button_rect  # Trả về rect để kiểm tra sự kiện click
 
-
-
 def hien_thi_bang_thua(screen, width, height):
     """Hiển thị bảng thông báo thua với nền mờ và căn giữa."""
     
@@ -462,3 +411,49 @@ def hien_thi_bang_thua(screen, width, height):
     screen.blit(text, (box_x + 320, box_y + 155))
 
     return btn_choi_lai, btn_thoat
+
+def hien_thi_bang_thang(screen, RONG, CAO, tg_da_troi):
+    """Hiển thị bảng thông báo chiến thắng với nền mờ và căn giữa."""
+    
+    # Tạo lớp nền mờ
+    overlay = pygame.Surface((RONG, CAO), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 150))  # Màu đen với độ trong suốt
+    screen.blit(overlay, (0, 0))
+
+    # Kích thước bảng thông báo
+    box_rong, box_cao = 510, 245
+    box_x = (RONG - box_rong) // 2  # Căn giữa theo chiều ngang
+    box_y = (CAO - box_cao) // 2  # Căn giữa theo chiều dọc
+
+    # Vẽ bảng trắng
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
+
+    # Vẽ chữ "Bạn đã thắng!"
+    font = pygame.font.SysFont("verdana", 28)
+    font_sub = pygame.font.SysFont("verdana", 20)
+    text = font.render("Chúc mừng bạn đã thắng!", True, (52, 72, 97))  # Chữ đen
+    text_sub = font_sub.render("Bạn đã hoàn thành trò chơi.", True, (148, 163, 183))  # Chữ đen
+    screen.blit(text, (box_x + 80, box_y + 20))
+    screen.blit(text_sub, (box_x + 120, box_y + 70))
+
+    # Tính phút và giây từ tg_da_troi (thời gian đã chơi tính bằng giây)
+    minutes = int(tg_da_troi) // 60
+    seconds = int(tg_da_troi) % 60
+    time_text = f"Thời gian chơi: {minutes:02}:{seconds:02}"  # Định dạng phút:giây
+
+    # Vẽ thời gian đã chơi
+    font_time = pygame.font.SysFont("verdana", 18)
+    time_render = font_time.render(time_text, True, (52, 72, 97))
+    screen.blit(time_render, (box_x + 120, box_y + 100))
+
+    # Vẽ nút "Chơi lại"
+    choilai_btn = pygame.draw.rect(screen, (90, 123, 192), pygame.Rect(box_x + 70, box_y + 150, 150, 50), border_radius=10)
+    text = font.render("Chơi lại", True, (255, 255, 255))
+    screen.blit(text, (box_x + 90, box_y + 155))
+
+    # Vẽ nút "Thoát"
+    thoat_btn = pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x + 290, box_y + 150, 150, 50), border_radius=10)
+    text = font.render("Thoát", True, (90, 123, 192))
+    screen.blit(text, (box_x + 320, box_y + 155))
+
+    return choilai_btn, thoat_btn
