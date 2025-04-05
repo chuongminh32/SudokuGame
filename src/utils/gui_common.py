@@ -199,7 +199,7 @@ def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     # Vẽ văn bản và mũi tên
     font = pygame.font.SysFont("verdana", 12)
     text_surf = font.render(ten_cap_do, True, DEN)
-    
+
     # Căn giữa chữ trong box, -10 - tranh đụng vào icon arow down 
     text_x = box_x + (box_rong - text_surf.get_width()) // 2 - 10
     text_y = box_y + (box_cao - text_surf.get_height()) // 2
@@ -272,4 +272,50 @@ def draw_mode_submenu(screen, small_font, selected_mode):  # Vẽ menu phụ ch�
         option_rects.append({"rect": option_rect, "value": option["value"]})  # Thêm thông tin về tùy chọn vào danh sách
     return option_rects  # Trả về danh sách thông tin về các tùy chọn
 
+
+
+def ve_highlight_cho_o(screen, row, col, grid):
+
+    sr = (row // 3) * 3  # Xác định hàng đầu của ô 3x3
+    sc = (col // 3) * 3  # Xác định cột đầu của ô 3x3
+
+    gia_tri_o_dang_duoc_chon = grid[row][col]
+
+    # Rect(x, y, w, h)
+    # x : trai -> phai : dùng cho col 
+    # Tô màu highlight cho hàng và cột
+    for i in range(KT_LUOI):  # Duyệt theo hàng (row)
+        pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
+            DEM + i * KT_O,  # Cột thay đổi, x tăng dần 
+            DEM + row * KT_O,  # Hàng giữ nguyên, y không đổi 
+            KT_O, KT_O
+        ))
+
+    for j in range(KT_LUOI):  # Duyệt theo cột (column)
+        pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
+            DEM + col * KT_O,  # Cột giữ nguyên
+            DEM + j * KT_O,  # Hàng thay đổi
+            KT_O, KT_O
+        ))
+
+    # Tô màu cho ô 3x3 chứa ô đang chọn
+    for i in range(3):
+        for j in range(3):  
+            ar = sr + i  # ar = actual_row(dòng chính xác tính từ vị trí chỉ số), sr = start_row    
+            ac = sc + j
+         
+            pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
+                DEM + ac * KT_O,  
+                DEM + ar * KT_O,  
+                KT_O, KT_O
+            ))  
+
+    # Tô tất cả ô cùng giá trị 
+    if gia_tri_o_dang_duoc_chon == 0:
+         pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + col* KT_O, DEM + row* KT_O, KT_O, KT_O))
+    else:
+        for r in range(KT_LUOI):
+            for c in range(KT_LUOI):
+                if (grid[r][c] == gia_tri_o_dang_duoc_chon):
+                    pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
 

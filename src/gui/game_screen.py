@@ -7,18 +7,25 @@ class SudokuGame:
         self.screen = init_pygame()
         pygame.display.set_caption("Sudoku - Chơi Game")
         self.font = pygame.font.SysFont("verdana", 25)  
-        self.board_original = layBangSuDoKuTheoCapDo()
-        self.board = [row[:] for row in self.board_original]
-        self.board_solution = [row[:] for row in self.board_original]
-        solve_sudoku(self.board_solution)
+        self.bang_goc = layBangSuDoKuTheoCapDo()
+        self.bang = [row[:] for row in self.bang_goc]
+        self.bang_giai = [row[:] for row in self.bang_goc]
+        solve_sudoku(self.bang_giai)
         
         # phân câp độ 
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ 
         self.ten_cap_do = "Dễ"
         self.bang_cap_do = [] # luu ds cac bang 
-        
+
+        # sự kiện click nút trong bảng 
+        self.o_chinh_sua = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) if self.bang_goc[i][j] == 0]
+        self.o_sai = []
+        self.o_dung = []
+        self.o_chon = None
+        self.ket_thuc = False
+    
         self.running = True
-        self.hints_left = 5
+    
 
     def layGoiY(self):
         empty_cells = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) 
@@ -29,7 +36,7 @@ class SudokuGame:
         return None
 
     def reset_game(self):
-        self.board = [row[:] for row in self.board_original]
+        self.board = [row[:] for row in self.bang_goc]
         self.selected_cell = None
         self.hints_left = 3
         self.game_over = False
@@ -48,6 +55,10 @@ class SudokuGame:
                 self.xuLiSuKienClickChuot(event.pos)
 
     def xuLiSuKienClickChuot(self, vitri_click):
+
+        x = vitri_click[0]
+        y = vitri_click[1]
+
         hint_btn, reset_btn, ai_btn, back_btn = ve_nut(self.screen)
 
         nut_cap_do = ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
@@ -65,7 +76,13 @@ class SudokuGame:
         elif back_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
-        
+
+        # click ô trong bảng 
+        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do:
+            cot = (x - DEM) // KT_O
+            dong = (y - DEM) // KT_O
+            self.o_chon = (dong, cot) # chọn ô
+            
         # click nút cấp độ 
         elif nut_cap_do.collidepoint(vitri_click):
             self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do 
@@ -91,12 +108,14 @@ class SudokuGame:
                     break
 
 
+    def veCauTrucBang(self):
+        ve_luoi(self.screen)
+        ve_so(self.screen, self.bang, self.bang_goc, self.font)
     def run(self):
         while self.running:
 
             self.screen.fill(TRANG)
-            ve_luoi(self.screen)
-            ve_so(self.screen, self.board, self.board_original, self.font)
+            self.veCauTrucBang()
             ve_nut(self.screen)
 
             # phân cấp độ 
@@ -104,6 +123,12 @@ class SudokuGame:
                 self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
 
             ve_nut_phan_chia_cap_do(self.screen,self.ten_cap_do)
+
+            if self.o_chon and not self.ket_thuc:
+                dong, cot = self.o_chon
+                # Vẽ các ô liên quan như hàng ngang, cột dọc và ô 3x3
+                ve_highlight_cho_o(self.screen, dong, cot, self.bang)  # Luôn vẽ ô chọn và các ô liên quan
+                self.veCauTrucBang()
 
             # xử lí sự kiện click nút 
             self.xuLiSuKien()
