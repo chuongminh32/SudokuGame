@@ -23,7 +23,6 @@ class SudokuGame:
         self.o_sai = []
         self.o_dung = []
         self.o_chon = None
-        self.ket_thuc = False
 
         # nút gợi ý 
         self.so_goi_y = 3
@@ -35,7 +34,6 @@ class SudokuGame:
         self.tg_pause = 0 # thời điểm dừng 
         self.tg_da_troi = 0
         self.tg_bat_dau = time.time()
-        self.ket_thuc = False
 
 
         # gõ số lên bảng 
@@ -54,22 +52,24 @@ class SudokuGame:
         return None
 
     def reset_game(self):
-        self.bang = [row[:] for row in self.bang_goc]
-        self.o_chon = None
-        self.so_goi_y = 3
-        self.thua_game = False
-        self.so_loi = 0
-        self.ket_thuc = False
-        self.tg_bat_dau = None
-        self.o_sai = []
-        self.o_dung = []
+        # Đặt lại bảng chơi về trạng thái ban đầu
+        self.bang = [row[:] for row in self.bang_goc]  # Khôi phục lại bảng ban đầu
+        self.o_chon = None  # Không có ô nào được chọn
+        self.so_goi_y = 3  # Khôi phục lại số gợi ý
+        self.thua_game = False  # Đặt lại trạng thái thua game
+        self.so_loi = 0  # Đặt lại số lỗi
+        self.tg_bat_dau = time.time()  # Khởi tạo lại thời gian bắt đầu
+        self.o_sai = []  # Xóa danh sách các ô sai
+        self.o_dung = []  # Xóa danh sách các ô đúng
+        self.isPause = False  # Khôi phục trạng thái chơi không pause2
+
       
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 self.running = False
-            elif e.type == pygame.KEYDOWN  and not self.ket_thuc:
+            elif e.type == pygame.KEYDOWN  and not self.thua_game:
                 self.xuLiSuKienNhanPhim(e)
             elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                 self.xuLiSuKienClickChuot(e.pos)
@@ -127,6 +127,8 @@ class SudokuGame:
 
         nut_cap_do = ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
 
+        # option chơi lại/thoát - thua game 
+        choilai_btn, thoat_btn, bang_thua = hien_thi_bang_thua(self.screen, RONG, CAO)
         
         # click nút gợi ý 
         if hint_btn.collidepoint(vitri_click) and self.so_goi_y > 0:
@@ -144,7 +146,7 @@ class SudokuGame:
             self.thua_game = True
         
         # click nút back 
-        elif back_btn.collidepoint(vitri_click):
+        elif back_btn.collidepoint(vitri_click) or thoat_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
         
@@ -168,7 +170,7 @@ class SudokuGame:
                 self.tg_bat_dau += time.time() - self.tg_pause  # Cập nhật lại thời gian bắt đầu
 
         # click ô trong bảng 
-        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do:
+        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.thua_game:
             cot = (x - DEM) // KT_O
             dong = (y - DEM) // KT_O
             self.o_chon = (dong, cot) # chọn ô
@@ -196,7 +198,11 @@ class SudokuGame:
                     self.hien_bang_cap_do = False
                     break
 
+        # click chơi lại 
+        elif choilai_btn.collidepoint(vitri_click):
+            self.reset_game()
 
+       
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         if self.isPause == False:
@@ -215,11 +221,11 @@ class SudokuGame:
     def run(self):
         while self.running:
             self.screen.fill(TRANG)
-
+            
             # hiển thị thời gian chơi 
             if self.tg_bat_dau is None:
                 self.tg_bat_dau = time.time()
-            if not self.ket_thuc and not self.isPause and self.tg_bat_dau is not None:
+            if not self.thua_game and not self.isPause and self.tg_bat_dau is not None:
                 self.tg_da_troi = time.time() - self.tg_bat_dau  # cập nhật thời gian đã trôi 
             hienThiTGChoi(self.screen, self.tg_da_troi, self.font)
 
@@ -233,7 +239,7 @@ class SudokuGame:
             self.veCauTrucBang()
 
             # Highlight nếu có ô chọn
-            if self.o_chon and not self.ket_thuc:
+            if self.o_chon and not self.thua_game:
                 dong, cot = self.o_chon
                 ve_highlight_cho_o(self.screen, dong, cot, self.bang)
                  # Vẽ nền, lưới và số
@@ -250,10 +256,17 @@ class SudokuGame:
             self.ve_lai_cac_o_dung()
             self.ve_lai_cac_o_sai()
 
+            # nếu thua game -> hiện bảng lựa chọn sau khi thua 
+            if self.so_loi > 5:
+                self.so_loi = 0
+                self.thua_game = True
+            if self.thua_game == True:
+                hien_thi_bang_thua(self.screen, RONG, CAO)
+                self.isPause = True
             # Vẽ bảng cấp độ SAU CÙNG
             if self.hien_bang_cap_do:
                 self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
-                
+
             pygame.display.update()
 
     pygame.quit()
