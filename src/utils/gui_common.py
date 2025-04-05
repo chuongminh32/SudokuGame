@@ -191,6 +191,7 @@ def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     box_rong, box_cao = 100, 30
     box_rect = pygame.Rect(box_x, box_y, box_rong, box_cao)
     
+  
     # Vẽ nền và viền
     pygame.draw.rect(screen, TRANG, box_rect, border_radius=5)
     pygame.draw.rect(screen, XAM, box_rect, 2, border_radius=5)
@@ -198,7 +199,12 @@ def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     # Vẽ văn bản và mũi tên
     font = pygame.font.SysFont("verdana", 12)
     text_surf = font.render(ten_cap_do, True, DEN)
-    screen.blit(text_surf, (box_x + 10, box_y + box_cao//2 - text_surf.get_width()//2))
+    
+    # Căn giữa chữ trong box, -10 - tranh đụng vào icon arow down 
+    text_x = box_x + (box_rong - text_surf.get_width()) // 2 - 10
+    text_y = box_y + (box_cao - text_surf.get_height()) // 2
+
+    screen.blit(text_surf, (text_x, text_y))
     
     # Vẽ mũi tên xuống
     arrow_points = [

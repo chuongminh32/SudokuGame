@@ -15,10 +15,12 @@ class SudokuGame:
         # phân câp độ 
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ 
         self.ten_cap_do = "Dễ"
+        self.bang_cap_do = [] # luu ds cac bang 
         
         self.running = True
         self.hints_left = 5
-    def get_hint(self):
+
+    def layGoiY(self):
         empty_cells = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) 
                       if self.board[i][j] == 0]
         if empty_cells:
@@ -36,36 +38,58 @@ class SudokuGame:
         self.wrong_cells = []
         self.correct_cells = []
 
-    def handle_events(self):
+    def xuLiSuKien(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == pygame.KEYDOWN and self.selected_cell and not self.game_over:
                 self.handle_key_input(event)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self.handle_mouse_click(event.pos)
+                self.xuLiSuKienClickChuot(event.pos)
 
-    def handle_mouse_click(self, pos):
+    def xuLiSuKienClickChuot(self, vitri_click):
         hint_btn, reset_btn, ai_btn, back_btn = ve_nut(self.screen)
-        nut_cap_do = ve_nut_phan_chia_cap_do(self.screen)
+
+        nut_cap_do = ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
         
-        if hint_btn.collidepoint(pos) and self.hints_left > 0:
-            hint = self.get_hint()
+        if hint_btn.collidepoint(vitri_click) and self.hints_left > 0:
+            hint = self.layGoiY()
             if hint:
                 i, j, value = hint
                 self.board[i][j] = value
                 self.hints_left -= 1
-        elif reset_btn.collidepoint(pos):
+        elif reset_btn.collidepoint(vitri_click):
             self.reset_game()
-        elif ai_btn.collidepoint(pos) and solve_sudoku(self.board):
+        elif ai_btn.collidepoint(vitri_click) and solve_sudoku(self.board):
             self.game_over = True
-        elif back_btn.collidepoint(pos):
+        elif back_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
         
         # click nút cấp độ 
-        elif nut_cap_do.collidepoint(pos):
-            hien_bang_cap_do = not hien_bang_cap_do # toggle hien bang cap do 
+        elif nut_cap_do.collidepoint(vitri_click):
+            self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do 
+
+         # Nếu click ra ngoài bảng cấp độ thì ẩn bảng cấp độ
+        elif self.hien_bang_cap_do and not pygame.Rect(RONG - 270, 50, 200, 200).collidepoint(vitri_click):
+            self.hien_bang_cap_do = False
+        
+        # Xử lí sự kiện click từng cấp độ trong bảng 
+        elif self.hien_bang_cap_do == True:
+            for cap_do in self.bang_cap_do:
+                if cap_do["rect"].collidepoint(vitri_click):
+                    self.chon_che_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
+                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
+                    self.bang_goc = layBangSuDoKuTheoCapDo(self.chon_che_do)
+                    self.bang = [row[:] for row in self.bang_goc]
+                    self.bang_giai = [row[:] for row in self.bang_goc]
+                    solve_sudoku(self.bang_giai)
+                    # cập nhật lại từng ô trong bảng giải 
+                    self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
+
+                    self.hien_bang_cap_do = False
+                    break
+
 
     def run(self):
         while self.running:
@@ -76,11 +100,13 @@ class SudokuGame:
             ve_nut(self.screen)
 
             # phân cấp độ 
-            ve_bang_chia_cap_do(self.screen)
+            if self.hien_bang_cap_do == True:
+                self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
+
             ve_nut_phan_chia_cap_do(self.screen,self.ten_cap_do)
 
             # xử lí sự kiện click nút 
-            self.handle_events()
+            self.xuLiSuKien()
 
             pygame.display.update()
 
