@@ -12,7 +12,7 @@ class SudokuGame:
         self.bang_giai = [row[:] for row in self.bang_goc]
         solve_sudoku(self.bang_giai)
         
-        # phân câp độ 
+        # phân cấp độ 
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ 
         self.ten_cap_do = "Dễ"
         self.bang_cap_do = [] # luu ds cac bang 
@@ -23,6 +23,7 @@ class SudokuGame:
         self.o_dung = []
         self.o_chon = None
         self.ket_thuc = False
+
 
         # gõ số lên bảng 
         self.so_loi = 0
@@ -149,7 +150,6 @@ class SudokuGame:
                     solve_sudoku(self.bang_giai)
                     # cập nhật lại từng ô trong bảng giải 
                     self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
-
                     self.hien_bang_cap_do = False
                     break
 
@@ -159,30 +159,33 @@ class SudokuGame:
         ve_so(self.screen, self.bang, self.bang_goc, self.font)
     def run(self):
         while self.running:
-
             self.screen.fill(TRANG)
-            ve_nut(self.screen)
-            ve_nut_phan_chia_cap_do(self.screen,self.ten_cap_do)
 
-            # phân cấp độ 
-            if self.hien_bang_cap_do == True:
-                self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
-                self.veCauTrucBang() # ve lai bang
+            # Vẽ nền, lưới và số
+            self.veCauTrucBang()
 
-
+            # Highlight nếu có ô chọn
             if self.o_chon and not self.ket_thuc:
                 dong, cot = self.o_chon
-                # Vẽ các ô liên quan như hàng ngang, cột dọc và ô 3x3
-                ve_highlight_cho_o(self.screen, dong, cot, self.bang)  # Luôn vẽ ô chọn và các ô liên quan
-                self.veCauTrucBang() # ve lai bang 
+                ve_highlight_cho_o(self.screen, dong, cot, self.bang)
+                 # Vẽ nền, lưới và số
+                self.veCauTrucBang()
 
-            # xử lí sự kiện click nút 
-            self.veCauTrucBang()
+            # Vẽ các nút
+            ve_nut(self.screen)
+            ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
+
+            # Vẽ bảng cấp độ SAU CÙNG
+            if self.hien_bang_cap_do:
+                self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
+
+            # Xử lý sự kiện
             self.xuLiSuKien()
 
             pygame.display.update()
 
-        pygame.quit()
+    pygame.quit()
+
 
 def khoiDongManHinhChoiGame():
     sdk = SudokuGame()
