@@ -27,6 +27,16 @@ class SudokuGame:
 
         # nút gợi ý 
         self.so_goi_y = 3
+        self.iconGoiY = None 
+
+        # nút pause 
+        self.iconPause_Play = None
+        self.isPause = False 
+        self.th_pause = 0 # thời điểm dừng 
+        self.tg_da_troi = 0
+        self.tg_bat_dau = time.time()
+        self.ket_thuc = False
+
 
         # gõ số lên bảng 
         self.so_loi = 0
@@ -48,8 +58,9 @@ class SudokuGame:
         self.o_chon = None
         self.so_goi_y = 3
         self.thua_game = False
-        self.errors = 0
-        self.start_time = time.time()
+        self.so_loi = 0
+        self.ket_thuc = False
+        self.tg_bat_dau = None
         self.o_sai = []
         self.o_dung = []
       
@@ -113,20 +124,46 @@ class SudokuGame:
         hint_btn, reset_btn, ai_btn, back_btn = ve_nut(self.screen)
 
         nut_cap_do = ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
+
         
+        # click nút gợi ý 
         if hint_btn.collidepoint(vitri_click) and self.so_goi_y > 0:
             hint = self.layGoiY()
             if hint:
                 i, j, value = hint
                 self.bang[i][j] = value
                 self.so_goi_y -= 1
+        # click nút reset 
         elif reset_btn.collidepoint(vitri_click):
             self.reset_game()
+        
+        # click nút ai giải 
         elif ai_btn.collidepoint(vitri_click) and solve_sudoku(self.bang):
             self.thua_game = True
+        
+        # click nút back 
         elif back_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
+        
+        # click nút pause 
+        elif self.iconPause_Play.collidepoint(vitri_click):
+            """
+            tg_bat_dau += tg_hien_tai(time.time()) - tg_pause 
+            tg_da_troi = tg_hien_tai - tg_bat_dau -> thoi diem chay tiep theo 
+
+            vd:
+            tg_bat_dau = 0
+            tg_pause = 10s 
+            tg_play = 14s = tg_hien_tai 
+            tg_bat_dau += tg_hien_tai - tg_pause = 0 + (14-10) = 4s 
+            tg_da_troi = 14 - 4 = 10s (đồng hồ sẽ tiếp tục tính tại thời điểm này) 
+            """
+            self.isPause = not self.isPause
+            if self.isPause:
+                self.tg_pause = time.time()  # Lưu thời điểm pause
+            else:
+                self.tg_bat_dau += time.time() - self.tg_pause  # Cập nhật lại thời gian bắt đầu
 
         # click ô trong bảng 
         elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do:
@@ -161,13 +198,21 @@ class SudokuGame:
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font)
-        
+
     def run(self):
         while self.running:
             self.screen.fill(TRANG)
 
-            # Vẽ icon gợi ý 
-            ve_icon_goi_y(self.screen, self.font_text, self.so_goi_y)
+            # hiển thị thời gian chơi 
+            if not self.ket_thuc and not self.isPause:
+                self.tg_da_troi = time.time() - self.tg_bat_dau  # cập nhật thời gian đã trôi 
+            hienThiTGChoi(self.screen, self.tg_da_troi, self.font)
+
+            # vẽ icon gợi ý 
+            self.iconGoiY = ve_icon_goi_y(self.screen, self.font_text, self.so_goi_y, self.so_loi)
+            
+            # vẽ icon pause/play 
+            self.iconPause_Play = ve_icon_pause(self.screen, self.isPause)
 
             # Vẽ nền, lưới và số
             self.veCauTrucBang()

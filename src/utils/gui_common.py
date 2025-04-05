@@ -1,6 +1,6 @@
 import random 
-
 import pygame, sys, os, math 
+import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from src.algorithm.backtracking import solve_sudoku 
@@ -374,13 +374,17 @@ def viTriHopLe(board, row, col, num):
 
     return invalid_positions  # Trả về danh sách các ô sai
 
-# Vẽ icon gợi ý 
+# Vẽ icon gợi ý, so goi y, so loi  
+def ve_icon_goi_y(screen, font, soGoiY, soLoi):
 
-def ve_icon_goi_y(screen, font, soGoiY):
-
+    # Hiển thị gợi ý 
     goi_y_text = font.render(f"Gợi ý: {soGoiY}", True, DEN)
     screen.blit(goi_y_text, (RONG - 430, 20))
-     
+
+    # Hiển thị lỗi 
+    loi_sai = font.render(f"Số lỗi: {soLoi}/5", True, DEN)
+    screen.blit(loi_sai, (RONG - 600, 20))
+
     icon_color = (255, 215, 0)  # Màu vàng sáng cho biểu tượng gợi ý
 
     # Vẽ phần bóng đèn tròn (hình tròn)
@@ -393,3 +397,30 @@ def ve_icon_goi_y(screen, font, soGoiY):
     pygame.draw.line(screen, icon_color, (RONG - 445, 15), (RONG - 445, 5), 2)
     pygame.draw.line(screen, icon_color, (RONG - 455, 20), (RONG - 465, 15), 2)
     pygame.draw.line(screen, icon_color, (RONG - 435, 20), (RONG - 425, 15), 2)
+
+# Hiển thị tg đang chơi 
+def hienThiTGChoi(screen, tg_da_troi, font):
+    phut = int(tg_da_troi) // 60
+    giay = int(tg_da_troi) % 60
+    thoi_gian_text = font.render(f"{phut:02}:{giay:02}", True, DEN) 
+    screen.blit(thoi_gian_text, (RONG - 250, 20)) 
+    
+# Vẽ icon pause/play  
+def ve_icon_pause(screen, is_paused):
+    """Vẽ nút Pause/Play trên màn hình"""
+    MAU_NUT = (200, 200, 200)  # Màu nền của nút
+    icon_color = (50, 50, 50)  # Màu biểu tượng Pause/Play
+    button_rect = pygame.Rect(RONG - 310, 10, 55, 40)  # Vị trí và kích thước của nút
+    
+    pygame.draw.rect(screen, MAU_NUT, button_rect, border_radius=10)  # Vẽ hình chữ nhật
+    
+    if is_paused:
+        # Nếu đang ở trạng thái tạm dừng -> vẽ biểu tượng "Play" (hình tam giác) top(x,y) - bottom(x,y) - right(x,y)
+        pygame.draw.polygon(screen, icon_color, [(RONG - 290   , 20), (RONG - 290, 40), (RONG - 270, 30)])
+    else:
+        # Nếu đang ở trạng thái chơi -> vẽ biểu tượng "Pause" (hai đường thẳng đứng)
+        pygame.draw.rect(screen, icon_color, (RONG - 295, 20, 8, 20))
+        pygame.draw.rect(screen, icon_color, (RONG - 280, 20, 8, 20))
+    
+    return button_rect  # Trả về rect để kiểm tra sự kiện click
+
