@@ -319,3 +319,57 @@ def ve_highlight_cho_o(screen, row, col, grid):
                 if (grid[r][c] == gia_tri_o_dang_duoc_chon):
                     pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
 
+
+def buocDiHopLe(board, row, col, num):
+    """Trả về T/F  nếu đặt số `num` vào vị trí `(row, col) khong hop le`"""
+    if num == 0:
+      return True
+    # Kiểm tra hàng
+    for i in range(9):
+        if board[row][i] == num and i != col:
+            return False
+
+    # Kiểm tra cột
+    for i in range(9):
+        if board[i][col] == num and i != row:
+           return False
+
+    # Xác định góc trên trái của ô 3x3
+    box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+
+    # Kiểm tra ô 3x3
+    for i in range(box_row, box_row + 3):
+        for j in range(box_col, box_col + 3):
+            if board[i][j] == num and (i, j) != (row, col):
+                return False
+
+    return True  # Trả về danh sách các ô sai
+
+
+def viTriHopLe(board, row, col, num):
+    """Trả về danh sách các ô bị lỗi nếu đặt số `num` vào vị trí `(row, col)`"""
+    if num == 0:
+        return []  # Ô trống luôn hợp lệ
+    
+    invalid_positions = []  # Danh sách ô bị lỗi
+
+    # Kiểm tra hàng
+    for i in range(9):
+        if board[row][i] == num and i != col:
+            invalid_positions.append((row, i))
+
+    # Kiểm tra cột
+    for i in range(9):
+        if board[i][col] == num and i != row:
+            invalid_positions.append((i, col))
+
+    # Xác định góc trên trái của ô 3x3
+    box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+
+    # Kiểm tra ô 3x3
+    for i in range(box_row, box_row + 3):
+        for j in range(box_col, box_col + 3):
+            if board[i][j] == num and (i, j) != (row, col):
+                invalid_positions.append((i, j))
+
+    return invalid_positions  # Trả về danh sách các ô sai

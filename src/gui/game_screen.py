@@ -18,11 +18,15 @@ class SudokuGame:
         self.bang_cap_do = [] # luu ds cac bang 
 
         # sự kiện click nút trong bảng 
-        self.o_chinh_sua = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) if self.bang_goc[i][j] == 0]
+        self.o_chinh_sua = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) if self.bang_goc[i][j] == 0] # ô có thể chỉnh sửa 
         self.o_sai = []
         self.o_dung = []
         self.o_chon = None
         self.ket_thuc = False
+
+        # gõ số lên bảng 
+        self.so_loi = 0
+        self.thua_game = False
     
         self.running = True
     
@@ -35,24 +39,66 @@ class SudokuGame:
             return i, j, self.board_solution[i][j]
         return None
 
-    def reset_game(self):
-        self.board = [row[:] for row in self.bang_goc]
-        self.selected_cell = None
-        self.hints_left = 3
-        self.game_over = False
-        self.errors = 0
-        self.start_time = time.time()
-        self.wrong_cells = []
-        self.correct_cells = []
+    # def reset_game(self):
+    #     self.board = [row[:] for row in self.bang_goc]
+    #     self.o_chon = None
+    #     self.hints_left = 3
+    #     self.thua_game = False
+    #     self.errors = 0
+    #     self.start_time = time.time()
+    #     self.o_sai = []
+    #     self.o_dung = []
 
     def xuLiSuKien(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.KEYDOWN and self.selected_cell and not self.game_over:
-                self.handle_key_input(event)
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self.xuLiSuKienClickChuot(event.pos)
+            elif e.type == pygame.KEYDOWN  and not self.ket_thuc:
+                self.xuLiSuKienNhanPhim(e)
+            elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+                self.xuLiSuKienClickChuot(e.pos)
+
+    def xuLiSuKienNhanPhim(self, vitri_go):
+        i, j = self.o_chon
+         # Kiểm tra phím nhập số từ 1-9
+        if (i, j) in self.o_chinh_sua and (
+            (pygame.K_1 <= vitri_go.key <= pygame.K_9) or
+            (pygame.K_KP1 <= vitri_go.key <= pygame.K_KP9)
+        ):
+            if pygame.K_1 <= vitri_go.key <= pygame.K_9:
+                gia_tri = vitri_go.key - pygame.K_0
+                if(buocDiHopLe(self.bang, i, j, gia_tri)):
+                    self.bang[i][j] = vitri_go.key - pygame.K_0
+                else : 
+                    self.so_loi += 1
+                    self.bang[i][j] = vitri_go.key - pygame.K_0
+            else:
+                gia_tri = vitri_go.key - pygame.K_0
+                if(viTriHopLe(self.bang, i, j, gia_tri)):
+                    self.bang[i][j] = vitri_go.key - pygame.KP_0  # Chuyển số từ numpad
+                else : 
+                    self.so_loi += 1
+                    self.bang[i][j] = vitri_go.key - pygame.K_0
+
+            o_sai = []  # Xóa danh sách cũ
+            o_dung = []  # Xóa danh sách cũ
+            for x in range(KT_LUOI):
+                for y in range(KT_LUOI):
+                    if self.bang[x][y] != 0:
+                        if viTriHopLe(self.bang, x, y, self.bang[x][y]):
+                            o_sai.append((x, y))
+                        elif (x,y) in self.o_chinh_sua:
+                            o_dung.append((x,y))
+
+        # Xóa số nếu nhấn DELETE hoặc BACKSPACE
+        elif vitri_go.key in [pygame.K_DELETE, pygame.K_BACKSPACE]:
+            self.bang[i][j] = 0
+                # Xóa ô khỏi danh sách lỗi nếu xóa số
+            o_sai_moi = []
+            for r, c in self.o_sai:
+                if(r,c) != (i,j):
+                    o_sai_moi.append((r,c))
+            self.o_sai = o_sai_moi 
 
     def xuLiSuKienClickChuot(self, vitri_click):
 
@@ -115,22 +161,23 @@ class SudokuGame:
         while self.running:
 
             self.screen.fill(TRANG)
-            self.veCauTrucBang()
             ve_nut(self.screen)
+            ve_nut_phan_chia_cap_do(self.screen,self.ten_cap_do)
 
             # phân cấp độ 
             if self.hien_bang_cap_do == True:
                 self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
+                self.veCauTrucBang() # ve lai bang
 
-            ve_nut_phan_chia_cap_do(self.screen,self.ten_cap_do)
 
             if self.o_chon and not self.ket_thuc:
                 dong, cot = self.o_chon
                 # Vẽ các ô liên quan như hàng ngang, cột dọc và ô 3x3
                 ve_highlight_cho_o(self.screen, dong, cot, self.bang)  # Luôn vẽ ô chọn và các ô liên quan
-                self.veCauTrucBang()
+                self.veCauTrucBang() # ve lai bang 
 
             # xử lí sự kiện click nút 
+            self.veCauTrucBang()
             self.xuLiSuKien()
 
             pygame.display.update()
