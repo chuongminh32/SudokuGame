@@ -24,6 +24,8 @@ class SudokuGame:
         self.o_chon = None
         self.ket_thuc = False
 
+        # nút gợi ý 
+        self.so_goi_y = 3
 
         # gõ số lên bảng 
         self.so_loi = 0
@@ -34,21 +36,22 @@ class SudokuGame:
 
     def layGoiY(self):
         empty_cells = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) 
-                      if self.board[i][j] == 0]
+                      if self.bang[i][j] == 0]
         if empty_cells:
             i, j = random.choice(empty_cells)
-            return i, j, self.board_solution[i][j]
+            return i, j, self.bang_giai[i][j]
         return None
 
-    # def reset_game(self):
-    #     self.board = [row[:] for row in self.bang_goc]
-    #     self.o_chon = None
-    #     self.hints_left = 3
-    #     self.thua_game = False
-    #     self.errors = 0
-    #     self.start_time = time.time()
-    #     self.o_sai = []
-    #     self.o_dung = []
+    def reset_game(self):
+        self.bang = [row[:] for row in self.bang_goc]
+        self.o_chon = None
+        self.hints_left = 3
+        self.thua_game = False
+        self.errors = 0
+        self.start_time = time.time()
+        self.o_sai = []
+        self.o_dung = []
+        # self.veCauTrucBang()
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
@@ -110,16 +113,16 @@ class SudokuGame:
 
         nut_cap_do = ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
         
-        if hint_btn.collidepoint(vitri_click) and self.hints_left > 0:
+        if hint_btn.collidepoint(vitri_click) and self.so_goi_y > 0:
             hint = self.layGoiY()
             if hint:
                 i, j, value = hint
-                self.board[i][j] = value
-                self.hints_left -= 1
+                self.bang[i][j] = value
+                self.so_goi_y -= 1
         elif reset_btn.collidepoint(vitri_click):
             self.reset_game()
-        elif ai_btn.collidepoint(vitri_click) and solve_sudoku(self.board):
-            self.game_over = True
+        elif ai_btn.collidepoint(vitri_click) and solve_sudoku(self.bang):
+            self.thua_game = True
         elif back_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
