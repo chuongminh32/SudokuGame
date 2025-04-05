@@ -22,4 +22,10 @@ Tự động giải (AI chạy đến khi hoàn tất).
 Giải từng bước (người dùng nhấn "Tiếp theo" để thấy từng bước AI thực hiện).
 3️⃣ Ghi log trạng thái AI (đếm số lần thử, điểm số thuật toán).
 4️⃣ Cho phép nhập bài toán mới & reset game.
-5️⃣ Điều khiển tốc độ AI bằng cách chọn thời gian chờ giữa các bước.
+5️⃣ Điều khiển tốc độ AI bằng cách chọn thời gian chờ giữa các bước.\
+
+
+- Tính năng đang thực hiện:
+•	Giao diện người dùng để chọn thuật toán và xem tiến trình giải.
+•	Tạo đồ thị/animation thể hiện quá trình giảm xung đột.
+•	Cho phép xuất lời giải cuối cùng + thời gian chạy.

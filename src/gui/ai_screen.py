@@ -3,7 +3,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.utils.gui_common import RONG, CAO  # Đảm bảo đã có RONG, CAO
+from src.utils.utils_ai_screen import RONG, CAO  # Đảm bảo đã có RONG, CAO
 
 class AI_Sudoku:
     def __init__(self):
