@@ -41,6 +41,9 @@ class SudokuGame:
         self.thua_game = False
     
         self.running = True
+
+        # thua game 
+        self.choilai_btn, self.thoat_btn = hien_thi_bang_thua(self.screen, RONG, CAO)
     
 
     def layGoiY(self):
@@ -127,9 +130,6 @@ class SudokuGame:
 
         nut_cap_do = ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
 
-        # option chơi lại/thoát - thua game 
-        choilai_btn, thoat_btn, bang_thua = hien_thi_bang_thua(self.screen, RONG, CAO)
-        
         # click nút gợi ý 
         if hint_btn.collidepoint(vitri_click) and self.so_goi_y > 0:
             hint = self.layGoiY()
@@ -146,7 +146,7 @@ class SudokuGame:
             self.thua_game = True
         
         # click nút back 
-        elif back_btn.collidepoint(vitri_click) or thoat_btn.collidepoint(vitri_click):
+        elif back_btn.collidepoint(vitri_click) or self.thoat_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
         
@@ -199,7 +199,7 @@ class SudokuGame:
                     break
 
         # click chơi lại 
-        elif choilai_btn.collidepoint(vitri_click):
+        elif self.choilai_btn.collidepoint(vitri_click):
             self.reset_game()
 
        

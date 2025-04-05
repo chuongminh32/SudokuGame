@@ -444,7 +444,7 @@ def hien_thi_bang_thua(screen, width, height):
     pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_width, box_height), border_radius=10)
 
     # Vẽ chữ "Bạn đã thua!"
-    bang_thua = font = pygame.font.SysFont("verdana", 28)
+    font = pygame.font.SysFont("verdana", 28)
     font_sub = pygame.font.SysFont("verdana", 20)
     text = font.render("Trò chơi kết thúc !", True, (52, 72, 97))  # Chữ đen
     text_sub = font_sub.render("Bạn đã mắc nhiều hơn 5 lỗi", True, (148, 163, 183))  # Chữ đen
@@ -461,4 +461,4 @@ def hien_thi_bang_thua(screen, width, height):
     text = font.render("Thoát", True, (90, 123, 192))
     screen.blit(text, (box_x + 320, box_y + 155))
 
-    return btn_choi_lai, btn_thoat, bang_thua
+    return btn_choi_lai, btn_thoat
