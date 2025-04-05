@@ -9,7 +9,8 @@ KT_O = (RONG - 2 * DEM) // KT_LUOI
 CAO_NUT, KC_NUT = 40, 20 
 TRANG, DEN, XAM, XAM_SANG = (255,255,255), (0,0,0), (200,200,200), (220,220,220) 
 XANH_DUONG, DO, XANH_LA = (0,0,255), (255,0,0), (0,128,0)
-MAU_NUT, MAU_CHU_NUT = (50, 150, 250), TRANG
+MAU_NUT, MAU_CHU_NUT = (90, 123, 192), TRANG
+MAU_NEN_NUT_HOVER = (67, 99, 167)
 # Màu nút và chữ trên nút
 MAU_NUT_BACK, MAU_ICON_BACK = (100, 100, 255), (80, 80, 80)  # Màu nút quay lại và biểu tượng
 MAU_NUT_CAIDAT, MAU_KHI_DUOC_CHON = (60, 60, 60), (180, 230, 255)  # Màu biểu tượng cài đặt và tùy chọn được chọn
@@ -42,19 +43,19 @@ def ve_nut(screen):
     # Nút Gợi ý
     nut_goi_y = pygame.Rect(DEM, y_nut, w_nut, CAO_NUT)  # Vị trí và kích thước của nút
     pygame.draw.rect(screen, MAU_NUT, nut_goi_y, border_radius=8)  # Vẽ nút với màu nền và bo tròn
-    text_goi_y = font.render("Gợi ý", True, TRANG)  # Vẽ chữ "Gợi ý"
+    text_goi_y = font.render("Gợi ý", True, MAU_CHU_NUT)  # Vẽ chữ "Gợi ý"
     screen.blit(text_goi_y, text_goi_y.get_rect(center=nut_goi_y.center))  # Căn giữa chữ trong nút
 
     # Nút Làm mới
     nut_lam_moi = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
-    pygame.draw.rect(screen, DO, nut_lam_moi, border_radius=8)
-    text_lam_moi = font.render("Làm mới", True, TRANG)
+    pygame.draw.rect(screen, MAU_NUT, nut_lam_moi, border_radius=8)
+    text_lam_moi = font.render("Làm mới", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_lam_moi.center))
 
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + 2 * (w_nut + KC_NUT), y_nut, w_nut, CAO_NUT)
-    pygame.draw.rect(screen, XANH_LA, nut_ai, border_radius=8)
-    text_ai = font.render("AI giải", True, TRANG)
+    pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
+    text_ai = font.render("AI giải", True, MAU_CHU_NUT)
     screen.blit(text_ai, text_ai.get_rect(center=nut_ai.center))
 
     # Nút Back (mũi tên trái)
@@ -351,17 +352,17 @@ def viTriHopLe(board, row, col, num):
     if num == 0:
         return []  # Ô trống luôn hợp lệ
     
-    invalid_positions = []  # Danh sách ô bị lỗi
+    ds_o_loi = []  # Danh sách ô bị lỗi
 
     # Kiểm tra hàng
     for i in range(9):
         if board[row][i] == num and i != col:
-            invalid_positions.append((row, i))
+            ds_o_loi.append((row, i))
 
     # Kiểm tra cột
     for i in range(9):
         if board[i][col] == num and i != row:
-            invalid_positions.append((i, col))
+            ds_o_loi.append((i, col))
 
     # Xác định góc trên trái của ô 3x3
     box_row, box_col = 3 * (row // 3), 3 * (col // 3)
@@ -370,9 +371,9 @@ def viTriHopLe(board, row, col, num):
     for i in range(box_row, box_row + 3):
         for j in range(box_col, box_col + 3):
             if board[i][j] == num and (i, j) != (row, col):
-                invalid_positions.append((i, j))
+                ds_o_loi.append((i, j))
 
-    return invalid_positions  # Trả về danh sách các ô sai
+    return ds_o_loi  # Trả về danh sách các ô sai
 
 # Vẽ icon gợi ý, so goi y, so loi  
 def ve_icon_goi_y(screen, font, soGoiY, soLoi):
@@ -404,7 +405,7 @@ def hienThiTGChoi(screen, tg_da_troi, font):
     giay = int(tg_da_troi) % 60
     thoi_gian_text = font.render(f"{phut:02}:{giay:02}", True, DEN) 
     screen.blit(thoi_gian_text, (RONG - 250, 20)) 
-    
+
 # Vẽ icon pause/play  
 def ve_icon_pause(screen, is_paused):
     """Vẽ nút Pause/Play trên màn hình"""

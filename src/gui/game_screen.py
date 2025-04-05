@@ -32,7 +32,7 @@ class SudokuGame:
         # nút pause 
         self.iconPause_Play = None
         self.isPause = False 
-        self.th_pause = 0 # thời điểm dừng 
+        self.tg_pause = 0 # thời điểm dừng 
         self.tg_da_troi = 0
         self.tg_bat_dau = time.time()
         self.ket_thuc = False
@@ -96,15 +96,17 @@ class SudokuGame:
                     self.so_loi += 1
                     self.bang[i][j] = vitri_go.key - pygame.K_0
 
-            o_sai = []  # Xóa danh sách cũ
-            o_dung = []  # Xóa danh sách cũ
+            self.o_sai = []  # Xóa danh sách cũ
+            self.o_dung = [] 
             for x in range(KT_LUOI):
                 for y in range(KT_LUOI):
                     if self.bang[x][y] != 0:
+                        # nếu ds ô lỗi != None -> lưu vào ds o_sai 
                         if viTriHopLe(self.bang, x, y, self.bang[x][y]):
-                            o_sai.append((x, y))
+                            self.o_sai.append((x, y))
+                            # nếu k lỗi và các ô là đang sửa -> đúng 
                         elif (x,y) in self.o_chinh_sua:
-                            o_dung.append((x,y))
+                            self.o_dung.append((x,y))
 
         # Xóa số nếu nhấn DELETE hoặc BACKSPACE
         elif vitri_go.key in [pygame.K_DELETE, pygame.K_BACKSPACE]:
@@ -197,14 +199,27 @@ class SudokuGame:
 
     def veCauTrucBang(self):
         ve_luoi(self.screen)
-        ve_so(self.screen, self.bang, self.bang_goc, self.font)
+        if self.isPause == False:
+            ve_so(self.screen, self.bang, self.bang_goc, self.font)
+
+    def ve_lai_cac_o_sai(self):
+        for r, c in self.o_sai:
+            pygame.draw.rect(self.screen, (234, 100, 100), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
+        self.veCauTrucBang()
+    
+    def ve_lai_cac_o_dung(self):
+        for r, c in self.o_dung:
+            pygame.draw.rect(self.screen, (159, 220, 133), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
+        self.veCauTrucBang()
 
     def run(self):
         while self.running:
             self.screen.fill(TRANG)
 
             # hiển thị thời gian chơi 
-            if not self.ket_thuc and not self.isPause:
+            if self.tg_bat_dau is None:
+                self.tg_bat_dau = time.time()
+            if not self.ket_thuc and not self.isPause and self.tg_bat_dau is not None:
                 self.tg_da_troi = time.time() - self.tg_bat_dau  # cập nhật thời gian đã trôi 
             hienThiTGChoi(self.screen, self.tg_da_troi, self.font)
 
@@ -234,6 +249,10 @@ class SudokuGame:
 
             # Xử lý sự kiện
             self.xuLiSuKien()
+
+            # Vẽ các ô nếu sai/đúng 
+            self.ve_lai_cac_o_dung()
+            self.ve_lai_cac_o_sai()
 
             pygame.display.update()
 
