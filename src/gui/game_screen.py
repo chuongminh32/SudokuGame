@@ -243,10 +243,6 @@ class SudokuGame:
             ve_nut(self.screen)
             ve_nut_phan_chia_cap_do(self.screen, self.ten_cap_do)
 
-            # Vẽ bảng cấp độ SAU CÙNG
-            if self.hien_bang_cap_do:
-                self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
-
             # Xử lý sự kiện
             self.xuLiSuKien()
 
@@ -254,6 +250,10 @@ class SudokuGame:
             self.ve_lai_cac_o_dung()
             self.ve_lai_cac_o_sai()
 
+            # Vẽ bảng cấp độ SAU CÙNG
+            if self.hien_bang_cap_do:
+                self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
+                
             pygame.display.update()
 
     pygame.quit()

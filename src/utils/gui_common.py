@@ -425,3 +425,40 @@ def ve_icon_pause(screen, is_paused):
     
     return button_rect  # Trả về rect để kiểm tra sự kiện click
 
+
+
+def hien_thi_bang_thua(screen, width, height):
+    """Hiển thị bảng thông báo thua với nền mờ và căn giữa."""
+    
+    # Tạo lớp nền mờ
+    overlay = pygame.Surface((width, height), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 150))  # Màu đen với độ trong suốt
+    screen.blit(overlay, (0, 0))
+
+    # Kích thước bảng thông báo
+    box_width, box_height = 510, 245
+    box_x = (RONG - box_width) // 2  # Căn giữa theo chiều ngang
+    box_y = (CAO - box_height) // 2  # Căn giữa theo chiều dọc
+
+    # Vẽ bảng trắng
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_width, box_height), border_radius=10)
+
+    # Vẽ chữ "Bạn đã thua!"
+    bang_thua = font = pygame.font.SysFont("verdana", 28)
+    font_sub = pygame.font.SysFont("verdana", 20)
+    text = font.render("Trò chơi kết thúc !", True, (52, 72, 97))  # Chữ đen
+    text_sub = font_sub.render("Bạn đã mắc nhiều hơn 5 lỗi", True, (148, 163, 183))  # Chữ đen
+    screen.blit(text, (box_x + 130, box_y + 20))
+    screen.blit(text_sub, (box_x + 120, box_y + 70))
+
+    # Vẽ nút "Chơi lại"
+    btn_choi_lai = pygame.draw.rect(screen, (90, 123, 192), pygame.Rect(box_x + 70, box_y + 150, 150, 50), border_radius=10)
+    text = font.render("Chơi lại", True, (255, 255, 255))
+    screen.blit(text, (box_x + 90, box_y + 155))
+
+    # Vẽ nút "Thoát"
+    btn_thoat = pygame.draw.rect(screen, (255,255,255), pygame.Rect(box_x + 290, box_y + 150, 150, 50), border_radius=10)
+    text = font.render("Thoát", True, (90, 123, 192))
+    screen.blit(text, (box_x + 320, box_y + 155))
+
+    return btn_choi_lai, btn_thoat, bang_thua
