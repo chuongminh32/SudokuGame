@@ -3,7 +3,6 @@ import pygame, sys, os, math
 import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from src.algorithm.backtracking import solve_sudoku 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
 KT_O = (RONG - 2 * DEM) // KT_LUOI 
 CAO_NUT, KC_NUT = 40, 20 
@@ -23,15 +22,6 @@ def init_pygame():
     pygame.display.set_caption("Trò chơi Sudoku")
     return screen 
 
-def ve_so(screen, board, board_original, font):
-        for i in range(KT_LUOI):
-            for j in range(KT_LUOI):
-                if board[i][j]:
-                    color = (25, 53, 88) if board_original[i][j] else DEN
-                    text = font.render(str(board[i][j]), True, color)
-                    rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, 
-                                               DEM + i * KT_O + KT_O // 2))
-                    screen.blit(text, rect)
 def ve_nut(screen):
     # Tính toán vị trí của các nút
     y_nut = DEM + KT_LUOI * KT_O + KC_NUT  # Vị trí y cho các nút
@@ -87,76 +77,6 @@ def ve_luoi(screen):  # Vẽ lưới Sudoku
         pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)  # Vẽ đường dọc
         pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)  # Vẽ đường ngang
 
-
-
-# phan chia cấp ____________
-def sinh_bang_sudoku_ngau_nhien():
-    """Tạo một bảng Sudoku hoàn chỉnh.
-    Được dùng để tính toán vị trí số cho từng ô trong bảng Sudoku, đảm bảo tuân thủ các quy tắc Sudoku. Cụ thể:
-    base * (r % base): Tính vị trí của hàng trong mỗi khối 3x3 (chỉ lấy phần dư khi chia hàng cho base).
-    r // base: Xác định khối (block) mà hàng thuộc về.
-    c: Cộng cột vào để xác định vị trí chính xác của số.
-    % side: Đảm bảo kết quả nằm trong phạm vi 9x9 bằng cách lấy phần dư với side (tức 9).
-    Công thức này giúp đảm bảo các số được sắp xếp hợp lý theo các khối và quy tắc của Sudoku.
-    """
-    base = 3  # Kích thước của khu vực 3x3 (tức là Sudoku 9x9)
-    side = base * base  # Tổng số hàng và cột là 9
-
-    # Hàm này tính toán vị trí của mỗi số trong bảng Sudoku
-    def pattern(r, c):
-        return (base * (r % base) + r // base + c) % side
-
-    # Hàm xáo trộn các danh sách, giúp tạo ra sự ngẫu nhiên
-    def shuffle(s):
-        return random.sample(s, len(s))  # Trả về danh sách xáo trộn ngẫu nhiên
-
-    r_base = range(base)  # Dãy số từ 0 đến base-1 (từ 0 đến 2)
-    
-    # Tạo danh sách các hàng và cột ngẫu nhiên dựa trên các số từ r_base
-    rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
-    cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
-
-    # Xáo trộn các số từ 1 đến 9 để sử dụng trong bảng
-    nums = shuffle(range(1, side + 1))
-
-    # Tạo bảng Sudoku hoàn chỉnh bằng cách áp dụng hàm pattern cho từng hàng, cột
-    sudoku = []
-    for r in rows:
-        sudoku_row = []
-        for c in cols:
-            sudoku_row.append(nums[pattern(r, c)])  # Sắp xếp các số vào bảng
-        sudoku.append(sudoku_row)
-
-    return sudoku
-
-def xoaSoNgauNhien(board, num_to_remove):
-    """Xóa một số lượng ô khỏi bảng Sudoku."""
-    positions = [(i, j) for i in range(9) for j in range(9)]
-    random.shuffle(positions)
-    
-    board_copy = [row[:] for row in board]  # Tạo bản sao tránh sửa bảng gốc
-    
-    for _ in range(num_to_remove):
-        row, col = positions.pop()
-        board_copy[row][col] = 0
-    
-    return board_copy
-
-def layBangSuDoKuTheoCapDo(level="easy"):
-    """Tạo bảng Sudoku theo cấp độ."""
-    bangDaGiai = sinh_bang_sudoku_ngau_nhien()
-
-    CapDo = {
-        "easy": 20,
-        "medium": 30,
-        "hard": 40,
-    }
-    
-    if level not in CapDo:
-        raise ValueError("Cấp độ không hợp lệ. Chọn 'easy', 'medium', 'hard'.")
-
-    return xoaSoNgauNhien(bangDaGiai, CapDo[level])
-
 def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     """Vẽ combobox chọn cấp độ khó dễ (Dễ, Trung bình, Khó)."""
     
@@ -165,7 +85,6 @@ def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     box_rong, box_cao = 100, 30
     box_rect = pygame.Rect(box_x, box_y, box_rong, box_cao)
     
-  
     # Vẽ nền và viền
     pygame.draw.rect(screen, TRANG, box_rect, border_radius=5)
     pygame.draw.rect(screen, XAM, box_rect, 2, border_radius=5)
@@ -196,15 +115,15 @@ def ve_bang_chia_cap_do(screen):
     box_rong, box_cao = 200, 200
     box_x, box_y = RONG - 270, 50
     bang_cap_do = [
-        {"text": "Dễ", "value": "easy", "rect": pygame.Rect(box_x + 23, box_y + 40, 150, 40)},
-        {"text": "Trung bình", "value": "medium", "rect": pygame.Rect(box_x + 23, box_y + 90, 150, 40)},
-        {"text": "Khó", "value": "hard", "rect": pygame.Rect(box_x + 23, box_y + 140, 150, 40)},
+        {"text": "Dễ", "value": "E", "rect": pygame.Rect(box_x + 23, box_y + 40, 150, 40)},
+        {"text": "Trung bình", "value": "M", "rect": pygame.Rect(box_x + 23, box_y + 90, 150, 40)},
+        {"text": "Khó", "value": "H", "rect": pygame.Rect(box_x + 23, box_y + 140, 150, 40)},
     ]
     
     font = pygame.font.SysFont("verdana", 20)
 
     # Vẽ bảng trắng
-    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
+    bang_bao_quanh = pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
 
     # Vẽ tiêu đề
     title_font = pygame.font.SysFont("verdana", 22)
@@ -223,8 +142,15 @@ def ve_bang_chia_cap_do(screen):
             cap_do["rect"].y + (cap_do["rect"].height - text_surf.get_height()) // 2
         ))
         
-    return bang_cap_do
-# phân chia cấp ______________
+    return bang_cap_do, bang_bao_quanh
+
+def ve_o_trong(screen, bang_goc):
+    for i in range(KT_LUOI):
+        for j in range(KT_LUOI):
+            if bang_goc[i][j] == 0:
+                x = j * KT_O
+                y = i * KT_O
+                pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(DEM +x,DEM + y, KT_O, KT_O))
 
 def ve_highlight_cho_o(screen, row, col, grid):
 
@@ -271,61 +197,6 @@ def ve_highlight_cho_o(screen, row, col, grid):
                 if (grid[r][c] == gia_tri_o_dang_duoc_chon):
                     pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
 
-
-def buocDiHopLe(board, row, col, num):
-    """Trả về T/F  nếu đặt số `num` vào vị trí `(row, col) khong hop le`"""
-    if num == 0:
-      return True
-    # Kiểm tra hàng
-    for i in range(9):
-        if board[row][i] == num and i != col:
-            return False
-
-    # Kiểm tra cột
-    for i in range(9):
-        if board[i][col] == num and i != row:
-           return False
-
-    # Xác định góc trên trái của ô 3x3
-    box_row, box_col = 3 * (row // 3), 3 * (col // 3)
-
-    # Kiểm tra ô 3x3
-    for i in range(box_row, box_row + 3):
-        for j in range(box_col, box_col + 3):
-            if board[i][j] == num and (i, j) != (row, col):
-                return False
-
-    return True  # Trả về danh sách các ô sai
-
-
-def viTriHopLe(board, row, col, num):
-    """Trả về danh sách các ô bị lỗi nếu đặt số `num` vào vị trí `(row, col)`"""
-    if num == 0:
-        return []  # Ô trống luôn hợp lệ
-    
-    ds_o_loi = []  # Danh sách ô bị lỗi
-
-    # Kiểm tra hàng
-    for i in range(9):
-        if board[row][i] == num and i != col:
-            ds_o_loi.append((row, i))
-
-    # Kiểm tra cột
-    for i in range(9):
-        if board[i][col] == num and i != row:
-            ds_o_loi.append((i, col))
-
-    # Xác định góc trên trái của ô 3x3
-    box_row, box_col = 3 * (row // 3), 3 * (col // 3)
-
-    # Kiểm tra ô 3x3
-    for i in range(box_row, box_row + 3):
-        for j in range(box_col, box_col + 3):
-            if board[i][j] == num and (i, j) != (row, col):
-                ds_o_loi.append((i, j))
-
-    return ds_o_loi  # Trả về danh sách các ô sai
-
 # Vẽ icon gợi ý, so goi y, so loi  
 def ve_icon_goi_y(screen, font, soGoiY, soLoi):
 
@@ -350,13 +221,6 @@ def ve_icon_goi_y(screen, font, soGoiY, soLoi):
     pygame.draw.line(screen, icon_color, (RONG - 455, 20), (RONG - 465, 15), 2)
     pygame.draw.line(screen, icon_color, (RONG - 435, 20), (RONG - 425, 15), 2)
 
-# Hiển thị tg đang chơi 
-def hienThiTGChoi(screen, tg_da_troi, font):
-    phut = int(tg_da_troi) // 60
-    giay = int(tg_da_troi) % 60
-    thoi_gian_text = font.render(f"{phut:02}:{giay:02}", True, DEN) 
-    screen.blit(thoi_gian_text, (RONG - 250, 20)) 
-
 # Vẽ icon pause/play  
 def ve_icon_pause(screen, is_paused):
     """Vẽ nút Pause/Play trên màn hình"""
@@ -376,7 +240,7 @@ def ve_icon_pause(screen, is_paused):
     
     return button_rect  # Trả về rect để kiểm tra sự kiện click
 
-def hien_thi_bang_thua(screen, width, height):
+def ve_bang_thua(screen, width, height):
     """Hiển thị bảng thông báo thua với nền mờ và căn giữa."""
     
     # Tạo lớp nền mờ
@@ -412,7 +276,7 @@ def hien_thi_bang_thua(screen, width, height):
 
     return btn_choi_lai, btn_thoat
 
-def hien_thi_bang_thang(screen, RONG, CAO, tg_da_troi):
+def ve_bang_thang(screen, RONG, CAO, tg_da_troi):
     """Hiển thị bảng thông báo chiến thắng với nền mờ và căn giữa."""
     
     # Tạo lớp nền mờ

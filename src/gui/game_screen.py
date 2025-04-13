@@ -1,6 +1,9 @@
 import pygame, sys, os, time, random
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.utils.utils_game_screen import * 
+from src.algorithm.generate_sudoku import *
+from src.algorithm.backtracking import *
+
 
 class SudokuGame:
     def __init__(self):
@@ -11,11 +14,11 @@ class SudokuGame:
         self.bang_goc = layBangSuDoKuTheoCapDo()
         self.bang = [row[:] for row in self.bang_goc]
         self.bang_giai = [row[:] for row in self.bang_goc]
-        solve_sudoku(self.bang_giai)
         
         # phân cấp độ 
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ 
         self.ten_cap_do = "Dễ"
+        # self.chon_che_do = None 
         self.bang_cap_do = [] # luu ds cac bang 
 
         # sự kiện click nút trong bảng 
@@ -35,15 +38,80 @@ class SudokuGame:
         self.tg_da_troi = 0
         self.tg_bat_dau = time.time()
 
-
         # gõ số lên bảng 
         self.so_loi = 0
         self.ket_thuc = False
         self.running = True
 
+        # xử lí ẩn hiện menu khi click ra ngoai rect(khung hcn) bang_cap_do (menu)
+        self.rect_bang_cap_do = None
+
         # thua/thang game 
         self.choilai_btn, self.thoat_btn = None, None
     
+        
+    # Hiển thị tg đang chơi 
+    def hienThiTGChoi(self, screen, tg_da_troi, font):
+        phut = int(tg_da_troi) // 60
+        giay = int(tg_da_troi) % 60
+        thoi_gian_text = font.render(f"{phut:02}:{giay:02}", True, DEN) 
+        screen.blit(thoi_gian_text, (RONG - 250, 20)) 
+
+    # hàm kt ô đó có hợp lệ hay k 
+    def buocDiHopLe(board, row, col, num):
+        """Trả về T/F  nếu đặt số `num` vào vị trí `(row, col) khong hop le`"""
+        if num == 0:
+            return True
+        # Kiểm tra hàng
+        for i in range(9):
+            if board[row][i] == num and i != col:
+                return False
+
+        # Kiểm tra cột
+        for i in range(9):
+            if board[i][col] == num and i != row:
+             return False
+
+        # Xác định góc trên trái của ô 3x3
+        box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+
+        # Kiểm tra ô 3x3
+        for i in range(box_row, box_row + 3):
+            for j in range(box_col, box_col + 3):
+                if board[i][j] == num and (i, j) != (row, col):
+                    return False
+
+        return True  # Trả về danh sách các ô sai
+
+    # hàm kt vị trí 
+    def viTriHopLe(board, row, col, num):
+        """Trả về danh sách các ô bị lỗi nếu đặt số `num` vào vị trí `(row, col)`"""
+        if num == 0:
+            return []  # Ô trống luôn hợp lệ
+        
+        ds_o_loi = []  # Danh sách ô bị lỗi
+
+        # Kiểm tra hàng
+        for i in range(9):
+            if board[row][i] == num and i != col:
+                ds_o_loi.append((row, i))
+
+        # Kiểm tra cột
+        for i in range(9):
+            if board[i][col] == num and i != row:
+                ds_o_loi.append((i, col))
+
+        # Xác định góc trên trái của ô 3x3
+        box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+
+        # Kiểm tra ô 3x3
+        for i in range(box_row, box_row + 3):
+            for j in range(box_col, box_col + 3):
+                if board[i][j] == num and (i, j) != (row, col):
+                    ds_o_loi.append((i, j))
+
+        return ds_o_loi  # Trả về danh sách các ô sai
+
 
     def layGoiY(self):
         empty_cells = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) 
@@ -68,8 +136,6 @@ class SudokuGame:
         self.ket_thuc = False
         self.thoat_btn, self.choilai_btn = None, None
 
-      
-
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -89,14 +155,14 @@ class SudokuGame:
             ):
                 if pygame.K_1 <= vitri_go.key <= pygame.K_9:
                     gia_tri = vitri_go.key - pygame.K_0
-                    if(buocDiHopLe(self.bang, i, j, gia_tri)):
+                    if(self.buocDiHopLe(self.bang, i, j, gia_tri)):
                         self.bang[i][j] = vitri_go.key - pygame.K_0
                     else : 
                         self.so_loi += 1
                         self.bang[i][j] = vitri_go.key - pygame.K_0
                 else:
                     gia_tri = vitri_go.key - pygame.K_0
-                    if(viTriHopLe(self.bang, i, j, gia_tri)):
+                    if(self.viTriHopLe(self.bang, i, j, gia_tri)):
                         self.bang[i][j] = vitri_go.key - pygame.KP_0  # Chuyển số từ numpad
                     else : 
                         self.so_loi += 1
@@ -108,7 +174,7 @@ class SudokuGame:
                     for y in range(KT_LUOI):
                         if self.bang[x][y] != 0:
                             # nếu ds ô lỗi != None -> lưu vào ds o_sai 
-                            if viTriHopLe(self.bang, x, y, self.bang[x][y]):
+                            if self.viTriHopLe(self.bang, x, y, self.bang[x][y]):
                                 self.o_sai.append((x, y))
                                 # nếu k 23 và các ô là đang sửa -> đúng 
                             elif (x,y) in self.o_chinh_sua:
@@ -140,16 +206,21 @@ class SudokuGame:
                 i, j, value = hint
                 self.bang[i][j] = value
                 self.so_goi_y -= 1
+
         # click nút reset 
         elif reset_btn.collidepoint(vitri_click):
             self.reset_game()
         
         # click nút ai giải 
-        elif ai_btn.collidepoint(vitri_click) and solve_sudoku(self.bang):
-            self.ket_thuc = True
+        elif ai_btn.collidepoint(vitri_click):
+            self.bang_giai = giai_sudoku_backtracking(self.bang)
+            if self.bang_giai:  # Nếu giải thành công
+                self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải
+                # self.ket_thuc = True  # Có thể dừng game nếu muốn
+            
         
-        # click nút back : click back hoạc click nút thoát nếu trò chơi kết thúc (win/lose)
-        elif back_btn.collidepoint(vitri_click) or (self.ket_thuc == True and self.thoat_btn.collidepoint(vitri_click)):
+        # click nút back
+        elif back_btn.collidepoint(vitri_click):
             from src.gui import home_screen
             home_screen.runHome()
         
@@ -183,8 +254,9 @@ class SudokuGame:
             self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do 
 
          # Nếu click ra ngoài bảng cấp độ thì ẩn bảng cấp độ
-        elif self.hien_bang_cap_do and not pygame.Rect(RONG - 270, 50, 200, 200).collidepoint(vitri_click):
+        elif self.hien_bang_cap_do and not self.rect_bang_cap_do.collidepoint(vitri_click):
             self.hien_bang_cap_do = False
+
         
         # Xử lí sự kiện click từng cấp độ trong bảng 
         elif self.hien_bang_cap_do == True:
@@ -192,10 +264,9 @@ class SudokuGame:
                 if cap_do["rect"].collidepoint(vitri_click):
                     self.chon_che_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
                     self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
-                    self.bang_goc = layBangSuDoKuTheoCapDo(self.chon_che_do)
+                    self.bang_cap_do = layBangSuDoKuTheoCapDo(self.chon_che_do)
+                    self.bang_goc = self.bang_cap_do
                     self.bang = [row[:] for row in self.bang_goc]
-                    self.bang_giai = [row[:] for row in self.bang_goc]
-                    solve_sudoku(self.bang_giai)
                     # cập nhật lại từng ô trong bảng giải 
                     self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
                     self.hien_bang_cap_do = False
@@ -221,25 +292,28 @@ class SudokuGame:
             pygame.draw.rect(self.screen, (159, 220, 133), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
         self.veCauTrucBang()
 
-    # hàm kiểm tra đã thắng hay chưa 
+    # hàm kiểm tra đã thắng hay chưa: số ô đúng = số ô trống 
     def isWin(self):
         cnt = 0
-        for i in range(KT_LUOI):
-            for j in range(KT_LUOI):
-                if self.bang[i][j] == 0:
-                    cnt += 1
-        return (len(self.o_dung) == cnt)
+        if self.ket_thuc:
+            for i in range(KT_LUOI):
+                for j in range(KT_LUOI):
+                    if self.bang[i][j] == 0:
+                        cnt += 1
+            return (len(self.o_dung) == cnt)
 
     def run(self):
         while self.running:
             self.screen.fill(TRANG)
-            
+
+            ve_o_trong(self.screen, self.bang_goc)
+
             # hiển thị thời gian chơi 
             if self.tg_bat_dau is None:
                 self.tg_bat_dau = time.time()
             if not self.ket_thuc and not self.isPause and self.tg_bat_dau is not None:
                 self.tg_da_troi = time.time() - self.tg_bat_dau  # cập nhật thời gian đã trôi 
-            hienThiTGChoi(self.screen, self.tg_da_troi, self.font)
+            self.hienThiTGChoi(self.screen, self.tg_da_troi, self.font)
 
             # vẽ icon gợi ý 
             self.iconGoiY = ve_icon_goi_y(self.screen, self.font_text, self.so_goi_y, self.so_loi)
@@ -274,16 +348,18 @@ class SudokuGame:
                 self.ket_thuc = True
             if self.ket_thuc == True:
                 self.isPause = True
-                self.choilai_btn, self.thoat_btn = hien_thi_bang_thua(self.screen, RONG, CAO)
+                self.choilai_btn, self.thoat_btn = ve_bang_thua(self.screen, RONG, CAO)
             
             if self.isWin() == True:
                 self.isPause = True
-                self.choilai_btn, self.thoat_btn = hien_thi_bang_thang(self.screen, RONG, CAO, self.tg_da_troi)
+                if self.da_thang == False:
+                    self.choilai_btn, self.thoat_btn = ve_bang_thang(self.screen, RONG, CAO, self.tg_da_troi)
+                    self.da_thang = True 
                 self.ket_thuc = True
 
             # Vẽ bảng cấp độ SAU CÙNG
             if self.hien_bang_cap_do:
-                self.bang_cap_do = ve_bang_chia_cap_do(self.screen)
+                self.bang_cap_do, self.rect_bang_cap_do = ve_bang_chia_cap_do(self.screen)
 
             pygame.display.update()
 

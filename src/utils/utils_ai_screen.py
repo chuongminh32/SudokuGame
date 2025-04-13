@@ -136,36 +136,40 @@ def xoaSoNgauNhien(board, num_to_remove):
     
     board_copy = [row[:] for row in board]  # Tạo bản sao tránh sửa bảng gốc
     
+    # từng cấp độ sẽ xóa số # nhau 
     for _ in range(num_to_remove):
         row, col = positions.pop()
         board_copy[row][col] = 0
     
     return board_copy
 
-def layBangSuDoKuTheoCapDo(level="easy"):
+def layBangSuDoKuTheoCapDo(level="Dễ"):
     """Tạo bảng Sudoku theo cấp độ."""
     bangDaGiai = sinh_bang_sudoku_ngau_nhien()
 
     CapDo = {
-        "easy": 20,
-        "medium": 30,
-        "hard": 40,
+        "Dễ": 20,
+        "Trung bình": 30,
+        "Khó": 40,
     }
     
     if level not in CapDo:
-        raise ValueError("Cấp độ không hợp lệ. Chọn 'easy', 'medium', 'hard'.")
+        raise ValueError("Cấp độ không hợp lệ. Chọn 'Dễ', 'Trung bình ', 'khó'.")
 
     return xoaSoNgauNhien(bangDaGiai, CapDo[level])
 
 
 def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     """Vẽ combobox chọn cấp độ khó dễ (Dễ, Trung bình, Khó)."""
-    
     # Vị trí và kích thước của combobox
     box_x, box_y = RONG - 170, 20
     box_rong, box_cao = 100, 30
     box_rect = pygame.Rect(box_x, box_y, box_rong, box_cao)
     
+    # Vẽ đoạn text "level:" bên cạnh
+    text_font = pygame.font.SysFont("verdana", 18)
+    text_surface = text_font.render("Level:", True, DEN)
+    screen.blit(text_surface, (box_x - 54, box_y + 7))
   
     # Vẽ nền và viền
     pygame.draw.rect(screen, TRANG, box_rect, border_radius=5)
@@ -190,15 +194,16 @@ def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     pygame.draw.polygon(screen, DEN, arrow_points)
     
     return box_rect  # Trả về hình chữ nhật của combobox để phát hiện sự kiện click
+
 def ve_bang_chia_cap_do(screen):
     """Hiển thị bảng chọn cấp độ: Dễ, Trung bình, Khó."""
     
     box_rong, box_cao = 200, 200
     box_x, box_y = RONG - 270, 50
     bang_cap_do = [
-        {"text": "Dễ", "value": "easy", "rect": pygame.Rect(box_x + 23, box_y + 40, 150, 40)},
-        {"text": "Trung bình", "value": "medium", "rect": pygame.Rect(box_x + 23, box_y + 90, 150, 40)},
-        {"text": "Khó", "value": "hard", "rect": pygame.Rect(box_x + 23, box_y + 140, 150, 40)},
+        {"text": "Dễ", "value": "Dễ", "rect": pygame.Rect(box_x + 23, box_y + 40, 150, 40)},
+        {"text": "Trung bình", "value": "Trung bình", "rect": pygame.Rect(box_x + 23, box_y + 90, 150, 40)},
+        {"text": "Khó", "value": "Khó", "rect": pygame.Rect(box_x + 23, box_y + 140, 150, 40)},
     ]
     
     font = pygame.font.SysFont("verdana", 20)
@@ -228,12 +233,15 @@ def ve_bang_chia_cap_do(screen):
 # _____ lua chon algorithm_______
 def ve_nut_lua_chon_alg(screen, ten_alg):
     """Vẽ combobox chọn cấp độ khó dễ (Dễ, Trung bình, Khó)."""
-    
     # Vị trí và kích thước của combobox
     box_x, box_y = RONG - 500, 20
     box_rong, box_cao = 100, 30
     box_rect = pygame.Rect(box_x, box_y, box_rong, box_cao)
     
+     # Vẽ đoạn text "alg options" bên cạnh
+    text_font = pygame.font.SysFont("verdana", 18)
+    text_surface = text_font.render("Alg:", True, DEN)
+    screen.blit(text_surface, (box_x - 35, box_y + 7))
   
     # Vẽ nền và viền
     pygame.draw.rect(screen, TRANG, box_rect, border_radius=5)
@@ -260,17 +268,17 @@ def ve_nut_lua_chon_alg(screen, ten_alg):
     return box_rect  # Trả về hình chữ nhật của combobox để phát hiện sự kiện click
 
 def ve_bang_chon_alg(screen):
-    """Hiển thị bảng chọn cấp độ: Dễ, Trung bình, Khó."""
-    
+    """Hiển thị bảng chọn Alg"""
+   
     box_rong, box_cao = 200, 200
-    box_x, box_y = RONG - 400, 50
-    bang_cap_do = [
-        {"text": "HillClimbing", "value": "easy", "rect": pygame.Rect(box_x + 23, box_y + 40, 150, 40)},
-        {"text": "Simulated Anealing", "value": "medium", "rect": pygame.Rect(box_x + 23, box_y + 90, 150, 40)},
-        {"text": "Backtracking", "value": "hard", "rect": pygame.Rect(box_x + 23, box_y + 140, 150, 40)},
+    box_x, box_y = RONG - 500, 50
+    bang_alg = [
+        {"text": "HillClimbing", "value": "HC", "rect": pygame.Rect(box_x + 23, box_y + 40, 150, 40)},
+        {"text": "Simulated Anealing", "value": "SA", "rect": pygame.Rect(box_x + 23, box_y + 90, 150, 40)},
+        {"text": "Backtracking", "value": "B", "rect": pygame.Rect(box_x + 23, box_y + 140, 150, 40)},
     ]
     
-    font = pygame.font.SysFont("verdana", 20)
+    font = pygame.font.SysFont("verdana", 14)
 
     # Vẽ bảng trắng
     pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
@@ -281,7 +289,7 @@ def ve_bang_chon_alg(screen):
     screen.blit(title_text, (box_x + (box_rong - title_text.get_width()) // 2, box_y + 10))
 
     # Vẽ các nút cấp độ
-    for cap_do in bang_cap_do:
+    for cap_do in bang_alg:
         pygame.draw.rect(screen, TRANG, cap_do["rect"], border_radius=5)
         pygame.draw.rect(screen, XAM, cap_do["rect"], 2, border_radius=5)
         
@@ -292,7 +300,7 @@ def ve_bang_chon_alg(screen):
             cap_do["rect"].y + (cap_do["rect"].height - text_surf.get_height()) // 2
         ))
         
-    return bang_cap_do
+    return bang_alg
 
 
 def ve_highlight_cho_o(screen, row, col, grid):
@@ -304,7 +312,7 @@ def ve_highlight_cho_o(screen, row, col, grid):
 
     # Rect(x, y, w, h)
     # x : trai -> phai : dùng cho col 
-    # Tô màu highlight cho hàng và cột
+    # Tô màu highlight cho hàng
     for i in range(KT_LUOI):  # Duyệt theo hàng (row)
         pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
             DEM + i * KT_O,  # Cột thay đổi, x tăng dần 
@@ -312,6 +320,7 @@ def ve_highlight_cho_o(screen, row, col, grid):
             KT_O, KT_O
         ))
 
+    # Tô hight light cho cột 
     for j in range(KT_LUOI):  # Duyệt theo cột (column)
         pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
             DEM + col * KT_O,  # Cột giữ nguyên
