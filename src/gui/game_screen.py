@@ -14,6 +14,7 @@ class SudokuGame:
         self.bang_goc = layBangSuDoKuTheoCapDo()
         self.bang = [row[:] for row in self.bang_goc]
         self.bang_giai = [row[:] for row in self.bang_goc]
+   
         
         # phân cấp độ 
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ 
@@ -48,6 +49,9 @@ class SudokuGame:
 
         # thua/thang game 
         self.choilai_btn, self.thoat_btn = None, None
+
+        # co hieu ai da giai
+        self.ai_giai_thanh_cong = False
     
         
     # Hiển thị tg đang chơi 
@@ -58,7 +62,7 @@ class SudokuGame:
         screen.blit(thoi_gian_text, (RONG - 250, 20)) 
 
     # hàm kt ô đó có hợp lệ hay k 
-    def buocDiHopLe(board, row, col, num):
+    def buocDiHopLe(self, board, row, col, num):
         """Trả về T/F  nếu đặt số `num` vào vị trí `(row, col) khong hop le`"""
         if num == 0:
             return True
@@ -84,7 +88,7 @@ class SudokuGame:
         return True  # Trả về danh sách các ô sai
 
     # hàm kt vị trí 
-    def viTriHopLe(board, row, col, num):
+    def viTriHopLe(self, board, row, col, num):
         """Trả về danh sách các ô bị lỗi nếu đặt số `num` vào vị trí `(row, col)`"""
         if num == 0:
             return []  # Ô trống luôn hợp lệ
@@ -215,10 +219,11 @@ class SudokuGame:
         elif ai_btn.collidepoint(vitri_click):
             self.bang_giai = giai_sudoku_backtracking(self.bang)
             if self.bang_giai:  # Nếu giải thành công
+                self.ai_giai_thanh_cong = True
                 self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải
                 # self.ket_thuc = True  # Có thể dừng game nếu muốn
-            
-        
+
+
         # click nút back
         elif back_btn.collidepoint(vitri_click):
             from src.gui import home_screen
@@ -268,6 +273,7 @@ class SudokuGame:
                     self.bang_goc = self.bang_cap_do
                     self.bang = [row[:] for row in self.bang_goc]
                     # cập nhật lại từng ô trong bảng giải 
+                    self.bang_giai = giai_sudoku_backtracking(self.bang)
                     self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
                     self.hien_bang_cap_do = False
                     break
@@ -280,16 +286,16 @@ class SudokuGame:
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         if self.isPause == False:
-            ve_so(self.screen, self.bang, self.bang_goc, self.font)
+            ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
 
     def ve_lai_cac_o_sai(self):
         for r, c in self.o_sai:
-            pygame.draw.rect(self.screen, (234, 100, 100), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
+            pygame.draw.rect(self.screen,  (250, 180, 180) , pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
         self.veCauTrucBang()
     
     def ve_lai_cac_o_dung(self):
         for r, c in self.o_dung:
-            pygame.draw.rect(self.screen, (159, 220, 133), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
+            pygame.draw.rect(self.screen, ((180, 230, 200)), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
         self.veCauTrucBang()
 
     # hàm kiểm tra đã thắng hay chưa: số ô đúng = số ô trống 
@@ -305,8 +311,6 @@ class SudokuGame:
     def run(self):
         while self.running:
             self.screen.fill(TRANG)
-
-            ve_o_trong(self.screen, self.bang_goc)
 
             # hiển thị thời gian chơi 
             if self.tg_bat_dau is None:

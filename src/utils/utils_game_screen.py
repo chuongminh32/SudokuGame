@@ -62,14 +62,25 @@ def ve_nut(screen):
 
     return nut_goi_y, nut_lam_moi, nut_ai, nut_back
 
-def ve_so(screen, bang, bang_goc, font):
+def ve_so(screen, bang, bang_goc, font, bang_giai):
     for i in range(KT_LUOI):
         for j in range(KT_LUOI):
             if bang[i][j]:
-                mau = (25,53,88) if bang_goc[i][j] else DEN # Màu xanh cho số gốc, màu đen cho số người chơi nhập
-                text = font.render(str(bang[i][j]), True, mau) # Tạo đối tượng văn bản số
+                # Xác định màu chữ
+                mau = (25, 53, 88) if bang_goc[i][j] else DEN  # Màu xanh cho số gốc, màu đen cho số người chơi nhập
+
+                # bỏ đi số gốc ban đầu chi tô nhưng ô có lời giải đúng trùng với bảng lời giải 
+                if not bang_goc[i][j] and bang[i][j] == bang_giai[i][j]:
+                    pygame.draw.rect(
+                        screen,
+                        (204, 255, 229),  # Màu xanh nhạt
+                        (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
+                    )
+
+                # Vẽ số
+                text = font.render(str(bang[i][j]), True, mau)
                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
-                screen.blit(text, rect) # Tạo hình chữ nhật bao quanh số
+                screen.blit(text, rect)
 
 def ve_luoi(screen):  # Vẽ lưới Sudoku
     for i in range(KT_LUOI + 1):  # Duyệt qua tất cả các đường
@@ -144,14 +155,6 @@ def ve_bang_chia_cap_do(screen):
         
     return bang_cap_do, bang_bao_quanh
 
-def ve_o_trong(screen, bang_goc):
-    for i in range(KT_LUOI):
-        for j in range(KT_LUOI):
-            if bang_goc[i][j] == 0:
-                x = j * KT_O
-                y = i * KT_O
-                pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(DEM +x,DEM + y, KT_O, KT_O))
-
 def ve_highlight_cho_o(screen, row, col, grid):
 
     sr = (row // 3) * 3  # Xác định hàng đầu của ô 3x3
@@ -163,14 +166,14 @@ def ve_highlight_cho_o(screen, row, col, grid):
     # x : trai -> phai : dùng cho col 
     # Tô màu highlight cho hàng và cột
     for i in range(KT_LUOI):  # Duyệt theo hàng (row)
-        pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
+        pygame.draw.rect(screen, (195, 215, 234), pygame.Rect(
             DEM + i * KT_O,  # Cột thay đổi, x tăng dần 
             DEM + row * KT_O,  # Hàng giữ nguyên, y không đổi 
             KT_O, KT_O
         ))
 
     for j in range(KT_LUOI):  # Duyệt theo cột (column)
-        pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
+        pygame.draw.rect(screen, (195, 215, 234), pygame.Rect(
             DEM + col * KT_O,  # Cột giữ nguyên
             DEM + j * KT_O,  # Hàng thay đổi
             KT_O, KT_O
@@ -182,7 +185,7 @@ def ve_highlight_cho_o(screen, row, col, grid):
             ar = sr + i  # ar = actual_row(dòng chính xác tính từ vị trí chỉ số), sr = start_row    
             ac = sc + j
          
-            pygame.draw.rect(screen, (226, 235, 243), pygame.Rect(
+            pygame.draw.rect(screen, (195, 215, 234), pygame.Rect(
                 DEM + ac * KT_O,  
                 DEM + ar * KT_O,  
                 KT_O, KT_O
