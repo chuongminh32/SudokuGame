@@ -166,14 +166,14 @@ def ve_highlight_cho_o(screen, row, col, grid):
     # x : trai -> phai : dùng cho col 
     # Tô màu highlight cho hàng và cột
     for i in range(KT_LUOI):  # Duyệt theo hàng (row)
-        pygame.draw.rect(screen, (195, 215, 234), pygame.Rect(
+        pygame.draw.rect(screen, (150, 190, 228), pygame.Rect(
             DEM + i * KT_O,  # Cột thay đổi, x tăng dần 
             DEM + row * KT_O,  # Hàng giữ nguyên, y không đổi 
             KT_O, KT_O
         ))
 
     for j in range(KT_LUOI):  # Duyệt theo cột (column)
-        pygame.draw.rect(screen, (195, 215, 234), pygame.Rect(
+        pygame.draw.rect(screen, (150, 190, 228), pygame.Rect(
             DEM + col * KT_O,  # Cột giữ nguyên
             DEM + j * KT_O,  # Hàng thay đổi
             KT_O, KT_O
@@ -185,7 +185,7 @@ def ve_highlight_cho_o(screen, row, col, grid):
             ar = sr + i  # ar = actual_row(dòng chính xác tính từ vị trí chỉ số), sr = start_row    
             ac = sc + j
          
-            pygame.draw.rect(screen, (195, 215, 234), pygame.Rect(
+            pygame.draw.rect(screen, (150, 190, 228), pygame.Rect(
                 DEM + ac * KT_O,  
                 DEM + ar * KT_O,  
                 KT_O, KT_O
@@ -257,7 +257,7 @@ def ve_bang_thua(screen, width, height):
     box_y = (CAO - box_height) // 2  # Căn giữa theo chiều dọc
 
     # Vẽ bảng trắng
-    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_width, box_height), border_radius=10)
+    rect_bang_thua = pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_width, box_height), border_radius=10)
 
     # Vẽ chữ "Bạn đã thua!"
     font = pygame.font.SysFont("verdana", 28)
@@ -272,12 +272,12 @@ def ve_bang_thua(screen, width, height):
     text = font.render("Chơi lại", True, (255, 255, 255))
     screen.blit(text, (box_x + 90, box_y + 155))
 
-    # Vẽ nút "Thoát"
+    # Vẽ nút "Exit"
     btn_thoat = pygame.draw.rect(screen, (255,255,255), pygame.Rect(box_x + 290, box_y + 150, 150, 50), border_radius=10)
-    text = font.render("Thoát", True, (90, 123, 192))
+    text = font.render("Exit game", True, (90, 123, 192))
     screen.blit(text, (box_x + 320, box_y + 155))
 
-    return btn_choi_lai, btn_thoat
+    return btn_choi_lai, btn_thoat, rect_bang_thua
 
 def ve_bang_thang(screen, RONG, CAO, tg_da_troi):
     """Hiển thị bảng thông báo chiến thắng với nền mờ và căn giữa."""
@@ -293,7 +293,7 @@ def ve_bang_thang(screen, RONG, CAO, tg_da_troi):
     box_y = (CAO - box_cao) // 2  # Căn giữa theo chiều dọc
 
     # Vẽ bảng trắng
-    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
+    rect_bang_thang = pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
 
     # Vẽ chữ "Bạn đã thắng!"
     font = pygame.font.SysFont("verdana", 28)
@@ -323,4 +323,4 @@ def ve_bang_thang(screen, RONG, CAO, tg_da_troi):
     text = font.render("Thoát", True, (90, 123, 192))
     screen.blit(text, (box_x + 320, box_y + 155))
 
-    return choilai_btn, thoat_btn
+    return choilai_btn, thoat_btn, rect_bang_thang

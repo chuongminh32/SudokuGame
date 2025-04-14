@@ -163,6 +163,8 @@ class HomeScreen:
     def bat_dau_choi_btn_click(self):
         from src.gui import game_screen
         game_screen.khoiDongManHinhChoiGame()
+        # Sau khi game_screen thoát, khởi tạo lại màn hình chính
+        self.__init__()  # Khởi tạo lại giao diện
     
     # Hàm bắt sự kiện click nút hướng dẫn  
     def huong_dan_btn_click(self):
@@ -203,9 +205,11 @@ class HomeScreen:
             self.ve_chan_trang  ()
             pygame.display.update()  # Cập nhật màn hình
             clock.tick(60)  # Giới hạn FPS
+
 def runHome():
-    game = HomeScreen()  # Tạo đối tượng game
-    game.run() 
+    game = HomeScreen()
+    game.run()
+
 
 # Chạy chương trình
 if __name__ == "__main__":
