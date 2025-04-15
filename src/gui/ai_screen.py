@@ -48,6 +48,12 @@ class Ai_Screen:
 
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_cap_do)
 
+        # -----------thông báo giải xong -------------
+        self.hien_thong_bao_ai = False
+        self.thoi_gian_giai = 0
+        self.thoat_btn = None
+
+
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -65,20 +71,21 @@ class Ai_Screen:
         self.o_sai = []  # Xóa danh sách các ô sai
         self.o_dung = []  # Xóa danh sách các ô đúng
 
+    def giai_sudoku(self, chon_val_alg, bang_goc, cap_nhat_gui):
+         if chon_val_alg == "B":
+              giai_sudoku_backtracking_visual(bang_goc, cap_nhat_gui)
+              
     def xuLiSuKienClickChuot(self, vitri_click):
 
         x = vitri_click[0]
         y = vitri_click[1]
 
-        
-
-    
         # click nút back -> home
         if (self.back_btn is not None and self.back_btn.collidepoint(vitri_click)):
             self.dangChayGame = False
 
         # click ô trong bảng (cho click khi đã ẩn bảng chọn)
-        elif (DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg):
+        elif (DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai):
             cot = (x - DEM) // KT_O
             dong = (y - DEM) // KT_O
             self.o_chon = (dong, cot) # chọn ô
@@ -93,8 +100,49 @@ class Ai_Screen:
         
         # click nút ai giải 
         elif self.ai_btn.collidepoint(vitri_click):
-            self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải bang hien tai 
-            self.an_bang_da_thang = False
+            # Xoá bàn cờ hiện tại để bắt đầu giải từ đầu
+            self.bang = [[0 for _ in range(9)] for _ in range(9)]
+
+            # Ghi lại thời gian bắt đầu
+            tg_bat_dau = time.time()
+
+            # Hàm cập nhật GUI từng bước giải
+            def cap_nhat_gui(row, col, value, trang_thai):
+                if trang_thai == "thu":
+                    mau = (255, 243, 176)  # Vàng nhạt
+                elif trang_thai == "sai":
+                    mau = (255, 193, 193)  # Đỏ nhạt
+                elif trang_thai == "dung":
+                    mau = (195, 247, 202)  # Xanh nhạt
+                else:
+                    mau = TRANG  # Mặc định
+
+                pygame.draw.rect(self.screen, mau, pygame.Rect(DEM + col*KT_O + 1, DEM + row*KT_O + 1, KT_O - 2, KT_O - 2))
+
+                if value != 0:
+                    text = self.font.render(str(value), True, DEN)
+                    rect = text.get_rect(center=(DEM + col * KT_O + KT_O // 2, DEM + row * KT_O + KT_O // 2))
+                    self.screen.blit(text, rect)
+
+                pygame.display.update()
+                pygame.time.delay(10)
+
+            # Gọi thuật toán giải có hiệu ứng
+            self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui)
+            # giai_sudoku_backtracking_visual(self.bang_goc, cap_nhat_gui)
+
+            # Ghi lại thời gian kết thúc và tính tổng thời gian
+            tg_ket_thuc = time.time()
+            self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 2)
+            self.hien_thong_bao_ai = True  # Cờ để hiện bảng thông báo
+
+            self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải bang hien tai
+
+        # click nút thoát -> ẩn bảng thông báo 
+        elif self.thoat_btn != None:
+            if self.thoat_btn.collidepoint(vitri_click):
+                self.hien_thong_bao_ai = False
+                self.thoat_btn = None
 
         # click nút reset
         elif self.reset_btn is not None and self.reset_btn.collidepoint(vitri_click):
@@ -180,6 +228,10 @@ class Ai_Screen:
             # vẽ bảng chọn alg 
             if self.hien_bang_chon_alg:
                 self.bang_alg, self.rect_bang_alg = ve_bang_chon_alg(self.screen)
+
+            # Nếu giải xong thì hiện thông báo
+            if self.hien_thong_bao_ai:
+                self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg)
 
             pygame.display.update()
 

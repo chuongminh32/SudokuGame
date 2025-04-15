@@ -82,6 +82,8 @@ def ve_so(screen, bang, bang_goc, font, bang_giai):
                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
                 screen.blit(text, rect)
 
+
+
 def ve_luoi(screen):  # Vẽ lưới Sudoku
     for i in range(KT_LUOI + 1):  # Duyệt qua tất cả các đường
         duongVien = 3 if i % 3 == 0 else 1  # Đường viền dày hơn cho mỗi khối 3x3
@@ -267,3 +269,52 @@ def ve_highlight_cho_o(screen, row, col, grid):
             for c in range(KT_LUOI):
                 if (grid[r][c] == gia_tri_o_dang_duoc_chon):
                     pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
+
+def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
+    """Hiển thị bảng thông báo giải xong."""
+
+    # Tạo lớp nền mờ
+    overlay = pygame.Surface((RONG, CAO), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 150))  # Màu đen với độ trong suốt
+    screen.blit(overlay, (0, 0))
+
+    # Kích thước bảng thông báo
+    box_rong, box_cao = 510, 245
+    box_x = (RONG - box_rong) // 2
+    box_y = (CAO - box_cao) // 2
+
+    # Vẽ bảng trắng
+    pygame.draw.rect(screen, (255, 255, 255),
+                                       pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
+
+    # Vẽ chữ thông báo
+    font = pygame.font.SysFont("verdana", 28)
+    font_sub = pygame.font.SysFont("verdana", 20)
+    text = font.render("Đã giải thành công!", True, (52, 72, 97))
+    text_sub = font_sub.render(f"Thuật toán sử dụng: {ten_alg}", True, (148, 163, 183))
+    screen.blit(text, (box_x + 105, box_y + 20))
+    screen.blit(text_sub, (box_x + 100, box_y + 70))
+
+    # Tính phút và giây
+    minutes = int(tg_giai) // 60
+    seconds = int(tg_giai) % 60
+    time_text = f"Thời gian giải: {minutes:02}:{seconds:02} (s)"
+
+    # Vẽ thời gian
+    font_time = pygame.font.SysFont("verdana", 18)
+    time_render = font_time.render(time_text, True, (52, 72, 97))
+    screen.blit(time_render, (box_x + 100, box_y + 100))
+
+    # Vẽ nút "Thoát" ở giữa
+    btn_width, btn_height = 150, 50
+    btn_x = box_x + (box_rong - btn_width) // 2  # Căn giữa
+    btn_y = box_y + 150
+    thoat_btn = pygame.draw.rect(screen, (90, 123, 192),
+                                 pygame.Rect(btn_x, btn_y, btn_width, btn_height), border_radius=10)
+
+    text = font.render("Thoát", True, (255, 255, 255))
+    screen.blit(text, (btn_x + 30, btn_y + 5))
+
+    return thoat_btn
+
+
