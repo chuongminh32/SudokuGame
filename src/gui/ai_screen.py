@@ -3,6 +3,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.utils.utils_ai_screen import * 
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
+from src.algorithm.hill_climbing import *
 
 
 class Ai_Screen:
@@ -42,11 +43,8 @@ class Ai_Screen:
         self.dangChayGame = True
         self.ket_thuc = False
 
-        # vẽ nút 
-        self.hint_btn, self.reset_btn, self.ai_btn, self.back_btn = ve_nut(self.screen)
-        self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
-
-        self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_cap_do)
+        # nút 
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg = [None] * 6
 
         # -----------thông báo giải xong -------------
         self.hien_thong_bao_ai = False
@@ -72,8 +70,11 @@ class Ai_Screen:
         self.o_dung = []  # Xóa danh sách các ô đúng
 
     def giai_sudoku(self, chon_val_alg, bang_goc, cap_nhat_gui):
-         if chon_val_alg == "B":
-              giai_sudoku_backtracking_visual(bang_goc, cap_nhat_gui)
+        if chon_val_alg == "B":
+            giai_sudoku_backtracking_visual(bang_goc, cap_nhat_gui)
+        # elif chon_val_alg == "HC":
+        #     giai_sudoku_hill_climbing_visual(bang_goc, cap_nhat_gui)
+    
               
     def xuLiSuKienClickChuot(self, vitri_click):
 
@@ -89,7 +90,13 @@ class Ai_Screen:
             cot = (x - DEM) // KT_O
             dong = (y - DEM) // KT_O
             self.o_chon = (dong, cot) # chọn ô
-            
+
+        # Trong xử lý click nút "So sánh"
+        elif self.nut_ss.collidepoint(vitri_click):
+            self.so_sanh_mode = True
+            from src.gui import compare_screen
+            compare_screen.KhoiDongManHinhSS()
+    
         # click nút cấp độ 
         elif self.nut_dd_cap_do.collidepoint(vitri_click):
             self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do 
@@ -100,6 +107,9 @@ class Ai_Screen:
         
         # click nút ai giải 
         elif self.ai_btn.collidepoint(vitri_click):
+            # # Disable nút làm mới và so sánh
+            self.reset_btn = None
+            self.nut_ss = None
             # Xoá bàn cờ hiện tại để bắt đầu giải từ đầu
             self.bang = [[0 for _ in range(9)] for _ in range(9)]
 
@@ -117,23 +127,36 @@ class Ai_Screen:
                 else:
                     mau = TRANG  # Mặc định
 
-                pygame.draw.rect(self.screen, mau, pygame.Rect(DEM + col*KT_O + 1, DEM + row*KT_O + 1, KT_O - 2, KT_O - 2))
+                # Vẽ một ô tại vị trí (row, col) với màu `mau`, viền nhỏ (để nhìn đẹp hơn)
+                pygame.draw.rect(self.screen, mau, pygame.Rect(
+                    DEM + col * KT_O + 1,             # Toạ độ X của ô cộng thêm 1 pixel để tạo khoảng viền
+                    DEM + row * KT_O + 1,             # Toạ độ Y của ô cộng thêm 1 pixel để tạo khoảng viền
+                    KT_O - 2,                         # Chiều rộng ô (giảm 2 pixel để giữ viền)
+                    KT_O - 2                          # Chiều cao ô (giảm 2 pixel để giữ viền)
+                ))
 
+                # Nếu ô có giá trị (khác 0), thì hiển thị số đó lên ô
                 if value != 0:
-                    text = self.font.render(str(value), True, DEN)
-                    rect = text.get_rect(center=(DEM + col * KT_O + KT_O // 2, DEM + row * KT_O + KT_O // 2))
-                    self.screen.blit(text, rect)
+                    text = self.font.render(str(value), True, DEN)  # Tạo đối tượng văn bản với màu đen
+                    rect = text.get_rect(center=(
+                        DEM + col * KT_O + KT_O // 2,             # Tọa độ X chính giữa ô
+                        DEM + row * KT_O + KT_O // 2              # Tọa độ Y chính giữa ô
+                    ))
+                    self.screen.blit(text, rect)  # Vẽ số lên ô Sudoku tại vị trí căn giữa
 
-                pygame.display.update()
-                pygame.time.delay(10)
+            # Cập nhật lại phần màn hình vừa vẽ để hiển thị ngay lập tức
+            pygame.display.update()
+
+            # Tạm dừng 10 mili giây để người dùng nhìn thấy bước này (hiệu ứng minh họa quá trình giải)
+            pygame.time.delay(10)
 
             # Gọi thuật toán giải có hiệu ứng
             self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui)
-            # giai_sudoku_backtracking_visual(self.bang_goc, cap_nhat_gui)
 
             # Ghi lại thời gian kết thúc và tính tổng thời gian
             tg_ket_thuc = time.time()
             self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 2)
+            
             self.hien_thong_bao_ai = True  # Cờ để hiện bảng thông báo
 
             self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải bang hien tai
@@ -184,6 +207,10 @@ class Ai_Screen:
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn = ve_nut(self.screen)
+        self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
+        self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
+            
 
     def ve_lai_cac_o_sai(self):
         for r, c in self.o_sai:

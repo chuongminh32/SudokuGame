@@ -31,10 +31,10 @@ def ve_nut(screen):
     font = pygame.font.SysFont("verdana", font_size)
 
     # Nút Gợi ý
-    nut_goi_y = pygame.Rect(DEM, y_nut, w_nut, CAO_NUT)  # Vị trí và kích thước của nút
-    pygame.draw.rect(screen, MAU_NUT, nut_goi_y, border_radius=8)  # Vẽ nút với màu nền và bo tròn
-    text_goi_y = font.render("Gợi ý", True, MAU_CHU_NUT)  # Vẽ chữ "Gợi ý"
-    screen.blit(text_goi_y, text_goi_y.get_rect(center=nut_goi_y.center))  # Căn giữa chữ trong nút
+    nut_ss  = pygame.Rect(DEM, y_nut, w_nut, CAO_NUT)  # Vị trí và kích thước của nút
+    pygame.draw.rect(screen, MAU_NUT, nut_ss, border_radius=8)  # Vẽ nút với màu nền và bo tròn
+    text_goi_y = font.render("So sánh", True, MAU_CHU_NUT)  # Vẽ chữ "Gợi ý"
+    screen.blit(text_goi_y, text_goi_y.get_rect(center=nut_ss.center))  # Căn giữa chữ trong nút
 
     # Nút Làm mới
     nut_lam_moi = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
@@ -60,7 +60,19 @@ def ve_nut(screen):
     ]
     pygame.draw.polygon(screen, DEN, arrow_points)  # Vẽ mũi tên màu trắng
 
-    return nut_goi_y, nut_lam_moi, nut_ai, nut_back
+    return nut_ss, nut_lam_moi, nut_ai, nut_back
+
+def ve_nut_run(screen, x, y):
+    w_nut = (RONG - 2 * DEM - 2 * KC_NUT) // 3  # Chiều rộng của mỗi nút, chia đều 3 nút
+
+    font_size = 24  # Cỡ chữ cho các nút
+    font = pygame.font.SysFont("verdana", font_size)
+
+    # Nút run ss 2 alg
+    nut_ss  = pygame.Rect(x, y, w_nut, CAO_NUT)  # Vị trí và kích thước của nút
+    pygame.draw.rect(screen, MAU_NUT, nut_ss, border_radius=8)  # Vẽ nút với màu nền và bo tròn
+    text_goi_y = font.render("Run", True, MAU_CHU_NUT)  # Vẽ chữ "Gợi ý"
+    screen.blit(text_goi_y, text_goi_y.get_rect(center=nut_ss.center))  # Căn giữa chữ trong nút
 
 def ve_so(screen, bang, bang_goc, font, bang_giai):
     for i in range(KT_LUOI):
@@ -295,10 +307,11 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
     screen.blit(text, (box_x + 105, box_y + 20))
     screen.blit(text_sub, (box_x + 100, box_y + 70))
 
-    # Tính phút và giây
-    minutes = int(tg_giai) // 60
-    seconds = int(tg_giai) % 60
-    time_text = f"Thời gian giải: {minutes:02}:{seconds:02} (s)"
+    # Tính giây và mili giây
+    seconds = int(tg_giai)
+    milliseconds = int((tg_giai - seconds) * 1000)
+    time_text = f"Thời gian giải: {seconds:1}.{milliseconds:03} (giây)"
+
 
     # Vẽ thời gian
     font_time = pygame.font.SysFont("verdana", 18)
