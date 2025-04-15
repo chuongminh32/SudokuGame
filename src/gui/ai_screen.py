@@ -32,7 +32,6 @@ class Ai_Screen:
         self.bang_alg = [] # luu ds cac alg 
         self.chon_val_alg = "B"
 
-
         # sự kiện click nút trong bảng 
         self.o_chinh_sua = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) if self.bang_goc[i][j] == 0] # ô có thể chỉnh sửa 
         self.o_sai = []
@@ -43,6 +42,11 @@ class Ai_Screen:
         self.dangChayGame = True
         self.ket_thuc = False
 
+        # vẽ nút 
+        self.hint_btn, self.reset_btn, self.ai_btn, self.back_btn = ve_nut(self.screen)
+        self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
+
+        self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_cap_do)
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
@@ -50,7 +54,6 @@ class Ai_Screen:
                 self.dangChayGame = False
             elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                 self.xuLiSuKienClickChuot(e.pos)
-
 
     def reset_game(self):
         # Đặt lại bảng chơi về trạng thái ban đầu
@@ -67,17 +70,12 @@ class Ai_Screen:
         x = vitri_click[0]
         y = vitri_click[1]
 
-        hint_btn, reset_btn, ai_btn, back_btn = ve_nut(self.screen)
-        nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
-
-        nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_cap_do)
-
+        
 
     
         # click nút back -> home
-        if (back_btn is not None and back_btn.collidepoint(vitri_click)):
+        if (self.back_btn is not None and self.back_btn.collidepoint(vitri_click)):
             self.dangChayGame = False
-        
 
         # click ô trong bảng (cho click khi đã ẩn bảng chọn)
         elif (DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg):
@@ -86,20 +84,20 @@ class Ai_Screen:
             self.o_chon = (dong, cot) # chọn ô
             
         # click nút cấp độ 
-        elif nut_dd_cap_do.collidepoint(vitri_click):
+        elif self.nut_dd_cap_do.collidepoint(vitri_click):
             self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do 
 
         # click nút alg 
-        elif nut_dd_alg.collidepoint(vitri_click):
+        elif self.nut_dd_alg.collidepoint(vitri_click):
             self.hien_bang_chon_alg = not self.hien_bang_chon_alg # toggle hien bang cap do 
         
         # click nút ai giải 
-        elif ai_btn.collidepoint(vitri_click):
+        elif self.ai_btn.collidepoint(vitri_click):
             self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải bang hien tai 
             self.an_bang_da_thang = False
 
         # click nút reset
-        elif reset_btn is not None and reset_btn.collidepoint(vitri_click):
+        elif self.reset_btn is not None and self.reset_btn.collidepoint(vitri_click):
             self.reset_game()
 
         # Nếu click ra ngoài bảng cấp độ thì ẩn bảng cấp độ
@@ -109,7 +107,6 @@ class Ai_Screen:
         # Nếu click ra ngoài bảng chọn alg thì ẩn đi
         elif self.hien_bang_chon_alg and not self.rect_bang_alg.collidepoint(vitri_click):
             self.hien_bang_chon_alg = False
-
         
         # Xử lí sự kiện click từng cấp độ trong bảng 
         elif self.hien_bang_cap_do == True:
@@ -125,6 +122,7 @@ class Ai_Screen:
                     self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
                     self.hien_bang_cap_do = False
                     break
+
         # Xử lí sự kiện click chọn alg
         elif self.hien_bang_chon_alg == True:
             for alg in self.bang_alg:
@@ -148,14 +146,11 @@ class Ai_Screen:
         for r, c in self.o_dung:
             pygame.draw.rect(self.screen, ((180, 230, 200)), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
         self.veCauTrucBang()
-
  
-   
     def run(self):
         while self.dangChayGame:
             self.screen.fill(TRANG)
-
-           
+  
             # Vẽ nền, lưới và số
             self.veCauTrucBang()
 
