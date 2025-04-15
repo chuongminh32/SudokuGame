@@ -330,4 +330,15 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
 
     return thoat_btn
 
+def ve_nut_mo_rong(screen, RONG, CAO):
+    # Load hình ảnh nút mở rộng
+    icon_mo_rong = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-expand-arrow-48.png")
+    icon_mo_rong = pygame.transform.scale(icon_mo_rong, (40, 40))  # Resize nếu cần
+
+    nut_x = RONG - 45
+    nut_y = (CAO - 20) // 2  # Căn giữa theo trục Y
+
+    rect_nut_mo_rong = screen.blit(icon_mo_rong, (nut_x, nut_y))
+
+    return rect_nut_mo_rong
 

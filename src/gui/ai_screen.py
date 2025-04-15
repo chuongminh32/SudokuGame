@@ -44,12 +44,17 @@ class Ai_Screen:
         self.ket_thuc = False
 
         # nút 
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg = [None] * 6
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg = [None] * 6 
 
         # -----------thông báo giải xong -------------
         self.hien_thong_bao_ai = False
         self.thoi_gian_giai = 0
         self.thoat_btn = None
+
+        # giao diện mở rộng 
+        self.nut_mo_rong = None 
+        self.bat_giao_dien_mo_rong = False
+
 
 
     def xuLiSuKien(self):
@@ -144,11 +149,11 @@ class Ai_Screen:
                     ))
                     self.screen.blit(text, rect)  # Vẽ số lên ô Sudoku tại vị trí căn giữa
 
-            # Cập nhật lại phần màn hình vừa vẽ để hiển thị ngay lập tức
-            pygame.display.update()
+                # Cập nhật lại phần màn hình vừa vẽ để hiển thị ngay lập tức
+                pygame.display.update()
 
-            # Tạm dừng 10 mili giây để người dùng nhìn thấy bước này (hiệu ứng minh họa quá trình giải)
-            pygame.time.delay(10)
+                # Tạm dừng 10 mili giây để người dùng nhìn thấy bước này (hiệu ứng minh họa quá trình giải)
+                pygame.time.delay(10)
 
             # Gọi thuật toán giải có hiệu ứng
             self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui)
@@ -156,7 +161,7 @@ class Ai_Screen:
             # Ghi lại thời gian kết thúc và tính tổng thời gian
             tg_ket_thuc = time.time()
             self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 2)
-            
+
             self.hien_thong_bao_ai = True  # Cờ để hiện bảng thông báo
 
             self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải bang hien tai
@@ -204,24 +209,24 @@ class Ai_Screen:
                     self.hien_bang_chon_alg = False
                     break
         
+       # click nut mo rong 
+        if self.nut_mo_rong and self.nut_mo_rong.collidepoint(vitri_click):
+            self.bat_giao_dien_mo_rong = not self.bat_giao_dien_mo_rong
+            if self.bat_giao_dien_mo_rong:
+                self.screen = pygame.display.set_mode((RONG * 2, CAO))
+            else:
+                self.screen = pygame.display.set_mode((RONG, CAO))
+
+
+        
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
         self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn = ve_nut(self.screen)
         self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
-            
+        self.nut_mo_rong = ve_nut_mo_rong(self.screen, RONG, CAO)
 
-    def ve_lai_cac_o_sai(self):
-        for r, c in self.o_sai:
-            pygame.draw.rect(self.screen,  (250, 180, 180) , pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
-        self.veCauTrucBang()
-    
-    def ve_lai_cac_o_dung(self):
-        for r, c in self.o_dung:
-            pygame.draw.rect(self.screen, ((180, 230, 200)), pygame.Rect(DEM + c*KT_O, DEM + r*KT_O, KT_O, KT_O))
-        self.veCauTrucBang()
- 
     def run(self):
         while self.dangChayGame:
             self.screen.fill(TRANG)
@@ -236,17 +241,8 @@ class Ai_Screen:
                  # Vẽ nền, lưới và số
                 self.veCauTrucBang()
 
-            # Vẽ các nút
-            ve_nut(self.screen)
-            ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
-            ve_nut_dd_bang_alg(self.screen, self.ten_alg)
-
             # Xử lý sự kiện
             self.xuLiSuKien()
-
-            # Vẽ các ô nếu sai/đúng 
-            self.ve_lai_cac_o_dung()
-            self.ve_lai_cac_o_sai()
 
             # vẽ bảng chọn level 
             if self.hien_bang_cap_do:
