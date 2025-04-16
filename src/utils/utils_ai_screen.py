@@ -62,6 +62,28 @@ def ve_nut_ai(screen):
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
+    # nut arrow left
+    icon_left = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-arrow-left-48.png").convert_alpha()
+    icon_left = pygame.transform.scale(icon_left, (40, 40))
+    # Vị trí icon
+    x = 120
+    y = CAO - 90
+    # Lấy rect từ icon và đặt vị trí
+    rect_left = icon_left.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_left, rect_left)
+
+    # nut arrow right 
+    icon_right = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-arrow-right.png").convert_alpha()
+    icon_right = pygame.transform.scale(icon_right, (40, 40))
+    # Vị trí icon
+    x = RONG - 160
+    y = CAO - 90
+    # Lấy rect từ icon và đặt vị trí
+    rect_nut_back = icon_right.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_right, rect_nut_back)
+
     
 
     return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
