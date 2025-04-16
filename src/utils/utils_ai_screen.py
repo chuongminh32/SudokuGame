@@ -84,8 +84,6 @@ def ve_nut_ai(screen):
     # Vẽ icon lên màn hình
     screen.blit(icon_right, rect_nut_back)
 
-    
-
     return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
 
 def ve_nut_run(screen, x, y):

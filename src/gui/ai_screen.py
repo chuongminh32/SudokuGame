@@ -55,8 +55,6 @@ class Ai_Screen:
         self.nut_mo_rong = None 
         self.bat_giao_dien_mo_rong = False
 
-
-
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
