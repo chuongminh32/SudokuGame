@@ -1,6 +1,4 @@
-import random 
-import pygame, sys, os, math 
-import time
+import pygame, sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9

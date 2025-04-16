@@ -395,7 +395,7 @@ class SudokuGame:
 
             pygame.display.update()
 
-    pygame.quit()
+    # pygame.quit()
 
 
 def khoiDongManHinhChoiGame():

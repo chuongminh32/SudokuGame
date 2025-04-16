@@ -122,38 +122,55 @@ class Ai_Screen:
             tg_bat_dau = time.time()
 
             # Hàm cập nhật GUI từng bước giải
-            def cap_nhat_gui(row, col, value, trang_thai):
+            def cap_nhat_gui(row, col, value, trang_thai, so_buoc):
                 if trang_thai == "thu":
-                    mau = (255, 243, 176)  # Vàng nhạt
+                    mau = (255, 243, 176)  # Màu vàng nhạt cho ô đang thử
+                    trang_thai_text = "Thử: "  # Hiển thị "Thử"
                 elif trang_thai == "sai":
-                    mau = (255, 193, 193)  # Đỏ nhạt
+                    mau = (255, 193, 193)  # Màu đỏ nhạt cho ô sai
+                    trang_thai_text = "Sai"  # Hiển thị "Sai"
                 elif trang_thai == "dung":
-                    mau = (195, 247, 202)  # Xanh nhạt
+                    mau = (195, 247, 202)  # Màu xanh nhạt cho ô đúng
+                    trang_thai_text = "Đúng"  # Hiển thị "Đúng"
                 else:
-                    mau = TRANG  # Mặc định
+                    mau = TRANG  # Mặc định là màu trắng
+                    trang_thai_text = ""
 
-                # Vẽ một ô tại vị trí (row, col) với màu `mau`, viền nhỏ (để nhìn đẹp hơn)
+                # Vẽ lại ô Sudoku tại vị trí (row, col)
                 pygame.draw.rect(self.screen, mau, pygame.Rect(
-                    DEM + col * KT_O + 1,             # Toạ độ X của ô cộng thêm 1 pixel để tạo khoảng viền
-                    DEM + row * KT_O + 1,             # Toạ độ Y của ô cộng thêm 1 pixel để tạo khoảng viền
-                    KT_O - 2,                         # Chiều rộng ô (giảm 2 pixel để giữ viền)
-                    KT_O - 2                          # Chiều cao ô (giảm 2 pixel để giữ viền)
+                    DEM + col * KT_O + 1,
+                    DEM + row * KT_O + 1,
+                    KT_O - 2, KT_O - 2
                 ))
 
-                # Nếu ô có giá trị (khác 0), thì hiển thị số đó lên ô
+                # Hiển thị giá trị trong ô nếu có
                 if value != 0:
-                    text = self.font.render(str(value), True, DEN)  # Tạo đối tượng văn bản với màu đen
+                    text = self.font.render(str(value), True, DEN)
                     rect = text.get_rect(center=(
-                        DEM + col * KT_O + KT_O // 2,             # Tọa độ X chính giữa ô
-                        DEM + row * KT_O + KT_O // 2              # Tọa độ Y chính giữa ô
+                        DEM + col * KT_O + KT_O // 2,
+                        DEM + row * KT_O + KT_O // 2
                     ))
-                    self.screen.blit(text, rect)  # Vẽ số lên ô Sudoku tại vị trí căn giữa
+                    self.screen.blit(text, rect)
 
-                # Cập nhật lại phần màn hình vừa vẽ để hiển thị ngay lập tức
+                # Hiển thị thông tin thay thế (giá trị thử, đúng, sai) trên màn hình
+                if self.bat_giao_dien_mo_rong:
+                    # Vẽ lại vùng thông tin bên phải
+                    pygame.draw.rect(self.screen, TRANG, pygame.Rect(RONG, 0, RONG, CAO))  # Vùng bên phải
+                    text1 = self.font.render(f"Thuật toán: {self.ten_alg}", True, DEN)
+                    text3 = self.font.render(f"Bước thử: {so_buoc}", True, DEN)
+                    text4 = self.font.render(f"Giá trị thay thế: {trang_thai_text} {value}", True, DEN)
+
+                    # Hiển thị thông tin trên giao diện
+                    self.screen.blit(text1, (RONG + 20, 50))
+                    self.screen.blit(text3, (RONG + 20, 150))
+                    self.screen.blit(text4, (RONG + 20, 200))  # Hiển thị giá trị thử/thành công
+
+                # Cập nhật màn hình
                 pygame.display.update()
 
-                # Tạm dừng 10 mili giây để người dùng nhìn thấy bước này (hiệu ứng minh họa quá trình giải)
+                # Tạm dừng 10 mili giây để người dùng thấy bước này (hiệu ứng minh họa quá trình giải)
                 pygame.time.delay(10)
+
 
             # Gọi thuật toán giải có hiệu ứng
             self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui)
@@ -218,11 +235,10 @@ class Ai_Screen:
                 self.screen = pygame.display.set_mode((RONG, CAO))
 
 
-        
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn = ve_nut(self.screen)
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn = ve_nut_ai(self.screen)
         self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
         self.nut_mo_rong = ve_nut_mo_rong(self.screen, RONG, CAO)
@@ -258,7 +274,7 @@ class Ai_Screen:
 
             pygame.display.update()
 
-    pygame.quit()
+    # pygame.quit()
 
 
 

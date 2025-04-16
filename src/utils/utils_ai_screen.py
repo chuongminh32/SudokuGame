@@ -1,6 +1,5 @@
-import random 
-import pygame, sys, os, math 
-import time
+import pygame, sys, os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
@@ -22,7 +21,7 @@ def init_pygame():
     pygame.display.set_caption("Trò chơi Sudoku")
     return screen 
 
-def ve_nut(screen):
+def ve_nut_ai(screen):
     # Tính toán vị trí của các nút
     y_nut = DEM + KT_LUOI * KT_O + KC_NUT  # Vị trí y cho các nút
     w_nut = (RONG - 2 * DEM - 2 * KC_NUT) // 3  # Chiều rộng của mỗi nút, chia đều 3 nút
@@ -30,37 +29,42 @@ def ve_nut(screen):
     font_size = 24  # Cỡ chữ cho các nút
     font = pygame.font.SysFont("verdana", font_size)
 
-    # Nút Gợi ý
-    nut_ss  = pygame.Rect(DEM, y_nut, w_nut, CAO_NUT)  # Vị trí và kích thước của nút
-    pygame.draw.rect(screen, MAU_NUT, nut_ss, border_radius=8)  # Vẽ nút với màu nền và bo tròn
-    text_goi_y = font.render("So sánh", True, MAU_CHU_NUT)  # Vẽ chữ "Gợi ý"
-    screen.blit(text_goi_y, text_goi_y.get_rect(center=nut_ss.center))  # Căn giữa chữ trong nút
+    # Load hình ảnh nút so sánh 
+    icon_ss = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-compare-50.png")
+    icon_ss = pygame.transform.scale(icon_ss, (40, 40))  # Resize nếu cần
+    x = RONG - 270
+    y = 15
+    rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
+    screen.blit(icon_ss, rect_nut_ss)
 
-    # Nút Làm mới
-    nut_lam_moi = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
-    pygame.draw.rect(screen, MAU_NUT, nut_lam_moi, border_radius=8)
-    text_lam_moi = font.render("Làm mới", True, MAU_CHU_NUT)
-    screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_lam_moi.center))
+    # Load hình ảnh nút làm mới
+    icon_lam_moi = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-refresh-48.png")
+    icon_lam_moi = pygame.transform.scale(icon_lam_moi, (40, 40))  # Resize nếu cần
+    x = RONG - 350
+    y = 15
+    rect_nut_lam_moi = icon_lam_moi.get_rect(topleft=(x, y))
+    screen.blit(icon_lam_moi, rect_nut_lam_moi)
+
+    # nut back 
+    icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
+    icon_back = pygame.transform.scale(icon_back, (40, 40))
+    # Vị trí icon
+    x = 12
+    y = 15
+    # Lấy rect từ icon và đặt vị trí
+    rect_nut_back = icon_back.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_back, rect_nut_back)
 
     # Nút AI giải
-    nut_ai = pygame.Rect(DEM + 2 * (w_nut + KC_NUT), y_nut, w_nut, CAO_NUT)
+    nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
     pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
-    text_ai = font.render("AI giải", True, MAU_CHU_NUT)
-    screen.blit(text_ai, text_ai.get_rect(center=nut_ai.center))
+    text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
+    screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-    # Nút Back (mũi tên trái)
-    x_b, y_b = DEM_NUT_BACK_x, DEM_NUT_BACK_y
-    nut_back = pygame.Rect(x_b, y_b, KT_NUT_BACK, KT_NUT_BACK)
+    
 
-    # Vẽ mũi tên trái '<' không có nền
-    arrow_points = [
-        (x_b + KT_NUT_BACK * 0.65, y_b + KT_NUT_BACK * 0.3),  # Điểm trên của mũi tên
-        (x_b + KT_NUT_BACK * 0.35, y_b + KT_NUT_BACK * 0.5),  # Điểm giữa của mũi tên
-        (x_b + KT_NUT_BACK * 0.65, y_b + KT_NUT_BACK * 0.7)   # Điểm dưới của mũi tên
-    ]
-    pygame.draw.polygon(screen, DEN, arrow_points)  # Vẽ mũi tên màu trắng
-
-    return nut_ss, nut_lam_moi, nut_ai, nut_back
+    return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
 
 def ve_nut_run(screen, x, y):
     w_nut = (RONG - 2 * DEM - 2 * KC_NUT) // 3  # Chiều rộng của mỗi nút, chia đều 3 nút
