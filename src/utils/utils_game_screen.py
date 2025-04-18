@@ -47,18 +47,17 @@ def ve_nut(screen):
     screen.blit(text_ai, text_ai.get_rect(center=nut_ai.center))
 
     # Nút Back (mũi tên trái)
-    x_b, y_b = DEM_NUT_BACK_x, DEM_NUT_BACK_y
-    nut_back = pygame.Rect(x_b, y_b, KT_NUT_BACK, KT_NUT_BACK)
+    icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
+    icon_back = pygame.transform.scale(icon_back, (40, 40))
+    # Vị trí icon
+    x = 12
+    y = 15
+    # Lấy rect từ icon và đặt vị trí
+    rect_nut_back = icon_back.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_back, rect_nut_back)
 
-    # Vẽ mũi tên trái '<' không có nền
-    arrow_points = [
-        (x_b + KT_NUT_BACK * 0.65, y_b + KT_NUT_BACK * 0.3),  # Điểm trên của mũi tên
-        (x_b + KT_NUT_BACK * 0.35, y_b + KT_NUT_BACK * 0.5),  # Điểm giữa của mũi tên
-        (x_b + KT_NUT_BACK * 0.65, y_b + KT_NUT_BACK * 0.7)   # Điểm dưới của mũi tên
-    ]
-    pygame.draw.polygon(screen, DEN, arrow_points)  # Vẽ mũi tên màu trắng
-
-    return nut_goi_y, nut_lam_moi, nut_ai, nut_back
+    return nut_goi_y, nut_lam_moi, nut_ai, rect_nut_back
 
 def ve_so(screen, bang, bang_goc, font, bang_giai):
     for i in range(KT_LUOI):

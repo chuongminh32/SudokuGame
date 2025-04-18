@@ -26,8 +26,7 @@ class Tutorial_Screen():
         self.font_chu_noi_dung = pygame.font.SysFont('Verdana', 20)
 
         # Nút quay lại 
-        self.nut_quay_lai = pygame.Rect(15, 15, 40, 40)
-        self.hover_nutquaylai = False 
+        self.nut_quay_lai = self.ve_nut_quay_lai()
 
         # Vị trí cố định cho tiêu đề và nội dung 
         self.tieude_y = 40 
@@ -38,6 +37,9 @@ class Tutorial_Screen():
         self.cuon_max = 0
         self.khung_thanh_cuon = None 
         self.dang_keo = False 
+
+        # run
+        self.dang_chay = True
 
     def tao_noi_dung(self):
             return [
@@ -166,22 +168,18 @@ class Tutorial_Screen():
 
     def ve_nut_quay_lai(self):
         """Vẽ nút quay lại (hình tròn có mũi tên)"""
-        
-        # Chọn màu cho nút (màu xanh nhạt nếu di chuột vào, ngược lại màu xanh đậm)
-        mau_nut = XANH_SANG if self.hover_nutquaylai else XANH
+        # Nút Back (mũi tên trái)
+        icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
+        icon_back = pygame.transform.scale(icon_back, (40, 40))
+        # Vị trí icon
+        x = 12
+        y = 15
+        # Lấy rect từ icon và đặt vị trí
+        rect_nut_back = icon_back.get_rect(topleft=(x, y))
+        # Vẽ icon lên màn hình
+        self.screen.blit(icon_back, rect_nut_back)
+        return rect_nut_back
 
-        # Vẽ hình tròn làm nền cho nút
-        pygame.draw.circle(self.screen, mau_nut, self.nut_quay_lai.center, 20)
-
-        # Tạo mũi tên chỉ sang trái
-        diem_mui_ten = [
-            (self.nut_quay_lai.centerx + 8, self.nut_quay_lai.centery - 12),  # Đầu trên của mũi tên
-            (self.nut_quay_lai.centerx - 12, self.nut_quay_lai.centery),       # Đỉnh mũi tên
-            (self.nut_quay_lai.centerx + 8, self.nut_quay_lai.centery + 12)    # Đầu dưới của mũi tên
-        ]
-
-        # Vẽ mũi tên màu trắng
-        pygame.draw.polygon(self.screen, TRANG, diem_mui_ten)
 
     def xu_ly_su_kien(self):
         """Xử lý các sự kiện như nhấn chuột, di chuột và cuộn chuột"""
@@ -193,9 +191,6 @@ class Tutorial_Screen():
 
             # Sự kiện di chuyển chuột
             elif event.type == pygame.MOUSEMOTION:
-                # Kiểm tra xem chuột có đang ở trên nút quay lại không
-                self.hover_nutquaylai = self.nut_quay_lai.collidepoint(event.pos)
-                
                 # Nếu đang kéo thanh cuộn
                 if self.dang_keo and self.cuon_max > 0:
                     mouse_y = event.pos[1]  # Lấy vị trí Y của chuột
@@ -208,8 +203,9 @@ class Tutorial_Screen():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Nếu nhấn chuột vào nút quay lại
                 if self.nut_quay_lai.collidepoint(event.pos):
-                    from src.gui.home_screen import HomeScreen
-                    HomeScreen().run()  # Quay lại màn hình chính
+                    # from src.gui.home_screen import HomeScreen
+                    # HomeScreen().run()  # Quay lại màn hình chính
+                    self.dang_chay = False
                 # Nếu nhấn chuột vào thanh cuộn
                 elif self.khung_thanh_cuon and self.khung_thanh_cuon.collidepoint(event.pos):
                     self.dang_keo = True  # Bắt đầu kéo thanh cuộn
@@ -224,7 +220,7 @@ class Tutorial_Screen():
                 self.dang_keo = False  # Dừng kéo thanh cuộn
 
     def run(self):
-        while True:
+        while self.dang_chay == True:
             self.xu_ly_su_kien()
             self.ve_noidung()
             self.ve_nut_quay_lai()
