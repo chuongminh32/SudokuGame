@@ -395,9 +395,6 @@ class SudokuGame:
 
             pygame.display.update()
 
-    # pygame.quit()
-
-
 def khoiDongManHinhChoiGame():
     sdk = SudokuGame()
     sdk.run()
