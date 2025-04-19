@@ -48,7 +48,6 @@ def ve_nut(screen):
 
     # Nút Back (mũi tên trái)
     icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
-    icon_back = pygame.transform.scale(icon_back, (40, 40))
     # Vị trí icon
     x = 12
     y = 15

@@ -32,22 +32,21 @@ def ve_nut_ai(screen):
     # Load hình ảnh nút so sánh 
     icon_ss = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-compare-50.png")
     icon_ss = pygame.transform.scale(icon_ss, (40, 40))  # Resize nếu cần
-    x = RONG - 270
-    y = 15
+    x = RONG - 160
+    y = CAO - 90
     rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
     screen.blit(icon_ss, rect_nut_ss)
 
     # Load hình ảnh nút làm mới
     icon_lam_moi = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-refresh-48.png")
     icon_lam_moi = pygame.transform.scale(icon_lam_moi, (40, 40))  # Resize nếu cần
-    x = RONG - 350
-    y = 15
+    x = 120
+    y = CAO - 90
     rect_nut_lam_moi = icon_lam_moi.get_rect(topleft=(x, y))
     screen.blit(icon_lam_moi, rect_nut_lam_moi)
 
     # nut back 
     icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
-    icon_back = pygame.transform.scale(icon_back, (40, 40))
     # Vị trí icon
     x = 12
     y = 15
@@ -62,27 +61,8 @@ def ve_nut_ai(screen):
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-    # nut arrow left
-    icon_left = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-arrow-left-48.png").convert_alpha()
-    icon_left = pygame.transform.scale(icon_left, (40, 40))
-    # Vị trí icon
-    x = 120
-    y = CAO - 90
-    # Lấy rect từ icon và đặt vị trí
-    rect_left = icon_left.get_rect(topleft=(x, y))
-    # Vẽ icon lên màn hình
-    screen.blit(icon_left, rect_left)
-
-    # nut arrow right 
-    icon_right = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-arrow-right.png").convert_alpha()
-    icon_right = pygame.transform.scale(icon_right, (40, 40))
-    # Vị trí icon
-    x = RONG - 160
-    y = CAO - 90
-    # Lấy rect từ icon và đặt vị trí
-    rect_nut_back = icon_right.get_rect(topleft=(x, y))
-    # Vẽ icon lên màn hình
-    screen.blit(icon_right, rect_nut_back)
+  
+  
 
     return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
 
@@ -333,8 +313,8 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
 
     # Tính giây và mili giây
     seconds = int(tg_giai)
-    milliseconds = int((tg_giai - seconds) * 1000)
-    time_text = f"Thời gian giải: {seconds:1}.{milliseconds:03} (giây)"
+    milliseconds = int((tg_giai - seconds) * 100000)
+    time_text = f"Thời gian giải: {seconds:1}.{milliseconds:05} (giây)"
 
 
     # Vẽ thời gian
