@@ -1,6 +1,5 @@
 import pygame, sys, os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
 KT_O = (RONG - 2 * DEM) // KT_LUOI 
@@ -14,6 +13,10 @@ MAU_NUT_BACK, MAU_ICON_BACK = (100, 100, 255), (80, 80, 80)  # Màu nút quay l�
 MAU_NUT_CAIDAT, MAU_KHI_DUOC_CHON = (60, 60, 60), (180, 230, 255)  # Màu biểu tượng cài đặt và tùy chọn được chọn
 KT_NUT_BACK, DEM_NUT_BACK_x, DEM_NUT_BACK_y = 40, 20, 20  # Kích thước và vị trí của biểu tượng quay lại
 KT_NUT_CAIDAT, DEM_NUT_CAIDAT = 37, 10  # Kích thước và khoảng cách của biểu tượng cài đặt
+
+# Tạo đường dẫn tương đối từ thư mục này
+def get_relative_path(*paths):
+    return os.path.join(BASE_DIR, *paths)
 
 def init_pygame():
     pygame.init()
@@ -30,23 +33,24 @@ def ve_nut_ai(screen):
     font = pygame.font.SysFont("verdana", font_size)
 
     # Load hình ảnh nút so sánh 
-    icon_ss = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-compare-50.png")
-    icon_ss = pygame.transform.scale(icon_ss, (40, 40))  # Resize nếu cần
+    icon_ss_path = get_relative_path("..", "assets", "icons8-compare-50.png")
+    icon_ss = pygame.image.load(icon_ss_path).convert_alpha()
     x = RONG - 160
     y = CAO - 90
     rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
     screen.blit(icon_ss, rect_nut_ss)
 
     # Load hình ảnh nút làm mới
-    icon_lam_moi = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-refresh-48.png")
-    icon_lam_moi = pygame.transform.scale(icon_lam_moi, (40, 40))  # Resize nếu cần
+    icon_ss_path = get_relative_path("..", "assets", "icons8-refresh-48.png")
+    icon_lam_moi = pygame.image.load(icon_ss_path).convert_alpha()
     x = 120
     y = CAO - 90
     rect_nut_lam_moi = icon_lam_moi.get_rect(topleft=(x, y))
     screen.blit(icon_lam_moi, rect_nut_lam_moi)
 
     # nut back 
-    icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
+    icon_ss_path = get_relative_path("..", "assets", "icons8-go-back-48.png")
+    icon_back = pygame.image.load(icon_ss_path).convert_alpha()
     # Vị trí icon
     x = 12
     y = 15
@@ -60,9 +64,6 @@ def ve_nut_ai(screen):
     pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
-
-  
-  
 
     return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
 
