@@ -1,5 +1,6 @@
 import pygame, sys, os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
 KT_O = (RONG - 2 * DEM) // KT_LUOI 
@@ -19,6 +20,10 @@ def init_pygame():
     screen = pygame.display.set_mode((RONG, CAO))
     pygame.display.set_caption("Trò chơi Sudoku")
     return screen 
+
+# Tạo đường dẫn tương đối từ thư mục này
+def get_relative_path(*paths):
+    return os.path.join(BASE_DIR, *paths)
 
 def ve_nut(screen):
     # Tính toán vị trí của các nút
@@ -47,7 +52,8 @@ def ve_nut(screen):
     screen.blit(text_ai, text_ai.get_rect(center=nut_ai.center))
 
     # Nút Back (mũi tên trái)
-    icon_back = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-go-back-48.png").convert_alpha()
+    icon_path = get_relative_path("..", "assets", "icons8-go-back-48.png")
+    icon_back = pygame.image.load(icon_path).convert_alpha()
     # Vị trí icon
     x = 12
     y = 15
