@@ -65,6 +65,7 @@ def ve_nut_ai(screen):
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
+
     return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
 
 def ve_nut_run(screen, x, y):
@@ -287,7 +288,7 @@ def ve_highlight_cho_o(screen, row, col, grid):
                 if (grid[r][c] == gia_tri_o_dang_duoc_chon):
                     pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
 
-def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
+def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
     """Hiển thị bảng thông báo giải xong."""
 
     # Tạo lớp nền mờ
@@ -313,9 +314,8 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
     screen.blit(text_sub, (box_x + 100, box_y + 70))
 
     # Tính giây và mili giây
-    seconds = int(tg_giai)
-    milliseconds = int((tg_giai - seconds) * 100000)
-    time_text = f"Thời gian giải: {seconds:1}.{milliseconds:05} (giây)"
+    time_text = f"Thời gian giải: {tg_giai:.9f} (giây)"
+    step = f"Tổng số bước thử: {so_buoc}(bước)"
 
 
     # Vẽ thời gian
@@ -323,10 +323,15 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg):
     time_render = font_time.render(time_text, True, (52, 72, 97))
     screen.blit(time_render, (box_x + 100, box_y + 100))
 
+    # Vẽ số bước 
+    font_step = pygame.font.SysFont("verdana", 18)
+    step_render = font_step.render(step, True, (52, 72, 97))
+    screen.blit(step_render, (box_x + 100, box_y + 130))
+
     # Vẽ nút "Thoát" ở giữa
     btn_width, btn_height = 150, 50
     btn_x = box_x + (box_rong - btn_width) // 2  # Căn giữa
-    btn_y = box_y + 150
+    btn_y = box_y + 170
     thoat_btn = pygame.draw.rect(screen, (90, 123, 192),
                                  pygame.Rect(btn_x, btn_y, btn_width, btn_height), border_radius=10)
 

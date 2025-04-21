@@ -34,11 +34,9 @@ def giai_sudoku_backtracking(bang):
     bang_copy = [row[:] for row in bang]  # Sao chép để không sửa bảng gốc
     solve(bang_copy)
     return bang_copy
-
-def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0.05):
+def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0):
     import time
 
-    # Hàm kiểm tra tính hợp lệ của giá trị
     def hop_le(bang, row, col, num):
         for i in range(9):
             if bang[row][i] == num or bang[i][col] == num:
@@ -50,29 +48,27 @@ def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0.05):
                     return False
         return True
 
-    # Hàm giải quyết bảng sudoku bằng thuật toán backtracking
-    so_buoc = 0  # Biến đếm số bước thử
+    so_buoc = 0
 
     def solve(bang):
         nonlocal so_buoc
         for row in range(9):
             for col in range(9):
-                if bang[row][col] == 0:  # Nếu ô trống
+                if bang[row][col] == 0:
                     for num in range(1, 10):
-                        if hop_le(bang, row, col, num):  # Kiểm tra xem số có hợp lệ không
+                        if hop_le(bang, row, col, num):
                             bang[row][col] = num
                             if cap_nhat_gui:
-                                cap_nhat_gui(row, col, num, "thu", so_buoc)  # Cập nhật GUI nếu có
+                                cap_nhat_gui(row, col, num, "thu", so_buoc)
                                 time.sleep(delay)
 
-                            so_buoc += 1  # Tăng số bước thử
+                            so_buoc += 1
 
                             if solve(bang):
                                 if cap_nhat_gui:
                                     cap_nhat_gui(row, col, num, "dung", so_buoc)
                                 return True
 
-                            # Nếu không thành công, quay lại (backtrack)
                             bang[row][col] = 0
                             if cap_nhat_gui:
                                 cap_nhat_gui(row, col, 0, "sai", so_buoc)
@@ -83,5 +79,4 @@ def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0.05):
     bang_copy = [row[:] for row in bang]
     solve(bang_copy)
 
-    return bang_copy  # Trả về bảng đã giải và số bước thử
-
+    return bang_copy, so_buoc  # Trả về cả bảng đã giải và số bước thử

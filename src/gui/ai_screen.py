@@ -1,4 +1,5 @@
 import pygame, sys, os, time, random
+import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.utils.utils_ai_screen import * 
 from src.algorithm.generate_sudoku import *
@@ -50,10 +51,15 @@ class Ai_Screen:
         self.hien_thong_bao_ai = False
         self.thoi_gian_giai = 0
         self.thoat_btn = None
+        self.so_buoc = 0 
 
         # giao diện mở rộng 
         self.nut_mo_rong = None 
         self.bat_giao_dien_mo_rong = False
+
+        # log giải thuật 
+        self.log_sau_cung = ""  # Lưu log cuối để vẽ lại sau khi thuật toán kết thúc
+        self.ds_log = []
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
@@ -74,11 +80,71 @@ class Ai_Screen:
 
     def giai_sudoku(self, chon_val_alg, bang_goc, cap_nhat_gui):
         if chon_val_alg == "B":
-            giai_sudoku_backtracking_visual(bang_goc, cap_nhat_gui)
+            bang_giai, so_buoc = giai_sudoku_backtracking_visual(bang_goc, cap_nhat_gui)
+            return bang_giai, so_buoc 
         # elif chon_val_alg == "HC":
         #     giai_sudoku_hill_climbing_visual(bang_goc, cap_nhat_gui)
-    
-              
+  
+    def cap_nhat_gui(self, row, col, value, trang_thai, so_buoc):
+        if trang_thai == "thu":
+            mau = (255, 243, 176)
+            trang_thai_text = "Thử"
+        elif trang_thai == "sai":
+            mau = (255, 193, 193)
+            trang_thai_text = "Sai"
+        elif trang_thai == "dung":
+            mau = (195, 247, 202)
+            trang_thai_text = "Đúng"
+        else:
+            mau = TRANG
+            trang_thai_text = ""
+
+        # Tạo dòng log chi tiết
+        dong_log = f"[Bước {so_buoc:04d}] ({row},{col}) <- {value} --> {trang_thai_text}"
+        # Ghi lại dữ liệu cho biểu đồ: (số bước, thời gian hiện tại)
+        self.ds_log.append((so_buoc, time.time()))
+
+
+        # Ghi log ra file
+        with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "a", encoding="utf-8") as f:
+            f.write(dong_log + "\n")
+
+        # Lưu lại để hiển thị lên GUI
+        self.dong_log_gan_nhat = dong_log
+
+        # Tô màu ô
+        pygame.draw.rect(self.screen, mau, pygame.Rect(
+            DEM + col * KT_O + 1,
+            DEM + row * KT_O + 1,
+            KT_O - 2, KT_O - 2
+        ))
+
+        # Vẽ số
+        if value != 0:
+            text = self.font.render(str(value), True, DEN)
+            rect = text.get_rect(center=(
+                DEM + col * KT_O + KT_O // 2,
+                DEM + row * KT_O + KT_O // 2
+            ))
+            self.screen.blit(text, rect)
+
+        # Hiển thị thông tin mở rộng
+        if self.bat_giao_dien_mo_rong:
+            pygame.draw.rect(self.screen, TRANG, pygame.Rect(RONG, 0, RONG, CAO))
+            text1 = self.font.render(f"Thuật toán: {self.ten_alg}", True, DEN)
+            text3 = self.font.render(f"Bước thử: {so_buoc}", True, DEN)
+            text4 = self.font.render(f"Giá trị thay thế: {trang_thai_text} {value}", True, DEN)
+            text5 = self.font.render(self.dong_log_gan_nhat, True, (100, 100, 100))  # Log gần nhất
+
+            self.screen.blit(text1, (RONG + 20, 50))
+            self.screen.blit(text3, (RONG + 20, 150))
+            self.screen.blit(text4, (RONG + 20, 200))
+            self.screen.blit(text5, (RONG + 20, 300))  # Hiển thị log tại vị trí khác
+
+
+        pygame.display.update()
+        pygame.time.delay(10)
+
     def xuLiSuKienClickChuot(self, vitri_click):
 
         x = vitri_click[0]
@@ -108,78 +174,29 @@ class Ai_Screen:
         elif self.nut_dd_alg.collidepoint(vitri_click):
             self.hien_bang_chon_alg = not self.hien_bang_chon_alg # toggle hien bang cap do 
         
-        # click nút ai giải 
         elif self.ai_btn.collidepoint(vitri_click):
-            # # Disable nút làm mới và so sánh
-            self.reset_btn = None
-            self.nut_ss = None
-            # Xoá bàn cờ hiện tại để bắt đầu giải từ đầu
-            self.bang = [[0 for _ in range(9)] for _ in range(9)]
+            # Xoá log cũ trước khi giải mới
+            with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "w", encoding="utf-8") as f:
+                f.write("")
+            self.ds_log = []
 
-            # Ghi lại thời gian bắt đầu
+            # Bắt đầu đo thời gian giải thực
+            bang_temp = [row[:] for row in self.bang_goc]  # sao chép để giữ nguyên gốc
             tg_bat_dau = time.time()
-
-            # Hàm cập nhật GUI từng bước giải
-            def cap_nhat_gui(row, col, value, trang_thai, so_buoc):
-                if trang_thai == "thu":
-                    mau = (255, 243, 176)  # Màu vàng nhạt cho ô đang thử
-                    trang_thai_text = "Thử: "  # Hiển thị "Thử"
-                elif trang_thai == "sai":
-                    mau = (255, 193, 193)  # Màu đỏ nhạt cho ô sai
-                    trang_thai_text = "Sai"  # Hiển thị "Sai"
-                elif trang_thai == "dung":
-                    mau = (195, 247, 202)  # Màu xanh nhạt cho ô đúng
-                    trang_thai_text = "Đúng"  # Hiển thị "Đúng"
-                else:
-                    mau = TRANG  # Mặc định là màu trắng
-                    trang_thai_text = ""
-
-                # Vẽ lại ô Sudoku tại vị trí (row, col)
-                pygame.draw.rect(self.screen, mau, pygame.Rect(
-                    DEM + col * KT_O + 1,
-                    DEM + row * KT_O + 1,
-                    KT_O - 2, KT_O - 2
-                ))
-
-                # Hiển thị giá trị trong ô nếu có
-                if value != 0:
-                    text = self.font.render(str(value), True, DEN)
-                    rect = text.get_rect(center=(
-                        DEM + col * KT_O + KT_O // 2,
-                        DEM + row * KT_O + KT_O // 2
-                    ))
-                    self.screen.blit(text, rect)
-
-                # Hiển thị thông tin thay thế (giá trị thử, đúng, sai) trên màn hình
-                if self.bat_giao_dien_mo_rong:
-                    # Vẽ lại vùng thông tin bên phải
-                    pygame.draw.rect(self.screen, TRANG, pygame.Rect(RONG, 0, RONG, CAO))  # Vùng bên phải
-                    text1 = self.font.render(f"Thuật toán: {self.ten_alg}", True, DEN)
-                    text3 = self.font.render(f"Bước thử: {so_buoc}", True, DEN)
-                    text4 = self.font.render(f"Giá trị thay thế: {trang_thai_text} {value}", True, DEN)
-
-                    # Hiển thị thông tin trên giao diện
-                    self.screen.blit(text1, (RONG + 20, 50))
-                    self.screen.blit(text3, (RONG + 20, 150))
-                    self.screen.blit(text4, (RONG + 20, 200))  # Hiển thị giá trị thử/thành công
-
-                # Cập nhật màn hình
-                pygame.display.update()
-
-                # Tạm dừng 10 mili giây để người dùng thấy bước này (hiệu ứng minh họa quá trình giải)
-                pygame.time.delay(10)
-
-
-            # Gọi thuật toán giải có hiệu ứng
-            self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui)
-
-            # Ghi lại thời gian kết thúc và tính tổng thời gian
+            self.bang_giai, self.so_buoc = self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui=None)  # KHÔNG cập nhật GUI
             tg_ket_thuc = time.time()
-            self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 2)
+            self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 4)
 
-            self.hien_thong_bao_ai = True  # Cờ để hiện bảng thông báo
 
-            self.bang = [row[:] for row in self.bang_giai]  # Hiển thị lời giải bang hien tai
+            # Chạy lại với cập nhật GUI để trực quan hóa (không đo thời gian)
+            self.bang = [row[:] for row in self.bang_goc]
+            self.giai_sudoku(self.chon_val_alg, self.bang, self.cap_nhat_gui)  # CÓ cập nhật GUI
+
+            self.hien_thong_bao_ai = True
+
+            # Cập nhật để hiển thị lời giải (nếu cần)
+            self.bang = [row[:] for row in self.bang_giai]
+
 
         # click nút thoát -> ẩn bảng thông báo 
         elif self.thoat_btn != None:
@@ -232,7 +249,6 @@ class Ai_Screen:
             else:
                 self.screen = pygame.display.set_mode((RONG, CAO))
 
-
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
@@ -240,6 +256,7 @@ class Ai_Screen:
         self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
         self.nut_mo_rong = ve_nut_mo_rong(self.screen, RONG, CAO)
+
 
     def run(self):
         while self.dangChayGame:
@@ -268,7 +285,7 @@ class Ai_Screen:
 
             # Nếu giải xong thì hiện thông báo
             if self.hien_thong_bao_ai:
-                self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg)
+                self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg, self.so_buoc)
 
             pygame.display.update()
 

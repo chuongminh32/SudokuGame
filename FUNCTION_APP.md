@@ -29,3 +29,5 @@ Giải từng bước (người dùng nhấn "Tiếp theo" để thấy từng b
 •	Giao diện người dùng để chọn thuật toán và xem tiến trình giải.
 •	Tạo đồ thị/animation thể hiện quá trình giảm xung đột.
 •	Cho phép xuất lời giải cuối cùng + thời gian chạy.
+
+pyinstaller --onefile --noconsole --add-data "build;build" src/main.py -> build file exe
