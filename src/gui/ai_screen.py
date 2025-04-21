@@ -45,7 +45,7 @@ class Ai_Screen:
         self.ket_thuc = False
 
         # nút 
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg = [None] * 6 
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do = [None] * 7 
 
         # -----------thông báo giải xong -------------
         self.hien_thong_bao_ai = False
@@ -60,6 +60,11 @@ class Ai_Screen:
         # log giải thuật 
         self.log_sau_cung = ""  # Lưu log cuối để vẽ lại sau khi thuật toán kết thúc
         self.ds_log = []
+
+        # hiện bảng chọn biểu đồ 
+        self.hien_bang_chon_bieu_do = False
+        self.bang_bieu_do = []
+
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
@@ -153,6 +158,23 @@ class Ai_Screen:
         # click nút back -> home
         if (self.back_btn is not None and self.back_btn.collidepoint(vitri_click)):
             self.dangChayGame = False
+
+        elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
+            self.hien_bang_chon_bieu_do = not self.hien_bang_chon_bieu_do
+
+        # xử lí click từng mục để chọn biểu đồ 
+        elif self.hien_bang_chon_bieu_do:
+            for bd in self.bang_bieu_do:
+                if bd["rect"].collidepoint(vitri_click):
+                    if bd["value"] == "TIME":
+                        ve_bieu_do_thoi_gian(self.ds_log)
+                    elif bd["value"] == "STEP":
+                        ve_bieu_do_so_buoc(self.ds_log)
+                    elif bd["value"] == "LOG":
+                        ve_bieu_do_log_theo_buoc()
+                    self.hien_bang_chon_bieu_do = False
+                    break
+
 
         # click ô trong bảng (cho click khi đã ẩn bảng chọn)
         elif (DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai):
@@ -252,7 +274,7 @@ class Ai_Screen:
     def veCauTrucBang(self):
         ve_luoi(self.screen)
         ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn = ve_nut_ai(self.screen)
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_bieu_do = ve_nut_ai(self.screen)
         self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
         self.nut_mo_rong = ve_nut_mo_rong(self.screen, RONG, CAO)
@@ -264,6 +286,11 @@ class Ai_Screen:
   
             # Vẽ nền, lưới và số
             self.veCauTrucBang()
+
+            # Vẽ biểu đồ 
+            if self.hien_bang_chon_bieu_do:
+                self.bang_bieu_do = ve_bang_chon_bieu_do(self.screen, self.nut_bieu_do.right + -170, self.nut_bieu_do.top + 50 )
+
 
             # Highlight nếu có ô chọn
             if self.o_chon and not self.ket_thuc:

@@ -1,4 +1,5 @@
 import pygame, sys, os
+import matplotlib.pyplot as plt
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
@@ -59,6 +60,18 @@ def ve_nut_ai(screen):
     # Vẽ icon lên màn hình
     screen.blit(icon_back, rect_nut_back)
 
+    # nut chart 
+    icon_chart_path = get_relative_path("..", "assets", "chart.png")
+    icon_chart = pygame.image.load(icon_chart_path).convert_alpha()
+    icon_chart = pygame.transform.scale(icon_chart, (40, 40))
+    # Vị trí icon
+    x = RONG - 230
+    y = 15
+    # Lấy rect từ icon và đặt vị trí
+    rect_btn_chart = icon_chart.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_chart, rect_btn_chart)
+
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
     pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
@@ -66,7 +79,7 @@ def ve_nut_ai(screen):
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
 
-    return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back
+    return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart
 
 def ve_nut_run(screen, x, y):
     w_nut = (RONG - 2 * DEM - 2 * KC_NUT) // 3  # Chiều rộng của mỗi nút, chia đều 3 nút
@@ -352,3 +365,61 @@ def ve_nut_mo_rong(screen, RONG, CAO):
 
     return rect_nut_mo_rong
 
+
+
+# _____________________vẽ biểu đồ ____________________________________
+# Vẽ menu chọn loại biểu đồ (thời gian, số bước, log)
+def ve_bang_chon_bieu_do(screen, x, y):
+    font = pygame.font.SysFont("verdana", 18)  # Khởi tạo font chữ
+    w, h = 180, 35  # Kích thước của mỗi ô menu
+    options = [  # Danh sách các tùy chọn biểu đồ
+        {"text": "Biểu đồ thời gian", "value": "TIME"},
+        {"text": "Biểu đồ số bước", "value": "STEP"},
+        {"text": "Log theo bước", "value": "LOG"},
+    ]
+    ds_rect = []  # Danh sách lưu vùng chọn (rect) tương ứng từng tùy chọn
+    for i, opt in enumerate(options):
+        rect = pygame.Rect(x, y + i * h, w, h)  # Tạo hình chữ nhật cho mỗi tùy chọn
+        pygame.draw.rect(screen, (230, 230, 230), rect)  # Tô màu nền ô
+        pygame.draw.rect(screen, (0, 0, 0), rect, 1)  # Vẽ viền ô
+        text = font.render(opt["text"], True, (0, 0, 0))  # Vẽ nội dung chữ
+        screen.blit(text, (x + 10, y + i * h + 5))  # Hiển thị chữ lên màn hình
+        ds_rect.append({"rect": rect, "text": opt["text"], "value": opt["value"]})  # Lưu thông tin tùy chọn
+    return ds_rect  # Trả về danh sách các ô tùy chọn đã vẽ
+
+# Vẽ biểu đồ thời gian theo từng bước (dạng đường thẳng)
+def ve_bieu_do_thoi_gian(ds_log):
+    if not ds_log:  # Nếu không có dữ liệu log thì thoát
+        return
+    buoc = [b[0] for b in ds_log]  # Danh sách các bước
+    thoi_gian = [b[1] - ds_log[0][1] for b in ds_log]  # Thời gian trôi qua từ bước đầu
+    plt.plot(buoc, thoi_gian, marker='o')  # Vẽ biểu đồ đường
+    plt.title("Thời gian theo bước")  # Tiêu đề
+    plt.xlabel("Bước")  # Nhãn trục X
+    plt.ylabel("Thời gian (s)")  # Nhãn trục Y
+    plt.grid()  # Hiển thị lưới
+    plt.show()  # Hiển thị biểu đồ
+
+# Vẽ biểu đồ số bước theo từng chỉ số log (dạng cột)
+def ve_bieu_do_so_buoc(ds_log):
+    if not ds_log:  # Nếu không có log thì thoát
+        return
+    plt.bar(range(len(ds_log)), [b[0] for b in ds_log])  # Vẽ biểu đồ cột
+    plt.title("Số bước theo thời gian")  # Tiêu đề
+    plt.xlabel("Chỉ số")  # Nhãn trục X
+    plt.ylabel("Bước")  # Nhãn trục Y
+    plt.grid()  # Hiển thị lưới
+    plt.show()  # Hiển thị biểu đồ
+
+# Vẽ log giải từng bước ra biểu đồ dưới dạng text
+def ve_bieu_do_log_theo_buoc():
+    # Mở file log đã lưu sẵn
+    with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", encoding="utf-8") as f:
+        lines = f.readlines()  # Đọc toàn bộ nội dung file
+    plt.figure(figsize=(10, 6))  # Tạo biểu đồ kích thước lớn
+    for i, line in enumerate(lines):
+        # Vẽ từng dòng text theo chiều dọc
+        plt.text(0.1, 1 - i * 0.03, line.strip(), fontsize=9)
+    plt.axis('off')  # Tắt trục tọa độ
+    plt.title("Log từng bước")  # Tiêu đề
+    plt.show()  # Hiển thị biểu đồ
