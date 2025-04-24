@@ -327,7 +327,7 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
     screen.blit(text_sub, (box_x + 100, box_y + 70))
 
     # Tính giây và mili giây
-    time_text = f"Thời gian giải: {tg_giai:.9f} (giây)"
+    time_text = f"Thời gian giải: {tg_giai:.6f} (giây)"
     step = f"Tổng số bước thử: {so_buoc}(bước)"
 
 

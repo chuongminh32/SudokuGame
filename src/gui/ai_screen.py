@@ -159,6 +159,7 @@ class Ai_Screen:
         if (self.back_btn is not None and self.back_btn.collidepoint(vitri_click)):
             self.dangChayGame = False
 
+        # cick nút biểu đồ 
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
             self.hien_bang_chon_bieu_do = not self.hien_bang_chon_bieu_do
 
@@ -196,6 +197,7 @@ class Ai_Screen:
         elif self.nut_dd_alg.collidepoint(vitri_click):
             self.hien_bang_chon_alg = not self.hien_bang_chon_alg # toggle hien bang cap do 
         
+        # click nut giai 
         elif self.ai_btn.collidepoint(vitri_click):
             # Xoá log cũ trước khi giải mới
             with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "w", encoding="utf-8") as f:
@@ -203,11 +205,11 @@ class Ai_Screen:
             self.ds_log = []
 
             # Bắt đầu đo thời gian giải thực
-            bang_temp = [row[:] for row in self.bang_goc]  # sao chép để giữ nguyên gốc
-            tg_bat_dau = time.time()
+            tg_bat_dau = time.perf_counter()
             self.bang_giai, self.so_buoc = self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui=None)  # KHÔNG cập nhật GUI
-            tg_ket_thuc = time.time()
-            self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 4)
+            tg_ket_thuc = time.perf_counter()
+            # Tính thời gian giải
+            self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 6)  # Làm tròn đến 6 chữ số thập phân
 
 
             # Chạy lại với cập nhật GUI để trực quan hóa (không đo thời gian)
