@@ -33,7 +33,7 @@ def ve_nut_ai(screen):
     font_size = 24  # Cỡ chữ cho các nút
     font = pygame.font.SysFont("verdana", font_size)
 
-    # Load hình ảnh nút so sánh 
+    # nút so sánh 
     icon_ss_path = get_relative_path("..", "assets", "icons8-compare-50.png")
     icon_ss = pygame.image.load(icon_ss_path).convert_alpha()
     x = RONG - 160
@@ -41,7 +41,7 @@ def ve_nut_ai(screen):
     rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
     screen.blit(icon_ss, rect_nut_ss)
 
-    # Load hình ảnh nút làm mới
+    # nút làm mới
     icon_ss_path = get_relative_path("..", "assets", "icons8-refresh-48.png")
     icon_lam_moi = pygame.image.load(icon_ss_path).convert_alpha()
     x = 120
@@ -72,6 +72,28 @@ def ve_nut_ai(screen):
     # Vẽ icon lên màn hình
     screen.blit(icon_chart, rect_btn_chart)
 
+    # nut tao de bai 
+    icon_create_topic = get_relative_path("..", "assets", "icons8-plus-50.png")
+    icon_topic = pygame.image.load(icon_create_topic).convert_alpha()
+    # Vị trí icon
+    x = RONG - 300
+    y = 12
+    # Lấy rect từ icon và đặt vị trí
+    rect_nut_tao_de_bai = icon_topic.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_topic, rect_nut_tao_de_bai)
+
+    # nut info 
+    icon_info = get_relative_path("..", "assets", "info.png")
+    icon_if = pygame.image.load(icon_info).convert_alpha()
+    # Vị trí icon
+    x = RONG - 370
+    y = 12
+    # Lấy rect từ icon và đặt vị trí
+    rect_nut_thong_tin = icon_if.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_if, rect_nut_thong_tin)
+
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
     pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
@@ -79,19 +101,7 @@ def ve_nut_ai(screen):
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
 
-    return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart
-
-def ve_nut_run(screen, x, y):
-    w_nut = (RONG - 2 * DEM - 2 * KC_NUT) // 3  # Chiều rộng của mỗi nút, chia đều 3 nút
-
-    font_size = 24  # Cỡ chữ cho các nút
-    font = pygame.font.SysFont("verdana", font_size)
-
-    # Nút run ss 2 alg
-    nut_ss  = pygame.Rect(x, y, w_nut, CAO_NUT)  # Vị trí và kích thước của nút
-    pygame.draw.rect(screen, MAU_NUT, nut_ss, border_radius=8)  # Vẽ nút với màu nền và bo tròn
-    text_goi_y = font.render("Run", True, MAU_CHU_NUT)  # Vẽ chữ "Gợi ý"
-    screen.blit(text_goi_y, text_goi_y.get_rect(center=nut_ss.center))  # Căn giữa chữ trong nút
+    return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin
 
 def ve_so(screen, bang, bang_goc, font, bang_giai):
     for i in range(KT_LUOI):
@@ -107,19 +117,23 @@ def ve_so(screen, bang, bang_goc, font, bang_giai):
                         (204, 255, 229),  # Màu xanh nhạt
                         (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
                     )
-
+                
                 # Vẽ số
                 text = font.render(str(bang[i][j]), True, mau)
                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
                 screen.blit(text, rect)
 
+def ve_luoi(screen):
+    # Vẽ lưới Sudoku
+    for i in range(KT_LUOI + 1):
+        duongVien = 3 if i % 3 == 0 else 1
+        # Vẽ đường dọc
+        pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)
+        # Vẽ đường ngang
+        pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)
 
-
-def ve_luoi(screen):  # Vẽ lưới Sudoku
-    for i in range(KT_LUOI + 1):  # Duyệt qua tất cả các đường
-        duongVien = 3 if i % 3 == 0 else 1  # Đường viền dày hơn cho mỗi khối 3x3
-        pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)  # Vẽ đường dọc
-        pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)  # Vẽ đường ngang
+    # Trả về hình chữ nhật bao quanh toàn bộ lưới để kiểm tra click
+    return pygame.Rect(DEM, DEM, KT_O * 9, KT_O * 9)
 
 def ve_nut_dd_bang_cap_do(screen, ten_cap_do):
     """Vẽ combobox chọn cấp độ khó dễ (Dễ, Trung bình, Khó)."""
@@ -386,8 +400,6 @@ def ve_bang_chon_bieu_do(screen, x, y):
         screen.blit(text, (x + 10, y + i * h + 5))  # Hiển thị chữ lên màn hình
         ds_rect.append({"rect": rect, "text": opt["text"], "value": opt["value"]})  # Lưu thông tin tùy chọn
     return ds_rect  # Trả về danh sách các ô tùy chọn đã vẽ
-
-# Vẽ biểu đồ thời gian theo từng bước (dạng đường thẳng)
 def ve_bieu_do_thoi_gian(ds_log):
     if not ds_log:  # Nếu không có dữ liệu log thì thoát
         return
@@ -398,28 +410,4 @@ def ve_bieu_do_thoi_gian(ds_log):
     plt.xlabel("Bước")  # Nhãn trục X
     plt.ylabel("Thời gian (s)")  # Nhãn trục Y
     plt.grid()  # Hiển thị lưới
-    plt.show()  # Hiển thị biểu đồ
-
-# Vẽ biểu đồ số bước theo từng chỉ số log (dạng cột)
-def ve_bieu_do_so_buoc(ds_log):
-    if not ds_log:  # Nếu không có log thì thoát
-        return
-    plt.bar(range(len(ds_log)), [b[0] for b in ds_log])  # Vẽ biểu đồ cột
-    plt.title("Số bước theo thời gian")  # Tiêu đề
-    plt.xlabel("Chỉ số")  # Nhãn trục X
-    plt.ylabel("Bước")  # Nhãn trục Y
-    plt.grid()  # Hiển thị lưới
-    plt.show()  # Hiển thị biểu đồ
-
-# Vẽ log giải từng bước ra biểu đồ dưới dạng text
-def ve_bieu_do_log_theo_buoc():
-    # Mở file log đã lưu sẵn
-    with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", encoding="utf-8") as f:
-        lines = f.readlines()  # Đọc toàn bộ nội dung file
-    plt.figure(figsize=(10, 6))  # Tạo biểu đồ kích thước lớn
-    for i, line in enumerate(lines):
-        # Vẽ từng dòng text theo chiều dọc
-        plt.text(0.1, 1 - i * 0.03, line.strip(), fontsize=9)
-    plt.axis('off')  # Tắt trục tọa độ
-    plt.title("Log từng bước")  # Tiêu đề
     plt.show()  # Hiển thị biểu đồ
