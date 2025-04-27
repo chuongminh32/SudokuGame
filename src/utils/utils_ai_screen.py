@@ -7,7 +7,7 @@ KT_O = (RONG - 2 * DEM) // KT_LUOI
 CAO_NUT, KC_NUT = 40, 20 
 TRANG, DEN, XAM, XAM_SANG = (255,255,255), (0,0,0), (200,200,200), (220,220,220) 
 XANH_DUONG, DO, XANH_LA = (0,0,255), (255,0,0), (0,128,0)
-MAU_NUT, MAU_CHU_NUT = (90, 123, 192), TRANG
+MAU_NUT, MAU_CHU_NUT, MAU_NEN = (90, 123, 192), TRANG, TRANG
 MAU_NEN_NUT_HOVER = (67, 99, 167)
 # Màu nút và chữ trên nút
 MAU_NUT_BACK, MAU_ICON_BACK = (100, 100, 255), (80, 80, 80)  # Màu nút quay lại và biểu tượng
@@ -100,28 +100,32 @@ def ve_nut_ai(screen):
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-
     return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin
 
-def ve_so(screen, bang, bang_goc, font, bang_giai):
+
+def to_o_giai(screen, bang_goc, bang_giai, font):
+    for i in range(KT_LUOI):
+        for j in range(KT_LUOI):
+            if bang_giai[i][j] != 0 and bang_goc[i][j] == 0:  # Kiểm tra ô có giá trị trong bảng giải nhưng không có trong bảng ban đầu
+                # Vẽ hình chữ nhật với màu để tô ô
+                pygame.draw.rect(
+                    screen,
+                    (204, 255, 229),  # Màu xanh nhạt (hoặc màu bạn muốn)
+                    (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
+                )
+
+
+def ve_so_ai(screen, bang, font):
     for i in range(KT_LUOI):
         for j in range(KT_LUOI):
             if bang[i][j]:
                 # Xác định màu chữ
-                mau = (25, 53, 88) if bang_goc[i][j] else DEN  # Màu xanh cho số gốc, màu đen cho số người chơi nhập
-
-                # bỏ đi số gốc ban đầu chi tô nhưng ô có lời giải đúng trùng với bảng lời giải 
-                if not bang_goc[i][j] and bang[i][j] == bang_giai[i][j]:
-                    pygame.draw.rect(
-                        screen,
-                        (204, 255, 229),  # Màu xanh nhạt
-                        (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
-                    )
-                
+                mau = (25, 53, 88)
                 # Vẽ số
                 text = font.render(str(bang[i][j]), True, mau)
                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
                 screen.blit(text, rect)
+
 
 def ve_luoi(screen):
     # Vẽ lưới Sudoku
@@ -132,7 +136,7 @@ def ve_luoi(screen):
         # Vẽ đường ngang
         pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)
 
-    # Trả về hình chữ nhật bao quanh toàn bộ lưới để kiểm tra click
+    # Trả về hình chữ nhật bao quanh toàn bộ lưới để kiểm tra click ở ngoài
     return pygame.Rect(DEM, DEM, KT_O * 9, KT_O * 9)
 
 def ve_nut_dd_bang_cap_do(screen, ten_cap_do):
@@ -367,17 +371,6 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
 
     return thoat_btn
 
-def ve_nut_mo_rong(screen, RONG, CAO):
-    # Load hình ảnh nút mở rộng
-    icon_mo_rong = pygame.image.load(r"G:\NamII_HK2\AI\Sudoku\src\assets\icons8-expand-arrow-48.png")
-    icon_mo_rong = pygame.transform.scale(icon_mo_rong, (40, 40))  # Resize nếu cần
-
-    nut_x = RONG - 45
-    nut_y = (CAO - 20) // 2  # Căn giữa theo trục Y
-
-    rect_nut_mo_rong = screen.blit(icon_mo_rong, (nut_x, nut_y))
-
-    return rect_nut_mo_rong
 
 
 
