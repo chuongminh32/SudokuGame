@@ -114,7 +114,10 @@ def to_o_giai(screen, bang_goc, bang_giai, font):
                     (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
                 )
 
-
+def to_o_loi(screen, ds_loi):
+    for dong, cot in ds_loi:
+        pygame.draw.rect(screen, (250, 180, 180), pygame.Rect(DEM + cot * KT_O, DEM + dong * KT_O, KT_O, KT_O))
+    
 def ve_so_ai(screen, bang, font):
     for i in range(KT_LUOI):
         for j in range(KT_LUOI):
@@ -371,6 +374,45 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
 
     return thoat_btn
 
+def ve_thong_bao_loi(screen, giatritrung):
+    """Vẽ bảng cảnh báo ô nhập sai Sudoku."""
+    
+    # Lớp nền mờ nhẹ hơn
+    overlay = pygame.Surface((RONG, CAO), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 50))  # Độ trong suốt nhẹ (80 thay vì 150)
+    screen.blit(overlay, (0, 0))
+
+    # Kích thước bảng thông báo nhỏ hơn
+    box_rong, box_cao = 400, 180
+    box_x = (RONG - box_rong) // 2
+    box_y = (CAO - box_cao) // 2
+
+    # Vẽ bảng trắng bán trong suốt
+    box_surface = pygame.Surface((box_rong, box_cao), pygame.SRCALPHA)
+    box_surface.fill((255, 255, 255, 200))  # Bảng trắng hơi trong suốt
+    screen.blit(box_surface, (box_x, box_y))
+
+    # Vẽ chữ thông báo
+    font = pygame.font.SysFont("verdana", 24)
+    font_sub = pygame.font.SysFont("verdana", 18)
+
+    text = font.render("Ô nhập bị sai logic Sudoku!", True, (52, 72, 97))
+    text_sub = font_sub.render(f"Giá trị bạn vừa nhập: {giatritrung} bị trùng!", True, (148, 163, 183))
+    screen.blit(text, (box_x + 30, box_y + 20))
+    screen.blit(text_sub, (box_x + 30, box_y + 70))
+
+    # Vẽ nút "Thoát"
+    btn_width, btn_height = 120, 40
+    btn_x = box_x + (box_rong - btn_width) // 2
+    btn_y = box_y + 120
+    thoat_btn = pygame.draw.rect(screen, (90, 123, 192),
+                                 pygame.Rect(btn_x, btn_y, btn_width, btn_height), border_radius=8)
+
+    text_btn = font_sub.render("Thoát", True, (255, 255, 255))
+    screen.blit(text_btn, (btn_x + 30, btn_y + 8))
+
+    return thoat_btn
+
 
 
 
@@ -393,6 +435,7 @@ def ve_bang_chon_bieu_do(screen, x, y):
         screen.blit(text, (x + 10, y + i * h + 5))  # Hiển thị chữ lên màn hình
         ds_rect.append({"rect": rect, "text": opt["text"], "value": opt["value"]})  # Lưu thông tin tùy chọn
     return ds_rect  # Trả về danh sách các ô tùy chọn đã vẽ
+
 def ve_bieu_do_thoi_gian(ds_log):
     if not ds_log:  # Nếu không có dữ liệu log thì thoát
         return

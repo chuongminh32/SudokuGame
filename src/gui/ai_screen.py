@@ -67,6 +67,14 @@ class Ai_Screen:
         self.daGiaiThanhCong = False
         self.click_giai = False
 
+        # error
+        self.hien_bang_thong_bao_loi = False
+        self.danh_sach_ve_loi = []
+        self.gia_tri_trung = None
+        self.vi_tri_sai = None
+        self.thoat_btn_loi = None
+
+
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -124,28 +132,11 @@ class Ai_Screen:
         # Kiểm tra hợp lệ
         is_hop_le, ds_o_loi = self.kiemTraHopLe(self.bang, i, j, self.bang[i][j])
         if not is_hop_le:
-            # Tô đỏ các ô lỗi + ô đang chọn
-            for r, c in ds_o_loi + [(i, j)]:
-                pygame.draw.rect(
-                    self.screen,
-                    (250, 180, 180),  # Màu đỏ nhạt
-                    pygame.Rect(DEM + c * KT_O, DEM + r * KT_O, KT_O, KT_O)
-                )
+            self.danh_sach_ve_loi = ds_o_loi + [(i, j)]  # lưu lại các ô lỗi
+            self.gia_tri_trung = self.bang[i][j]          # lưu lại giá trị sai
+            self.vi_tri_sai = (i, j)                      # lưu vị trí để xóa sau
+            self.hien_bang_thong_bao_loi = True           # mở bảng thông báo lỗi
 
-            # Vẽ lại toàn bộ số/grid để không in đè
-            ve_so_ai(self.screen, self.bang, self.font)
-            ve_luoi(self.screen)
-
-            pygame.display.update()
-
-            # Hiển thị hộp thoại cảnh báo
-            messagebox.showwarning(
-                "Ô nhập bị sai logic Sudoku!",
-                f"Giá trị bạn vừa nhập: {self.bang[i][j]} bị trùng!"
-            )
-
-            # reset 
-            self.bang[i][j] = 0
 
         return
 
@@ -278,7 +269,7 @@ class Ai_Screen:
             self.hien_bang_chon_alg = not self.hien_bang_chon_alg 
 
         # click ô 
-        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai and not self.hien_bang_chon_bieu_do:
+        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai and not self.hien_bang_chon_bieu_do and not self.hien_bang_thong_bao_loi:
             cot = (x - DEM) // KT_O
             dong = (y - DEM) // KT_O
             self.o_chon = (dong, cot) # chọn ô
@@ -319,6 +310,22 @@ class Ai_Screen:
             if self.thoat_btn.collidepoint(vitri_click):
                 self.hien_thong_bao_ai = False
                 self.thoat_btn = None
+        
+        # click nút thoát -> ẩn bảng thông báo lỗi 
+        elif self.hien_bang_thong_bao_loi and self.thoat_btn_loi and self.thoat_btn_loi.collidepoint(vitri_click):
+        # Người dùng bấm nút "Thoát"
+        
+            # Xóa giá trị sai (i,j = vitrisai)
+            i, j = self.vi_tri_sai 
+            self.bang[i][j] = 0
+
+            # Ẩn bảng cảnh báo
+            self.hien_bang_thong_bao_loi = False
+
+            # Xóa danh sách lỗi
+            self.danh_sach_ve_loi = []
+            self.vi_tri_sai = None
+            self.thoat_btn_loi = None
 
         # click nút reset
         elif self.reset_btn is not None and self.reset_btn.collidepoint(vitri_click):
@@ -411,6 +418,16 @@ class Ai_Screen:
             if self.hien_thong_bao_ai:
                 self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg, self.so_buoc)
             
+            # Nếu lỗi -> hiện thông báo lỗi
+            if self.hien_bang_thong_bao_loi:
+                # Tô đỏ các ô lỗi
+                to_o_loi(self.screen, self.danh_sach_ve_loi)
+
+                # Vẽ lại số và lưới
+                ve_so_ai(self.screen, self.bang, self.font)
+                ve_luoi(self.screen)
+                self.thoat_btn_loi = ve_thong_bao_loi(self.screen, self.gia_tri_trung)
+
             # Vẽ biểu đồ 
             if self.hien_bang_chon_bieu_do:
                 self.bang_bieu_do = ve_bang_chon_bieu_do(self.screen, self.nut_bieu_do.right + -170, self.nut_bieu_do.top + 50 )
