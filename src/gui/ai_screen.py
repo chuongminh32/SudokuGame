@@ -1,5 +1,7 @@
 import pygame, sys, os, time, random
 import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import messagebox
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.utils.utils_ai_screen import * 
 from src.algorithm.generate_sudoku import *
@@ -13,15 +15,17 @@ class Ai_Screen:
         pygame.display.set_caption("Sudoku - Chơi Game")
         self.font = pygame.font.SysFont("verdana", 25)
         self.font_text = pygame.font.SysFont("verdana", 20)  
-        self.bang_goc = layBangSuDoKuTheoCapDo()
-        self.bang = [row[:] for row in self.bang_goc]
-        self.bang_giai = giai_sudoku_backtracking(self.bang_goc)
+        self.bang = layBangSuDoKuTheoCapDo()
+        self.bang_goc = [row[:] for row in self.bang]
+        self.bang_giai = None
+        self.bang_sudoku = None # grid -> bắt sk click ngoài 
 
         #------ chon cap do -------
         # khung bao quanh bang cap do
         self.rect_bang_cap_do = None
         # phân cấp độ 
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ 
+        self.gia_tri_cap_do = "E"
         self.ten_cap_do = "Dễ"
         self.bang_cap_do = [] # luu ds cac lv 
 
@@ -32,30 +36,21 @@ class Ai_Screen:
         self.hien_bang_chon_alg = False # mặc định không hiện bảng cấp độ 
         self.ten_alg = "Backtracking"
         self.bang_alg = [] # luu ds cac alg 
-        self.chon_val_alg = "B"
+        self.gia_tri_alg = "B"
 
         # sự kiện click nút trong bảng 
-        self.o_chinh_sua = [(i, j) for i in range(KT_LUOI) for j in range(KT_LUOI) if self.bang_goc[i][j] == 0] # ô có thể chỉnh sửa 
-        self.o_sai = []
-        self.o_dung = []
         self.o_chon = None
 
-        self.so_loi = 0
         self.dangChayGame = True
-        self.ket_thuc = False
 
         # nút 
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do = [None] * 7 
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin = [None] * 9
 
         # -----------thông báo giải xong -------------
         self.hien_thong_bao_ai = False
         self.thoi_gian_giai = 0
         self.thoat_btn = None
         self.so_buoc = 0 
-
-        # giao diện mở rộng 
-        self.nut_mo_rong = None 
-        self.bat_giao_dien_mo_rong = False
 
         # log giải thuật 
         self.log_sau_cung = ""  # Lưu log cuối để vẽ lại sau khi thuật toán kết thúc
@@ -65,30 +60,145 @@ class Ai_Screen:
         self.hien_bang_chon_bieu_do = False
         self.bang_bieu_do = []
 
+        # cờ để bắt tín hiệu tạo đề 
+        self.dang_tao_de = False
+
+        # cờ đã giải 
+        self.daGiaiThanhCong = False
+        self.click_giai = False
 
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 self.dangChayGame = False
+            elif e.type == pygame.KEYDOWN:
+                self.xuLiSuKienNhanPhim(e)
             elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                 self.xuLiSuKienClickChuot(e.pos)
 
-    def reset_game(self):
-        # Đặt lại bảng chơi về trạng thái ban đầu
-        self.bang = [row[:] for row in self.bang_goc]  # Khôi phục lại bảng ban đầu
-        self.o_chon = None  # Không có ô nào được chọn
-        self.ket_thuc = False  # Đặt lại trạng thái thua game
-        self.so_loi = 0  # Đặt lại số lỗi
-        self.tg_bat_dau = time.time()  # Khởi tạo lại thời gian bắt đầu
-        self.o_sai = []  # Xóa danh sách các ô sai
-        self.o_dung = []  # Xóa danh sách các ô đúng
+    def kiemTraHopLe(self, board, row, col, num):
+        """
+        Trả về tuple (is_valid, ds_o_loi):
+            - is_valid: True nếu hợp lệ, False nếu không
+            - ds_o_loi: Danh sách các ô bị lỗi khi đặt số `num` vào vị trí (row, col)
+        """
+        if num == 0:
+            return True, []
 
-    def giai_sudoku(self, chon_val_alg, bang_goc, cap_nhat_gui):
-        if chon_val_alg == "B":
-            bang_giai, so_buoc = giai_sudoku_backtracking_visual(bang_goc, cap_nhat_gui)
-            return bang_giai, so_buoc 
-        # elif chon_val_alg == "HC":
-        #     giai_sudoku_hill_climbing_visual(bang_goc, cap_nhat_gui)
+        ds_o_loi = []
+
+        # Kiểm tra hàng
+        for i in range(9):
+            if board[row][i] == num and i != col:
+                ds_o_loi.append((row, i))
+
+        # Kiểm tra cột
+        for i in range(9):
+            if board[i][col] == num and i != row:
+                ds_o_loi.append((i, col))
+
+        # Xác định góc trên trái của ô 3x3
+        box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+
+        # Kiểm tra ô 3x3
+        for i in range(box_row, box_row + 3):
+            for j in range(box_col, box_col + 3):
+                if board[i][j] == num and (i, j) != (row, col):
+                    ds_o_loi.append((i, j))
+
+        return len(ds_o_loi) == 0, ds_o_loi
+
+    def xuLiSuKienNhanPhim(self, go_phim):
+        if self.o_chon is None:
+            return
+
+        i, j = self.o_chon
+
+        if pygame.K_1 <= go_phim.key <= pygame.K_9:
+            self.bang[i][j] = go_phim.key - pygame.K_0
+        elif pygame.K_KP1 <= go_phim.key <= pygame.K_KP9:
+            self.bang[i][j] = go_phim.key - pygame.K_KP0
+        elif go_phim.key in [pygame.K_DELETE, pygame.K_BACKSPACE]:
+            self.bang[i][j] = 0
+
+        # Kiểm tra hợp lệ
+        is_hop_le, ds_o_loi = self.kiemTraHopLe(self.bang, i, j, self.bang[i][j])
+        if not is_hop_le:
+            # Tô đỏ các ô lỗi + ô đang chọn
+            for r, c in ds_o_loi + [(i, j)]:
+                pygame.draw.rect(
+                    self.screen,
+                    (250, 180, 180),  # Màu đỏ nhạt
+                    pygame.Rect(DEM + c * KT_O, DEM + r * KT_O, KT_O, KT_O)
+                )
+
+            # Vẽ lại toàn bộ số/grid để không in đè
+            ve_so_ai(self.screen, self.bang, self.font)
+            ve_luoi(self.screen)
+
+            pygame.display.update()
+
+            # Hiển thị hộp thoại cảnh báo
+            messagebox.showwarning(
+                "Ô nhập bị sai logic Sudoku!",
+                f"Giá trị bạn vừa nhập: {self.bang[i][j]} bị trùng!"
+            )
+
+            # reset 
+            self.bang[i][j] = 0
+
+        return
+
+    def reset_game(self):
+        """Reset toàn bộ trạng thái giao diện và dữ liệu Sudoku."""
+
+        # Dừng tất cả chế độ đặc biệt
+        self.hien_bang_cap_do = False
+        self.hien_bang_chon_alg = False
+        self.hien_bang_chon_bieu_do = False
+        self.hien_thong_bao_ai = False
+
+        # Reset bảng Sudoku mới theo tên cấp độ đã chọn 
+        self.bang = layBangSuDoKuTheoCapDo(self.gia_tri_cap_do)
+
+        # Reset bảng lời giải
+        self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
+
+        # Reset các trạng thái giải AI
+        self.so_buoc = 0
+        self.ds_log = []
+        self.log_sau_cung = ""
+        self.dong_log_gan_nhat = ""
+        self.thoi_gian_giai = 0
+        self.daGiaiThanhCong = False
+        self.click_giai = False
+
+        # Không có ô nào đang chọn
+        self.o_chon = None
+
+        # Xóa log cũ nếu có
+        try:
+            with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "w", encoding="utf-8") as f:
+                f.write("")
+        except Exception as e:
+            print("Không thể xóa log:", e)
+
+        # Sau cùng vẽ lại màn hình (nếu muốn)
+        self.veCauTrucBang()
+
+        pygame.display.update()
+
+     # hàm giải sudoku theo thuật toán 
+    
+    def giai_sudoku_theo_ten_alg(self, bang, cap_nhat_gui):
+        if self.gia_tri_alg == "B":
+            bang_giai, so_buoc, ds_log, self.daGiaiThanhCong = giai_sudoku_backtracking(bang, cap_nhat_gui)
+            self.ds_log = ds_log
+            return bang_giai, so_buoc
+        # elif self.gia_tri_alg == "HC":
+        #     self.bang_giai = giai_sudoku_hillclimbing(bang)
+        # elif self.gia_tri_alg == "SA":
+        #     self.bang_giai = giai_sudoku_simulatedanealing(bang)
   
     def cap_nhat_gui(self, row, col, value, trang_thai, so_buoc):
         if trang_thai == "thu":
@@ -98,24 +208,19 @@ class Ai_Screen:
             mau = (255, 193, 193)
             trang_thai_text = "Sai"
         elif trang_thai == "dung":
-            mau = (195, 247, 202)
+            mau = (195, 247, 202)  # Màu xanh nhạt khi đúng
             trang_thai_text = "Đúng"
+            self.bang[row][col] = value  # Cập nhật giá trị vào bảng
         else:
-            mau = TRANG
+            mau = TRANG  # Màu mặc định cho ô
             trang_thai_text = ""
 
         # Tạo dòng log chi tiết
         dong_log = f"[Bước {so_buoc:04d}] ({row},{col}) <- {value} --> {trang_thai_text}"
-        # Ghi lại dữ liệu cho biểu đồ: (số bước, thời gian hiện tại)
-        self.ds_log.append((so_buoc, time.time()))
-
 
         # Ghi log ra file
         with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "a", encoding="utf-8") as f:
             f.write(dong_log + "\n")
-
-        # Lưu lại để hiển thị lên GUI
-        self.dong_log_gan_nhat = dong_log
 
         # Tô màu ô
         pygame.draw.rect(self.screen, mau, pygame.Rect(
@@ -124,31 +229,18 @@ class Ai_Screen:
             KT_O - 2, KT_O - 2
         ))
 
-        # Vẽ số
+        # Vẽ số trong ô
         if value != 0:
-            text = self.font.render(str(value), True, DEN)
+            text = self.font.render(str(value), True, DEN)  # Đặt màu chữ là đen
             rect = text.get_rect(center=(
                 DEM + col * KT_O + KT_O // 2,
                 DEM + row * KT_O + KT_O // 2
             ))
             self.screen.blit(text, rect)
 
-        # Hiển thị thông tin mở rộng
-        if self.bat_giao_dien_mo_rong:
-            pygame.draw.rect(self.screen, TRANG, pygame.Rect(RONG, 0, RONG, CAO))
-            text1 = self.font.render(f"Thuật toán: {self.ten_alg}", True, DEN)
-            text3 = self.font.render(f"Bước thử: {so_buoc}", True, DEN)
-            text4 = self.font.render(f"Giá trị thay thế: {trang_thai_text} {value}", True, DEN)
-            text5 = self.font.render(self.dong_log_gan_nhat, True, (100, 100, 100))  # Log gần nhất
+        pygame.display.update()  # Cập nhật giao diện
+        pygame.time.delay(10)  # Tạm dừng một chút giữa các bước (nếu cần)
 
-            self.screen.blit(text1, (RONG + 20, 50))
-            self.screen.blit(text3, (RONG + 20, 150))
-            self.screen.blit(text4, (RONG + 20, 200))
-            self.screen.blit(text5, (RONG + 20, 300))  # Hiển thị log tại vị trí khác
-
-
-        pygame.display.update()
-        pygame.time.delay(10)
 
     def xuLiSuKienClickChuot(self, vitri_click):
 
@@ -159,33 +251,21 @@ class Ai_Screen:
         if (self.back_btn is not None and self.back_btn.collidepoint(vitri_click)):
             self.dangChayGame = False
 
-        # cick nút biểu đồ 
-        elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
-            self.hien_bang_chon_bieu_do = not self.hien_bang_chon_bieu_do
-
-        # xử lí click từng mục để chọn biểu đồ 
-        elif self.hien_bang_chon_bieu_do:
-            for bd in self.bang_bieu_do:
-                if bd["rect"].collidepoint(vitri_click):
-                    if bd["value"] == "TIME":
-                        ve_bieu_do_thoi_gian(self.ds_log)
-                    elif bd["value"] == "STEP":
-                        ve_bieu_do_so_buoc(self.ds_log)
-                    elif bd["value"] == "LOG":
-                        ve_bieu_do_log_theo_buoc()
-                    self.hien_bang_chon_bieu_do = False
-                    break
-
-
-        # click ô trong bảng (cho click khi đã ẩn bảng chọn)
-        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai and not self.hien_bang_chon_bieu_do:
-            cot = (x - DEM) // KT_O
-            dong = (y - DEM) // KT_O
-            self.o_chon = (dong, cot) # chọn ô
-
+        # click nut info
+        elif self.nut_thong_tin and self.nut_thong_tin.collidepoint(vitri_click):
+            self.hien_thong_bao_ai = not self.hien_thong_bao_ai
+            self.thoat_btn = None
+        
+        # click nut tao de sudoku
+        elif self.nut_tao_de_sudoku.collidepoint(vitri_click):
+            self.dang_tao_de = True
+            # Xóa số trong grid hiện tại (reset grid) use list comprehension
+            self.bang = [[0 for _ in range(9)] for _ in range(9)]  # Giả sử grid là 9x9
+    
         # Trong xử lý click nút "So sánh"
         elif self.nut_ss.collidepoint(vitri_click):
-            self.so_sanh_mode = True
+            # self.dang_tao_de = False
+            self.so_sanh_mode = True    
             from src.gui import compare_screen
             compare_screen.KhoiDongManHinhSS()
     
@@ -195,32 +275,44 @@ class Ai_Screen:
 
         # click nút alg 
         elif self.nut_dd_alg.collidepoint(vitri_click):
-            self.hien_bang_chon_alg = not self.hien_bang_chon_alg # toggle hien bang cap do 
-        
-        # click nut giai 
+            self.hien_bang_chon_alg = not self.hien_bang_chon_alg 
+
+        # click ô 
+        elif DEM <= x <= DEM + KT_LUOI * KT_O and DEM <= y <= DEM + KT_LUOI * KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai and not self.hien_bang_chon_bieu_do:
+            cot = (x - DEM) // KT_O
+            dong = (y - DEM) // KT_O
+            self.o_chon = (dong, cot) # chọn ô
+
+        # cick nút biểu đồ 
+        elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
+            self.hien_bang_chon_bieu_do = not self.hien_bang_chon_bieu_do
+
+       # click nút giải
         elif self.ai_btn.collidepoint(vitri_click):
-            # Xoá log cũ trước khi giải mới
+            self.click_giai = True
+            self.bang_goc = [row[:] for row in self.bang]
+            self.dang_tao_de = False
+            # Xóa log cũ trước khi giải mới
             with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "w", encoding="utf-8") as f:
                 f.write("")
             self.ds_log = []
 
-            # Bắt đầu đo thời gian giải thực
+            # Bắt đầu đo thời gian giải thuật
             tg_bat_dau = time.perf_counter()
-            self.bang_giai, self.so_buoc = self.giai_sudoku(self.chon_val_alg, self.bang_goc, cap_nhat_gui=None)  # KHÔNG cập nhật GUI
+            self.bang_giai, self.so_buoc = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)  # KHÔNG cập nhật GUI
             tg_ket_thuc = time.perf_counter()
+
             # Tính thời gian giải
             self.thoi_gian_giai = round(tg_ket_thuc - tg_bat_dau, 6)  # Làm tròn đến 6 chữ số thập phân
 
-
             # Chạy lại với cập nhật GUI để trực quan hóa (không đo thời gian)
-            self.bang = [row[:] for row in self.bang_goc]
-            self.giai_sudoku(self.chon_val_alg, self.bang, self.cap_nhat_gui)  # CÓ cập nhật GUI
+            self.giai_sudoku_theo_ten_alg(self.bang, self.cap_nhat_gui)  # CÓ cập nhật GUI
 
-            self.hien_thong_bao_ai = True
+            # hiện thông báo giải xong 
+            self.hien_thong_bao_ai = True 
 
-            # Cập nhật để hiển thị lời giải (nếu cần)
+            # Cập nhật bảng giải cho bảng chính
             self.bang = [row[:] for row in self.bang_giai]
-
 
         # click nút thoát -> ẩn bảng thông báo 
         elif self.thoat_btn != None:
@@ -240,18 +332,16 @@ class Ai_Screen:
         elif self.hien_bang_chon_alg and not self.rect_bang_alg.collidepoint(vitri_click):
             self.hien_bang_chon_alg = False
         
-        # Xử lí sự kiện click từng cấp độ trong bảng 
+        # Xử lí sự kiện click từng cấp độ trong bảng( có thể sửa đề trực tiếp trong đề mẫu )
         elif self.hien_bang_cap_do == True:
+            self.reset_game()
             for cap_do in self.bang_cap_do:
                 if cap_do["rect"].collidepoint(vitri_click):
-                    self.chon_che_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
+                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
                     self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
-                    self.bang_cap_do = layBangSuDoKuTheoCapDo(self.chon_che_do)
-                    self.bang_goc = self.bang_cap_do
-                    self.bang = [row[:] for row in self.bang_goc]
+                    self.bang = layBangSuDoKuTheoCapDo(self.gia_tri_cap_do)
                     # cập nhật lại từng ô trong bảng giải 
-                    self.bang_giai = giai_sudoku_backtracking(self.bang)
-                    self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
+                    self.bang_giai, _ = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
                     self.hien_bang_cap_do = False
                     break
 
@@ -259,29 +349,39 @@ class Ai_Screen:
         elif self.hien_bang_chon_alg == True:
             for alg in self.bang_alg:
                 if alg["rect"].collidepoint(vitri_click):
-                    self.chon_val_alg = alg["value"] # cập nhất giá trị cấp độ đã chọn 
+                    self.gia_tri_alg = alg["value"] # cập nhất giá trị cấp độ đã chọn 
                     self.ten_alg = alg["text"] # hiển thị lên giao diện 
                     # cập nhật lại từng ô trong bảng giải 
                     self.hien_bang_chon_alg = False
                     break
         
-       # click nut mo rong 
-        if self.nut_mo_rong and self.nut_mo_rong.collidepoint(vitri_click):
-            self.bat_giao_dien_mo_rong = not self.bat_giao_dien_mo_rong
-            if self.bat_giao_dien_mo_rong:
-                self.screen = pygame.display.set_mode((RONG * 2, CAO))
-            else:
-                self.screen = pygame.display.set_mode((RONG, CAO))
+        # xử lí click từng mục để chọn biểu đồ 
+        elif self.hien_bang_chon_bieu_do:
+            # self.dang_tao_de = False
+            for bd in self.bang_bieu_do:
+                if bd["rect"].collidepoint(vitri_click):
+                    if bd["value"] == "TIME":
+                        ve_bieu_do_thoi_gian(self.ds_log)
+                    elif bd["value"] == "STEP":
+                        ve_bieu_do_so_buoc(self.ds_log)
+                    elif bd["value"] == "LOG":
+                        ve_bieu_do_log_theo_buoc()
+                    self.hien_bang_chon_bieu_do = False
+                    break 
+
+        # click ra ngoai luoi -> xoa o dang chon
+        elif self.bang_sudoku and not self.bang_sudoku.collidepoint(vitri_click):
+            self.o_chon = None
 
     def veCauTrucBang(self):
-        ve_luoi(self.screen)
-        ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_bieu_do = ve_nut_ai(self.screen)
+        if self.daGiaiThanhCong and self.click_giai:
+            to_o_giai(self.screen, self.bang_goc, self.bang_giai, self.font)
+        ve_so_ai(self.screen, self.bang, self.font)
+        self.bang_sudoku = ve_luoi(self.screen)
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin = ve_nut_ai(self.screen)
         self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
-        self.nut_mo_rong = ve_nut_mo_rong(self.screen, RONG, CAO)
-
-
+    
     def run(self):
         while self.dangChayGame:
             self.screen.fill(TRANG)
@@ -289,13 +389,8 @@ class Ai_Screen:
             # Vẽ nền, lưới và số
             self.veCauTrucBang()
 
-            # Vẽ biểu đồ 
-            if self.hien_bang_chon_bieu_do:
-                self.bang_bieu_do = ve_bang_chon_bieu_do(self.screen, self.nut_bieu_do.right + -170, self.nut_bieu_do.top + 50 )
-
-
-            # Highlight nếu có ô chọn
-            if self.o_chon and not self.ket_thuc:
+            # Highlight nếu có ô chọn -> vẽ trước để tránh che table khác 
+            if self.o_chon:
                 dong, cot = self.o_chon
                 ve_highlight_cho_o(self.screen, dong, cot, self.bang)
                  # Vẽ nền, lưới và số
@@ -315,12 +410,11 @@ class Ai_Screen:
             # Nếu giải xong thì hiện thông báo
             if self.hien_thong_bao_ai:
                 self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg, self.so_buoc)
-
+            
+            # Vẽ biểu đồ 
+            if self.hien_bang_chon_bieu_do:
+                self.bang_bieu_do = ve_bang_chon_bieu_do(self.screen, self.nut_bieu_do.right + -170, self.nut_bieu_do.top + 50 )
             pygame.display.update()
-
-    # pygame.quit()
-
-
 
 def KhoiDongManHinhAI():
     sdk = Ai_Screen()
