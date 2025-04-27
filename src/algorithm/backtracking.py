@@ -3,40 +3,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.algorithm.generate_sudoku import *
 from src.utils.utils_ai_screen import *
 
-# trả về bảng giải 
-def giai_sudoku_backtracking(bang):
-    def hop_le(bang, row, col, num):
-        for i in range(9):
-            if bang[row][i] == num or bang[i][col] == num:
-                return False
+import time
 
-        start_row, start_col = 3 * (row // 3), 3 * (col // 3)
-        for i in range(start_row, start_row + 3):
-            for j in range(start_col, start_col + 3):
-                if bang[i][j] == num:
-                    return False
-
-        return True
-
-    def solve(bang):
-        for row in range(9):
-            for col in range(9):
-                if bang[row][col] == 0:
-                    for num in range(1, 10):
-                        if hop_le(bang, row, col, num):
-                            bang[row][col] = num
-                            if solve(bang):
-                                return True
-                            bang[row][col] = 0 # quay lui nếu k tìm được lời giải hợp lệ 
-                    return False
-        return True
-
-    bang_copy = [row[:] for row in bang]  # Sao chép để không sửa bảng gốc
-    solve(bang_copy)
-    return bang_copy
-def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0):
-    import time
-
+# Trả về bảng giải, số bước và log (nếu có)
+def giai_sudoku_backtracking(bang, cap_nhat_gui=None, delay=0.0, isSolve = False):
     def hop_le(bang, row, col, num):
         for i in range(9):
             if bang[row][i] == num or bang[i][col] == num:
@@ -49,6 +19,8 @@ def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0):
         return True
 
     so_buoc = 0
+    ds_log = []
+    start_time = time.perf_counter()
 
     def solve(bang):
         nonlocal so_buoc
@@ -58,11 +30,14 @@ def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0):
                     for num in range(1, 10):
                         if hop_le(bang, row, col, num):
                             bang[row][col] = num
+                            so_buoc += 1
+
+                            # Nếu có GUI -> cập nhật hiệu ứng
                             if cap_nhat_gui:
+                                current_time = time.perf_counter()
+                                ds_log.append((so_buoc, current_time - start_time))
                                 cap_nhat_gui(row, col, num, "thu", so_buoc)
                                 time.sleep(delay)
-
-                            so_buoc += 1
 
                             if solve(bang):
                                 if cap_nhat_gui:
@@ -76,7 +51,11 @@ def giai_sudoku_backtracking_visual(bang, cap_nhat_gui=None, delay=0):
                     return False
         return True
 
-    bang_copy = [row[:] for row in bang]
-    solve(bang_copy)
+    bang_copy = [row[:] for row in bang]  # Copy bảng ban đầu để giữ nguyên
+    if solve(bang_copy):
+        isSolve = True
 
-    return bang_copy, so_buoc  # Trả về cả bảng đã giải và số bước thử
+    if cap_nhat_gui:
+        return bang_copy, so_buoc, ds_log, isSolve
+    else:
+        return bang_copy, so_buoc, None, isSolve
