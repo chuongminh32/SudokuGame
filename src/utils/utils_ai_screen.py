@@ -1,9 +1,9 @@
-import pygame, sys, os
+import pygame, sys, os, math
 import matplotlib.pyplot as plt
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
-KT_O = (RONG - 2 * DEM) // KT_LUOI 
+RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9    
+# KT_O = (RONG - 2 * DEM) // KT_LUOI 
 CAO_NUT, KC_NUT = 40, 20 
 TRANG, DEN, XAM, XAM_SANG = (255,255,255), (0,0,0), (200,200,200), (220,220,220) 
 XANH_DUONG, DO, XANH_LA = (0,0,255), (255,0,0), (0,128,0)
@@ -25,21 +25,22 @@ def init_pygame():
     pygame.display.set_caption("Trò chơi Sudoku")
     return screen 
 
-def ve_nut_ai(screen):
+def ve_nut_ai(screen, size):
+    KT_O = (RONG - 2 * DEM) // size 
     # Tính toán vị trí của các nút
-    y_nut = DEM + KT_LUOI * KT_O + KC_NUT  # Vị trí y cho các nút
+    y_nut = DEM + size * KT_O + KC_NUT  # Vị trí y cho các nút
     w_nut = (RONG - 2 * DEM - 2 * KC_NUT) // 3  # Chiều rộng của mỗi nút, chia đều 3 nút
 
     font_size = 24  # Cỡ chữ cho các nút
     font = pygame.font.SysFont("verdana", font_size)
 
     # nút so sánh 
-    icon_ss_path = get_relative_path("..", "assets", "icons8-compare-50.png")
-    icon_ss = pygame.image.load(icon_ss_path).convert_alpha()
-    x = RONG - 160
-    y = CAO - 90
-    rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
-    screen.blit(icon_ss, rect_nut_ss)
+    # icon_ss_path = get_relative_path("..", "assets", "icons8-compare-50.png")
+    # icon_ss = pygame.image.load(icon_ss_path).convert_alpha()
+    # x = RONG - 160
+    # y = CAO - 90
+    # rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
+    # screen.blit(icon_ss, rect_nut_ss)
 
     # nút làm mới
     icon_ss_path = get_relative_path("..", "assets", "icons8-refresh-48.png")
@@ -65,8 +66,8 @@ def ve_nut_ai(screen):
     icon_chart = pygame.image.load(icon_chart_path).convert_alpha()
     icon_chart = pygame.transform.scale(icon_chart, (40, 40))
     # Vị trí icon
-    x = RONG - 230
-    y = 15
+    x = RONG - 160
+    y = CAO - 90
     # Lấy rect từ icon và đặt vị trí
     rect_btn_chart = icon_chart.get_rect(topleft=(x, y))
     # Vẽ icon lên màn hình
@@ -76,7 +77,7 @@ def ve_nut_ai(screen):
     icon_create_topic = get_relative_path("..", "assets", "icons8-plus-50.png")
     icon_topic = pygame.image.load(icon_create_topic).convert_alpha()
     # Vị trí icon
-    x = RONG - 300
+    x = RONG - 340
     y = 12
     # Lấy rect từ icon và đặt vị trí
     rect_nut_tao_de_bai = icon_topic.get_rect(topleft=(x, y))
@@ -87,7 +88,7 @@ def ve_nut_ai(screen):
     icon_info = get_relative_path("..", "assets", "info.png")
     icon_if = pygame.image.load(icon_info).convert_alpha()
     # Vị trí icon
-    x = RONG - 370
+    x = RONG - 400
     y = 12
     # Lấy rect từ icon và đặt vị trí
     rect_nut_thong_tin = icon_if.get_rect(topleft=(x, y))
@@ -100,12 +101,12 @@ def ve_nut_ai(screen):
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-    return rect_nut_ss, rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin
+    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin
 
-
-def to_o_giai(screen, bang_goc, bang_giai, font):
-    for i in range(KT_LUOI):
-        for j in range(KT_LUOI):
+def to_o_giai(screen, bang_goc, bang_giai, size):
+    KT_O = (RONG - 2*DEM) // size
+    for i in range(size):
+        for j in range(size):
             if bang_giai[i][j] != 0 and bang_goc[i][j] == 0:  # Kiểm tra ô có giá trị trong bảng giải nhưng không có trong bảng ban đầu
                 # Vẽ hình chữ nhật với màu để tô ô
                 pygame.draw.rect(
@@ -114,13 +115,17 @@ def to_o_giai(screen, bang_goc, bang_giai, font):
                     (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
                 )
 
-def to_o_loi(screen, ds_loi):
+def to_o_loi(screen, ds_loi, size):
+    KT_O = (RONG - 2*DEM) // size
     for dong, cot in ds_loi:
         pygame.draw.rect(screen, (250, 180, 180), pygame.Rect(DEM + cot * KT_O, DEM + dong * KT_O, KT_O, KT_O))
     
-def ve_so_ai(screen, bang, font):
-    for i in range(KT_LUOI):
-        for j in range(KT_LUOI):
+def ve_so_ai(screen, bang, size):
+    KT_O = (RONG - 2 * DEM) // size 
+    font_size = KT_O // 2  # Bạn có thể điều chỉnh tỷ lệ này để font không quá lớn hoặc quá nhỏ
+    font = pygame.font.SysFont("verdana", font_size)
+    for i in range(size):
+        for j in range(size):
             if bang[i][j]:
                 # Xác định màu chữ
                 mau = (25, 53, 88)
@@ -130,17 +135,57 @@ def ve_so_ai(screen, bang, font):
                 screen.blit(text, rect)
 
 
-def ve_luoi(screen):
+# def ve_so_ai(screen, bang, font):
+#     """
+#     Vẽ số lên giao diện cho bảng Sudoku.
+#     :param screen: Màn hình pygame
+#     :param bang: Bảng Sudoku
+#     :param font: Phông chữ
+#     :param n: Kích thước bảng Sudoku (n x n)
+#     :param KT_O: Kích thước ô
+#     :param DEM: Khoảng cách lề
+#     """
+#     for i in range(KT_LUOI):
+#         for j in range(KT_LUOI):
+#             if bang[i][j]:
+#                 # Xác định màu chữ
+#                 mau = (25, 53, 88)
+#                 # Vẽ số
+#                 text = font.render(str(bang[i][j]), True, mau)
+#                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
+#                 screen.blit(text, rect)
+
+# def ve_luoi(screen):
+#     # Vẽ lưới Sudoku
+#     for i in range(KT_LUOI + 1):
+#         duongVien = 3 if i % 3 == 0 else 1
+#         # Vẽ đường dọc
+#         pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)
+#         # Vẽ đường ngang
+#         pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)
+
+#     # Trả về hình chữ nhật bao quanh toàn bộ lưới để kiểm tra click ở ngoài
+#     return pygame.Rect(DEM, DEM, KT_O * 9, KT_O * 9)
+
+def ve_luoi(screen, size):
+    """
+    Vẽ lưới Sudoku với kích thước bảng n x n.
+    :param screen: Màn hình pygame
+    :param n: Kích thước bảng Sudoku (n x n)
+    :param KT_O: Kích thước ô
+    :param DEM: Khoảng cách lề
+    """
+    KT_O = (RONG - 2 * DEM) // size 
     # Vẽ lưới Sudoku
-    for i in range(KT_LUOI + 1):
-        duongVien = 3 if i % 3 == 0 else 1
+    for i in range(size + 1):
+        duongVien = 3 if i % int(size ** 0.5) == 0 else 1  # Tùy vào kích thước khối con (3x3, 4x4, v.v.)
         # Vẽ đường dọc
-        pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)
+        pygame.draw.line(screen, (0, 0, 0), (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + size * KT_O), duongVien)
         # Vẽ đường ngang
-        pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)
+        pygame.draw.line(screen, (0, 0, 0), (DEM, DEM + i * KT_O), (DEM + size * KT_O, DEM + i * KT_O), duongVien)
 
     # Trả về hình chữ nhật bao quanh toàn bộ lưới để kiểm tra click ở ngoài
-    return pygame.Rect(DEM, DEM, KT_O * 9, KT_O * 9)
+    return pygame.Rect(DEM, DEM, KT_O * size, KT_O * size)
 
 def ve_nut_dd_bang_cap_do(screen, ten_cap_do):
     """Vẽ combobox chọn cấp độ khó dễ (Dễ, Trung bình, Khó)."""
@@ -276,34 +321,100 @@ def ve_bang_chon_alg(screen):
         
     return bang_alg, rect_bang_alg
 
+# Vẽ dropdown chọn kích thước bảng Sudoku
+def ve_nut_dd_bang_size(screen, size_board="9x9"):
+    """Vẽ nút dropdown cho kích thước bảng Sudoku."""
+    
+    # Vị trí và kích thước của combobox
+    box_x, box_y = RONG - 260, 20
+    box_rong, box_cao = 80, 30
+    box_rect = pygame.Rect(box_x, box_y, box_rong, box_cao)
+    
+    # Vẽ nền và viền
+    pygame.draw.rect(screen, TRANG, box_rect, border_radius=5)
+    pygame.draw.rect(screen, XAM, box_rect, 2, border_radius=5)
+    
+    # Vẽ văn bản và mũi tên
+    font = pygame.font.SysFont("verdana", 15)
+    text_surf = font.render(size_board, True, DEN)
 
-def ve_highlight_cho_o(screen, row, col, grid):
+    # Căn giữa chữ trong box, -10 - tránh đụng vào icon mũi tên xuống 
+    text_x = box_x + (box_rong - text_surf.get_width()) // 2 - 10
+    text_y = box_y + (box_cao - text_surf.get_height()) // 2
 
-    sr = (row // 3) * 3  # Xác định hàng đầu của ô 3x3
-    sc = (col // 3) * 3  # Xác định cột đầu của ô 3x3
+    screen.blit(text_surf, (text_x, text_y))
+    
+    # Vẽ mũi tên xuống
+    arrow_points = [
+        (box_x + box_rong - 20, box_y + box_cao//2 - 3),
+        (box_x + box_rong - 10, box_y + box_cao//2 - 3),
+        (box_x + box_rong - 15, box_y + box_cao//2 + 5)
+    ]
+    pygame.draw.polygon(screen, DEN, arrow_points)
+    
+    return box_rect  # Trả về hình chữ nhật của combobox để phát hiện sự kiện click
+
+# Vẽ bảng chọn kích thước cho Sudoku
+def ve_bang_chon_size(screen):
+    """Vẽ combobox chọn kích thước bảng Sudoku (9x9, 16x16, 25x25)."""
+   
+    box_x, box_y = RONG - 280, 55
+    box_rong, box_cao = 120, 100
+    bang_size = [
+        {"text": "9x9", "value": 9, "rect": pygame.Rect(box_x + 23 , box_y + 10, 80, 40)},
+        {"text": "16x16", "value": 16, "rect": pygame.Rect(box_x + 23, box_y + 60, 80, 40)},
+        {"text": "25x25", "value": 25, "rect": pygame.Rect(box_x + 23, box_y + 110, 80, 40)},
+    ]
+    
+    font = pygame.font.SysFont("verdana", 18)
+
+    # Vẽ bảng trắng
+    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, 160), border_radius=10)
+
+    # Vẽ các nút kích thước
+    for size in bang_size:
+        pygame.draw.rect(screen, TRANG, size["rect"], border_radius=5)
+        pygame.draw.rect(screen, XAM, size["rect"], 2, border_radius=5)
+        
+        # Hiển thị văn bản căn giữa
+        text_surf = font.render(size["text"], True, DEN)
+        screen.blit(text_surf, (
+            size["rect"].x + (size["rect"].width - text_surf.get_width()) // 2,
+            size["rect"].y + (size["rect"].height - text_surf.get_height()) // 2
+        ))
+        
+    return bang_size  # Trả về danh sách các nút kích thước
+
+def ve_highlight_cho_o(screen, row, col, grid, size):
+    base = math.isqrt(size)
+    KT_O = (RONG - 2 * DEM) // size 
+
+    sr = (row // base) * base  # Xác định hàng đầu của box
+    sc = (col // base) * base  # Xác định cột đầu của box
 
     gia_tri_o_dang_duoc_chon = grid[row][col]
 
     # Rect(x, y, w, h)
     # x : trai -> phai : dùng cho col 
     # Tô màu highlight cho hàng và cột
-    for i in range(KT_LUOI):  # Duyệt theo hàng (row)
+    for i in range(size):  # Duyệt theo hàng (row)
         pygame.draw.rect(screen, (150, 190, 228), pygame.Rect(
             DEM + i * KT_O,  # Cột thay đổi, x tăng dần 
             DEM + row * KT_O,  # Hàng giữ nguyên, y không đổi 
             KT_O, KT_O
         ))
 
-    for j in range(KT_LUOI):  # Duyệt theo cột (column)
+    for j in range(size):  # Duyệt theo cột (column)
         pygame.draw.rect(screen, (150, 190, 228), pygame.Rect(
             DEM + col * KT_O,  # Cột giữ nguyên
             DEM + j * KT_O,  # Hàng thay đổi
             KT_O, KT_O
         ))
 
+   
     # Tô màu cho ô 3x3 chứa ô đang chọn
-    for i in range(3):
-        for j in range(3):  
+    for i in range(base):
+        for j in range(base):  
             ar = sr + i  # ar = actual_row(dòng chính xác tính từ vị trí chỉ số), sr = start_row    
             ac = sc + j
          
@@ -317,8 +428,8 @@ def ve_highlight_cho_o(screen, row, col, grid):
     if gia_tri_o_dang_duoc_chon == 0:
          pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + col* KT_O, DEM + row* KT_O, KT_O, KT_O))
     else:
-        for r in range(KT_LUOI):
-            for c in range(KT_LUOI):
+        for r in range(size):
+            for c in range(size):
                 if (grid[r][c] == gia_tri_o_dang_duoc_chon):
                     pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
 
@@ -389,7 +500,7 @@ def ve_thong_bao_loi(screen, giatritrung):
 
     # Vẽ bảng trắng bán trong suốt
     box_surface = pygame.Surface((box_rong, box_cao), pygame.SRCALPHA)
-    box_surface.fill((255, 255, 255, 200))  # Bảng trắng hơi trong suốt
+    box_surface.fill((255, 255, 255, 230))  # Bảng trắng hơi trong suốt
     screen.blit(box_surface, (box_x, box_y))
 
     # Vẽ chữ thông báo

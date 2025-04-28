@@ -1,16 +1,19 @@
-import random 
-# phan chia cấp ____________
-def sinh_bang_sudoku_ngau_nhien():
-    """Tạo một bảng Sudoku hoàn chỉnh.
-    Được dùng để tính toán vị trí số cho từng ô trong bảng Sudoku, đảm bảo tuân thủ các quy tắc Sudoku. Cụ thể:
-    base * (r % base): Tính vị trí của hàng trong mỗi khối 3x3 (chỉ lấy phần dư khi chia hàng cho base).
-    r // base: Xác định khối (block) mà hàng thuộc về.
-    c: Cộng cột vào để xác định vị trí chính xác của số.
-    % side: Đảm bảo kết quả nằm trong phạm vi 9x9 bằng cách lấy phần dư với side (tức 9).
-    Công thức này giúp đảm bảo các số được sắp xếp hợp lý theo các khối và quy tắc của Sudoku.
-    """
-    base = 3  # Kích thước của khu vực 3x3 (tức là Sudoku 9x9)
-    side = base * base  # Tổng số hàng và cột là 9
+import random
+import math
+
+def sinh_bang_sudoku_ngau_nhien(side):
+    """Tạo một bảng Sudoku hoàn chỉnh với kích thước bất kỳ (base x base)."""
+    # Kiểm tra xem side có phải là số nguyên không, nếu là chuỗi thì chuyển thành số nguyên
+    try:
+        side = int(side)
+    except ValueError:
+        raise ValueError("Kích thước side phải là một số nguyên hợp lệ.")
+    
+    base = int(math.isqrt(side))
+
+    # Kiểm tra xem side có phải là một số chính phương không
+    if base * base != side:
+        raise ValueError("Kích thước side phải là một số chính phương.")
 
     # Hàm này tính toán vị trí của mỗi số trong bảng Sudoku
     def pattern(r, c):
@@ -20,13 +23,13 @@ def sinh_bang_sudoku_ngau_nhien():
     def shuffle(s):
         return random.sample(s, len(s))  # Trả về danh sách xáo trộn ngẫu nhiên
 
-    r_base = range(base)  # Dãy số từ 0 đến base-1 (từ 0 đến 2)
-    
+    r_base = range(base)  # Dãy số từ 0 đến base-1
+
     # Tạo danh sách các hàng và cột ngẫu nhiên dựa trên các số từ r_base
     rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
     cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
 
-    # Xáo trộn các số từ 1 đến 9 để sử dụng trong bảng
+    # Xáo trộn các số từ 1 đến side để sử dụng trong bảng
     nums = shuffle(range(1, side + 1))
 
     # Tạo bảng Sudoku hoàn chỉnh bằng cách áp dụng hàm pattern cho từng hàng, cột
@@ -41,7 +44,7 @@ def sinh_bang_sudoku_ngau_nhien():
 
 def xoaSoNgauNhien(board, num_to_remove):
     """Xóa một số lượng ô khỏi bảng Sudoku."""
-    positions = [(i, j) for i in range(9) for j in range(9)]
+    positions = [(i, j) for i in range(len(board)) for j in range(len(board[0]))]
     random.shuffle(positions)
     
     board_copy = [row[:] for row in board]  # Tạo bản sao tránh sửa bảng gốc
@@ -52,17 +55,19 @@ def xoaSoNgauNhien(board, num_to_remove):
     
     return board_copy
 
-def layBangSuDoKuTheoCapDo(level="E"):
-    """Tạo bảng Sudoku theo cấp độ."""
-    bangDaGiai = sinh_bang_sudoku_ngau_nhien()
+def layBangSuDoKuTheoCapDo(side, level="E"):
+    """Tạo bảng Sudoku theo cấp độ và kích thước tùy chọn."""
+    c = side * side
+    b = sinh_bang_sudoku_ngau_nhien(side)
 
     CapDo = {
-        "E": 20,
-        "M": 30,
-        "H": 40,
-    }
+    "E": int(0.2 * c),  # 60% ô giữ lại cho cấp độ dễ
+    "M": int(0.3 * c),  # 30% ô giữ lại cho cấp độ trung bình
+    "H": int(0.4 * c),  # Giảm số lượng ô xóa cho cấp độ khó (chỉ xóa 50%)
+}
+
     
     if level not in CapDo:
         raise ValueError("Cấp độ không hợp lệ. Chọn 'E', 'M', 'H'.")
 
-    return xoaSoNgauNhien(bangDaGiai, CapDo[level])
+    return xoaSoNgauNhien(b, CapDo[level])
