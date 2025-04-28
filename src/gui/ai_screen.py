@@ -7,8 +7,12 @@ from src.utils.utils_ai_screen import *
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
 from src.algorithm.hill_climbing import *
+# Đường dẫn gốc đến thư mục gốc của dự án (Sudoku)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
+def get_relative_path(*paths):
+    """Trả về đường dẫn tuyệt đối từ thư mục gốc dự án."""
+    return os.path.join(BASE_DIR, *paths)
 class Ai_Screen:
     def __init__(self):
         self.screen = init_pygame()
@@ -58,7 +62,7 @@ class Ai_Screen:
 
         # hiện bảng chọn biểu đồ 
         self.hien_bang_chon_bieu_do = False
-        self.bang_bieu_do = []
+        self.bang_bieu_do = [] # chứa ds biểu đồ vẽ 
 
         # cờ để bắt tín hiệu tạo đề 
         self.dang_tao_de = False
@@ -185,6 +189,7 @@ class Ai_Screen:
         if self.gia_tri_alg == "B":
             bang_giai, so_buoc, ds_log, self.daGiaiThanhCong = giai_sudoku_backtracking(bang, cap_nhat_gui)
             self.ds_log = ds_log
+            print(ds_log)
             return bang_giai, so_buoc
         # elif self.gia_tri_alg == "HC":
         #     self.bang_giai = giai_sudoku_hillclimbing(bang)
@@ -209,9 +214,14 @@ class Ai_Screen:
         # Tạo dòng log chi tiết
         dong_log = f"[Bước {so_buoc:04d}] ({row},{col}) <- {value} --> {trang_thai_text}"
 
-        # Ghi log ra file
-        with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "a", encoding="utf-8") as f:
+        log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
+
+        # Đảm bảo thư mục 'data' tồn tại (nếu không có sẽ lỗi)
+        os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+
+        with open(log_file_path, "a", encoding="utf-8") as f:
             f.write(dong_log + "\n")
+
 
         # Tô màu ô
         pygame.draw.rect(self.screen, mau, pygame.Rect(
@@ -284,7 +294,9 @@ class Ai_Screen:
             self.bang_goc = [row[:] for row in self.bang]
             self.dang_tao_de = False
             # Xóa log cũ trước khi giải mới
-            with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "w", encoding="utf-8") as f:
+            log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
+            os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+            with open(log_file_path, "a", encoding="utf-8") as f:
                 f.write("")
             self.ds_log = []
 
