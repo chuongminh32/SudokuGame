@@ -107,13 +107,14 @@ def to_o_giai(screen, bang_goc, bang_giai, size):
     KT_O = (RONG - 2*DEM) // size
     for i in range(size):
         for j in range(size):
-            if bang_giai[i][j] != 0 and bang_goc[i][j] == 0:  # Kiểm tra ô có giá trị trong bảng giải nhưng không có trong bảng ban đầu
-                # Vẽ hình chữ nhật với màu để tô ô
-                pygame.draw.rect(
-                    screen,
-                    (204, 255, 229),  # Màu xanh nhạt (hoặc màu bạn muốn)
-                    (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
-                )
+            if bang_giai != None:
+                if bang_giai[i][j] != 0 and bang_goc[i][j] == 0:  # Kiểm tra ô có giá trị trong bảng giải nhưng không có trong bảng ban đầu
+                    # Vẽ hình chữ nhật với màu để tô ô
+                    pygame.draw.rect(
+                        screen,
+                        (204, 255, 229),  # Màu xanh nhạt (hoặc màu bạn muốn)
+                        (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
+                    )
 
 def to_o_loi(screen, ds_loi, size):
     KT_O = (RONG - 2*DEM) // size
@@ -133,39 +134,6 @@ def ve_so_ai(screen, bang, size):
                 text = font.render(str(bang[i][j]), True, mau)
                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
                 screen.blit(text, rect)
-
-
-# def ve_so_ai(screen, bang, font):
-#     """
-#     Vẽ số lên giao diện cho bảng Sudoku.
-#     :param screen: Màn hình pygame
-#     :param bang: Bảng Sudoku
-#     :param font: Phông chữ
-#     :param n: Kích thước bảng Sudoku (n x n)
-#     :param KT_O: Kích thước ô
-#     :param DEM: Khoảng cách lề
-#     """
-#     for i in range(KT_LUOI):
-#         for j in range(KT_LUOI):
-#             if bang[i][j]:
-#                 # Xác định màu chữ
-#                 mau = (25, 53, 88)
-#                 # Vẽ số
-#                 text = font.render(str(bang[i][j]), True, mau)
-#                 rect = text.get_rect(center=(DEM + j * KT_O + KT_O // 2, DEM + i * KT_O + KT_O // 2))
-#                 screen.blit(text, rect)
-
-# def ve_luoi(screen):
-#     # Vẽ lưới Sudoku
-#     for i in range(KT_LUOI + 1):
-#         duongVien = 3 if i % 3 == 0 else 1
-#         # Vẽ đường dọc
-#         pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)
-#         # Vẽ đường ngang
-#         pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)
-
-#     # Trả về hình chữ nhật bao quanh toàn bộ lưới để kiểm tra click ở ngoài
-#     return pygame.Rect(DEM, DEM, KT_O * 9, KT_O * 9)
 
 def ve_luoi(screen, size):
     """
@@ -528,33 +496,21 @@ def ve_thong_bao_loi(screen, giatritrung):
 
 
 # _____________________vẽ biểu đồ ____________________________________
-# Vẽ menu chọn loại biểu đồ (thời gian, số bước, log)
-def ve_bang_chon_bieu_do(screen, x, y):
-    font = pygame.font.SysFont("verdana", 18)  # Khởi tạo font chữ
-    w, h = 180, 35  # Kích thước của mỗi ô menu
-    options = [  # Danh sách các tùy chọn biểu đồ
-        {"text": "Biểu đồ thời gian", "value": "TIME"},
-        {"text": "Biểu đồ số bước", "value": "STEP"},
-        {"text": "Log theo bước", "value": "LOG"},
-    ]
-    ds_rect = []  # Danh sách lưu vùng chọn (rect) tương ứng từng tùy chọn
-    for i, opt in enumerate(options):
-        rect = pygame.Rect(x, y + i * h, w, h)  # Tạo hình chữ nhật cho mỗi tùy chọn
-        pygame.draw.rect(screen, (230, 230, 230), rect)  # Tô màu nền ô
-        pygame.draw.rect(screen, (0, 0, 0), rect, 1)  # Vẽ viền ô
-        text = font.render(opt["text"], True, (0, 0, 0))  # Vẽ nội dung chữ
-        screen.blit(text, (x + 10, y + i * h + 5))  # Hiển thị chữ lên màn hình
-        ds_rect.append({"rect": rect, "text": opt["text"], "value": opt["value"]})  # Lưu thông tin tùy chọn
-    return ds_rect  # Trả về danh sách các ô tùy chọn đã vẽ
-
-def ve_bieu_do_thoi_gian(ds_log):
-    if not ds_log:  # Nếu không có dữ liệu log thì thoát
+def ve_bieu_do_tong_thoi_gian_so_buoc(ds_log):
+    if not ds_log:
+        print("Không có dữ liệu log để vẽ.")
         return
-    buoc = [b[0] for b in ds_log]  # Danh sách các bước
-    thoi_gian = [b[1] - ds_log[0][1] for b in ds_log]  # Thời gian trôi qua từ bước đầu
-    plt.plot(buoc, thoi_gian, marker='o')  # Vẽ biểu đồ đường
-    plt.title("Thời gian theo bước")  # Tiêu đề
-    plt.xlabel("Bước")  # Nhãn trục X
-    plt.ylabel("Thời gian (s)")  # Nhãn trục Y
-    plt.grid()  # Hiển thị lưới
-    plt.show()  # Hiển thị biểu đồ
+
+    so_buoc = [item[0] for item in ds_log]  # Lấy số bước thử từ log
+    thoi_gian = [item[1] for item in ds_log]  # Lấy thời gian từ log
+
+    # Vẽ biểu đồ
+    plt.figure(figsize=(10, 6))
+    plt.plot(so_buoc, thoi_gian, marker='o', linestyle='-', color='b')
+
+    # Thêm tiêu đề và nhãn cho các trục
+    plt.title('Biểu đồ thời gian và số bước giải Sudoku')
+    plt.xlabel('Số bước thử')
+    plt.ylabel('Tổng thời gian (giây)')
+    plt.grid(True)
+    plt.show()

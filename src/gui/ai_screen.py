@@ -23,7 +23,6 @@ class Ai_Screen:
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
-        # self.bang = layBangSuDoKuTheoCapDo(9 ,"E")
         self.bang = layBangSuDoKuTheoCapDo(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]
         self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
@@ -64,10 +63,8 @@ class Ai_Screen:
         # log giải thuật 
         self.log_sau_cung = ""  # Lưu log cuối để vẽ lại sau khi thuật toán kết thúc
         self.ds_log = []
+        self.time = 0
 
-        # hiện bảng chọn biểu đồ 
-        self.hien_bang_chon_bieu_do = False
-        self.bang_bieu_do = [] # chứa ds biểu đồ vẽ 
 
         # cờ để bắt tín hiệu tạo đề 
         self.dang_tao_de = False
@@ -88,7 +85,6 @@ class Ai_Screen:
         self.hien_bang_chon_size = False
         self.bang_chon_size = []
         self.ten_size = "9x9"
-  
         self.KT_O = (RONG - 2 * DEM) // 9  
          
 
@@ -208,8 +204,6 @@ class Ai_Screen:
         self.nut_dd_size = None 
         self.hien_bang_chon_size = False
         self.bang_chon_size = []
-        # self.ten_size = "9x9"
-        # self.size = 9 
 
         # Không có ô nào đang chọn
         self.o_chon = None
@@ -228,13 +222,11 @@ class Ai_Screen:
 
         pygame.display.update()
 
-     # hàm giải sudoku theo thuật toán 
-    
+    # hàm giải sudoku theo thuật toán 
     def giai_sudoku_theo_ten_alg(self, bang, cap_nhat_gui):
         if self.gia_tri_alg == "B":
-            bang_giai, so_buoc, ds_log, self.daGiaiThanhCong = giai_sudoku_backtracking(bang, cap_nhat_gui)
-            self.ds_log = ds_log
-            print(ds_log)
+            bang_giai, so_buoc, self.ds_log, self.daGiaiThanhCong = giai_sudoku_backtracking(bang,self.size, cap_nhat_gui)
+            print(self.ds_log)
             return bang_giai, so_buoc
         # elif self.gia_tri_alg == "HC":
         #     self.bang_giai = giai_sudoku_hillclimbing(bang)
@@ -272,9 +264,11 @@ class Ai_Screen:
             self.KT_O - 2, self.KT_O - 2
         ))
 
-        # Vẽ số trong ô
+       # Vẽ số trong ô
         if value != 0:
-            text = self.font.render(str(value), True, DEN)  # Đặt màu chữ là đen
+            font_size = int(self.KT_O * 0.6)  # 60% kích thước ô, bạn có thể điều chỉnh 0.6 thành số khác nếu cần
+            font = pygame.font.SysFont(None, font_size)  # Tạo font mới với size động
+            text = font.render(str(value), True, DEN)  # Đặt màu chữ là đen
             rect = text.get_rect(center=(
                 DEM + col * self.KT_O + self.KT_O // 2,
                 DEM + row * self.KT_O + self.KT_O // 2
@@ -303,13 +297,7 @@ class Ai_Screen:
             # Xóa số trong grid hiện tại (reset grid) use list comprehension
             self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]  # Giả sử grid là 9x9
     
-        # Trong xử lý click nút "So sánh"
-        # elif self.nut_ss.collidepoint(vitri_click):
-        #     # self.dang_tao_de = False
-        #     self.so_sanh_mode = True    
-        #     from src.gui import compare_screen
-        #     compare_screen.KhoiDongManHinhSS()
-    
+          
         # click nút cấp độ 
         elif self.nut_dd_cap_do.collidepoint(vitri_click):
             self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do 
@@ -323,7 +311,7 @@ class Ai_Screen:
             self.hien_bang_chon_size = not self.hien_bang_chon_size
 
         # click ô 
-        elif DEM <= x <= DEM + self.size * self.KT_O and DEM <= y <= DEM + self.size * self.KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai and not self.hien_bang_chon_bieu_do and not self.hien_bang_thong_bao_loi and not self.hien_bang_chon_size:
+        elif DEM <= x <= DEM + self.size * self.KT_O and DEM <= y <= DEM + self.size * self.KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai  and not self.hien_bang_thong_bao_loi and not self.hien_bang_chon_size:
             print(self.KT_O, self.size)
             cot = (x - DEM) // self.KT_O
             dong = (y - DEM) // self.KT_O
@@ -331,8 +319,8 @@ class Ai_Screen:
 
         # cick nút biểu đồ 
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
-            self.hien_bang_chon_bieu_do = not self.hien_bang_chon_bieu_do
-
+            ve_bieu_do_tong_thoi_gian_so_buoc(self.ds_log)
+            
        # click nút giải
         elif self.ai_btn.collidepoint(vitri_click):
             self.click_giai = True
@@ -426,20 +414,7 @@ class Ai_Screen:
                     self.update_sudoku_board()  # Cập nhật lại bảng Sudoku
                     break
         
-        # xử lí click từng mục để chọn biểu đồ 
-        elif self.hien_bang_chon_bieu_do:
-            # self.dang_tao_de = False
-            for bd in self.bang_bieu_do:
-                if bd["rect"].collidepoint(vitri_click):
-                    if bd["value"] == "TIME":
-                        ve_bieu_do_thoi_gian(self.ds_log)
-                    elif bd["value"] == "STEP":
-                        ve_bieu_do_so_buoc(self.ds_log)
-                    elif bd["value"] == "LOG":
-                        ve_bieu_do_log_theo_buoc()
-                    self.hien_bang_chon_bieu_do = False
-                    break 
-
+     
         # click ra ngoai luoi -> xoa o dang chon
         elif self.bang_sudoku and not self.bang_sudoku.collidepoint(vitri_click):
             self.o_chon = None
@@ -493,10 +468,7 @@ class Ai_Screen:
                 ve_luoi(self.screen, self.size)
                 self.thoat_btn_loi = ve_thong_bao_loi(self.screen, self.gia_tri_trung)
 
-            # Vẽ biểu đồ 
-            if self.hien_bang_chon_bieu_do:
-                self.bang_bieu_do = ve_bang_chon_bieu_do(self.screen, self.nut_bieu_do.right + -170, self.nut_bieu_do.top + 50 )
-
+          
             # ve bảng chọn size 
             if self.hien_bang_chon_size:
                 self.bang_chon_size = ve_bang_chon_size(self.screen)
