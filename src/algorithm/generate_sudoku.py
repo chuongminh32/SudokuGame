@@ -8,7 +8,7 @@ def sinh_bang_sudoku_ngau_nhien(side):
         side = int(side)
     except ValueError:
         raise ValueError("Kích thước side phải là một số nguyên hợp lệ.")
-    
+
     base = int(math.isqrt(side))
 
     # Kiểm tra xem side có phải là một số chính phương không
@@ -46,13 +46,13 @@ def xoaSoNgauNhien(board, num_to_remove):
     """Xóa một số lượng ô khỏi bảng Sudoku."""
     positions = [(i, j) for i in range(len(board)) for j in range(len(board[0]))]
     random.shuffle(positions)
-    
+
     board_copy = [row[:] for row in board]  # Tạo bản sao tránh sửa bảng gốc
-    
+
     for _ in range(num_to_remove):
         row, col = positions.pop()
         board_copy[row][col] = 0
-    
+
     return board_copy
 
 def layBangSuDoKuTheoCapDo(side, level="E"):
@@ -66,7 +66,7 @@ def layBangSuDoKuTheoCapDo(side, level="E"):
     "H": int(0.4 * c),  # Giảm số lượng ô xóa cho cấp độ khó (chỉ xóa 50%)
 }
 
-    
+
     if level not in CapDo:
         raise ValueError("Cấp độ không hợp lệ. Chọn 'E', 'M', 'H'.")
 
