@@ -173,7 +173,9 @@ class Ai_Screen:
 
         # Xóa log cũ nếu có
         try:
-            with open(r"G:\NamII_HK2\AI\Sudoku\data\log_giai_sudoku.txt", "w", encoding="utf-8") as f:
+            log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
+            os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+            with open(log_file_path, "w", encoding="utf-8") as f:
                 f.write("")
         except Exception as e:
             print("Không thể xóa log:", e)
@@ -213,15 +215,12 @@ class Ai_Screen:
 
         # Tạo dòng log chi tiết
         dong_log = f"[Bước {so_buoc:04d}] ({row},{col}) <- {value} --> {trang_thai_text}"
-
+        
+        # ghi file log 
         log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
-
-        # Đảm bảo thư mục 'data' tồn tại (nếu không có sẽ lỗi)
         os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-
         with open(log_file_path, "a", encoding="utf-8") as f:
             f.write(dong_log + "\n")
-
 
         # Tô màu ô
         pygame.draw.rect(self.screen, mau, pygame.Rect(
@@ -241,7 +240,6 @@ class Ai_Screen:
 
         pygame.display.update()  # Cập nhật giao diện
         pygame.time.delay(10)  # Tạm dừng một chút giữa các bước (nếu cần)
-
 
     def xuLiSuKienClickChuot(self, vitri_click):
 
@@ -293,12 +291,6 @@ class Ai_Screen:
             self.click_giai = True
             self.bang_goc = [row[:] for row in self.bang]
             self.dang_tao_de = False
-            # Xóa log cũ trước khi giải mới
-            log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
-            os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-            with open(log_file_path, "a", encoding="utf-8") as f:
-                f.write("")
-            self.ds_log = []
 
             # Bắt đầu đo thời gian giải thuật
             tg_bat_dau = time.perf_counter()
