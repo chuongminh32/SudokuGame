@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.utils.utils_ai_screen import * 
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
+from src.algorithm.simulate_anealing import *
 from src.algorithm.hill_climbing import *
 # Đường dẫn gốc đến thư mục gốc của dự án (Sudoku)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,7 +24,7 @@ class Ai_Screen:
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
-        self.bang = layBangSuDoKuTheoCapDo(self.size, self.gia_tri_cap_do)
+        self.bang = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]
         self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
         self.bang_sudoku = None # grid -> bắt sk click ngoài 
@@ -50,7 +51,7 @@ class Ai_Screen:
         self.o_chon = None
 
         self.dangChayGame = True
-
+    
         # nút 
         self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin = [None] * 9
 
@@ -92,7 +93,8 @@ class Ai_Screen:
     def update_sudoku_board(self):
         """Cập nhật bảng Sudoku khi kích thước thay đổi."""
         # Khởi tạo lại bảng Sudoku dựa trên kích thước mới
-        self.bang = layBangSuDoKuTheoCapDo(self.size, self.gia_tri_cap_do)
+        self.bang = []
+        self.bang = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]  # Lưu bảng gốc để so sánh sau này
         self.bang_giai = None  # Reset bảng giải
         self.bang_sudoku = None  # Reset bảng sudoku nếu có
@@ -185,11 +187,8 @@ class Ai_Screen:
         self.hien_bang_chon_bieu_do = False
         self.hien_thong_bao_ai = False
 
-        # Reset bảng Sudoku mới theo tên cấp độ đã chọn 
-        self.bang = layBangSuDoKuTheoCapDo(self.size, self.gia_tri_cap_do)
-
-        # Reset bảng lời giải
-        self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
+        # Reset bảng
+        self.update_sudoku_board()
 
         # Reset các trạng thái giải AI
         self.so_buoc = 0
@@ -230,8 +229,10 @@ class Ai_Screen:
             return bang_giai, so_buoc
         # elif self.gia_tri_alg == "HC":
         #     self.bang_giai = giai_sudoku_hillclimbing(bang)
-        # elif self.gia_tri_alg == "SA":
-        #     self.bang_giai = giai_sudoku_simulatedanealing(bang)
+        elif self.gia_tri_alg == "SA":
+            bang_giai, so_buoc, self.ds_log, self.daGiaiThanhCong = giai_sudoku_simulatedanealing(bang,self.size, cap_nhat_gui)
+            print(self.ds_log)
+            return bang_giai, so_buoc
   
     def cap_nhat_gui(self, row, col, value, trang_thai, so_buoc):
         if trang_thai == "thu":
@@ -386,10 +387,15 @@ class Ai_Screen:
                 if cap_do["rect"].collidepoint(vitri_click):
                     self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
                     self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
-                    self.bang = layBangSuDoKuTheoCapDo(self.size, self.gia_tri_cap_do)
-                    print(self.size)
+                    # self.bang = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
+                    # print(self.size, self.gia_tri_cap_do)
+                    # print(self.bang)
+                    print(self.bang)
+                    self.update_sudoku_board()
+                    print(self.bang)
+
                     # cập nhật lại từng ô trong bảng giải 
-                    self.bang_giai, _ = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
+                    # self.bang_giai, _ = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
                     self.hien_bang_cap_do = False
                     break
 

@@ -148,7 +148,7 @@ def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.0, isSolve =
 #     total_time = 0
 #     for _ in range(repeat_times):
 #         _, _, _, _, elapsed_time = giai_sudoku_backtracking(bang, size, cap_nhat_gui=None)
-#         total_time += elapsed_time
+#         total_time +=     elapsed_time
 
 #     avg_time = total_time / repeat_times
 #     print(f"Thời gian trung bình cho {repeat_times} lần chạy: {avg_time:.6f} giây")
