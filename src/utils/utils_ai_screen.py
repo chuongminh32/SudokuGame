@@ -570,6 +570,40 @@ def ve_thong_bao_loi(screen, giatritrung):
     return thoat_btn
 
 
+# Vẽ log giao diện với thanh cuộn 
+def ve_log_giao_dien(screen, KT_O, size, max_lines_log, danh_sach_log, log_scroll):
+    log_x = DEM + size * KT_O + 70
+    log_y = DEM
+    log_width = RONG * 0.70 
+    log_height = CAO - 3 * DEM
+    line_height = 22
+    font = pygame.font.SysFont("consolas", 18)
+
+    # Vẽ nền log
+    pygame.draw.rect(screen, (30, 30, 30), (log_x, log_y, log_width, log_height))
+
+    # Tính số dòng có thể hiển thị
+    max_lines = int(log_height // line_height)
+    max_lines_log = max_lines  # lưu lại để xử lý scroll
+
+    # Cắt dòng hiển thị theo scroll
+    start = max(0, len(danh_sach_log) - max_lines - log_scroll)
+    end = start + max_lines
+    logs_to_draw = danh_sach_log[start:end]
+
+    # Vẽ log
+    y = log_y + 5
+    x = log_x + 10
+    for dong in logs_to_draw:
+        text = font.render(dong.strip(), True, (255, 255, 255))
+        screen.blit(text, (x, y))
+        y += line_height
+
+    # Thanh cuộn (tùy chọn)
+    # if len(danh_sach_log) > max_lines:
+    #     scroll_bar_height = log_height * (max_lines / len(danh_sach_log))
+    #     scroll_bar_y = log_y + (log_height - scroll_bar_height) * (log_scroll / (len(danh_sach_log) - max_lines))
+    #     pygame.draw.rect(screen, (180, 180, 180), (log_x + log_width - 8, scroll_bar_y, 6, scroll_bar_height))
 
 
 # _____________________vẽ biểu đồ ____________________________________

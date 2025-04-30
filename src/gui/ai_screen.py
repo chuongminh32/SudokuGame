@@ -102,8 +102,9 @@ class Ai_Screen:
         self.hien_bang_delay = False 
         self.bang_chon_delay = []
         self.ten_delay = "0.5s"
-       
-         
+        
+        # thanh cuộn 
+        self.log_scroll = 0  # chỉ số cuộn log
 
 
     def update_sudoku_board(self):
@@ -124,6 +125,13 @@ class Ai_Screen:
                 self.xuLiSuKienNhanPhim(e)
             elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                 self.xuLiSuKienClickChuot(e.pos)
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                if e.button == 4:  # Lăn lên
+                    self.log_scroll = max(0, self.log_scroll - 1)
+                elif e.button == 5:  # Lăn xuống
+                    max_scroll = max(0, len(self.danh_sach_log) - self.max_lines_log)
+                    self.log_scroll = min(max_scroll, self.log_scroll + 1)
+
 
     def kiemTraHopLe(self, board, row, col, num):
         """
@@ -251,7 +259,6 @@ class Ai_Screen:
         #     return bang_giai, so_buoc
         
     def ve_log_giao_dien(self):
-       
         log_x = DEM + self.size * self.KT_O + 70
         log_y = DEM
         log_width = RONG * 0.70 
@@ -262,22 +269,28 @@ class Ai_Screen:
         # Vẽ nền log
         pygame.draw.rect(self.screen, (30, 30, 30), (log_x, log_y, log_width, log_height))
 
-        # Hiển thị các dòng log mới nhất
+        # Tính số dòng có thể hiển thị
         max_lines = int(log_height // line_height)
-        # lấy các log từ cuối đến hết 
-        logs_to_draw = self.danh_sach_log[-max_lines:]
-        y = log_y + log_height - line_height * len(logs_to_draw) - 5
-        x = log_x + 10
+        self.max_lines_log = max_lines  # lưu lại để xử lý scroll
 
+        # Cắt dòng hiển thị theo scroll
+        start = max(0, len(self.danh_sach_log) - max_lines - self.log_scroll)
+        end = start + max_lines
+        logs_to_draw = self.danh_sach_log[start:end]
+
+        # Vẽ log
+        y = log_y + 5
+        x = log_x + 10
         for dong in logs_to_draw:
-            text = font.render(dong, True, (255, 255, 255))
+            text = font.render(dong.strip(), True, (255, 255, 255))
             self.screen.blit(text, (x, y))
             y += line_height
-   
-    def cap_nhat_gui(self, row, col, value, trang_thai, so_buoc):
+
+    def cap_nhat_gui(self, row, col, value,  trang_thai, so_buoc):
         mau_map = {
-            "sai": ((255, 193, 193), "Sai"),
-            "dung": ((195, 247, 202), "Đúng")
+            "sai": ((255, 193, 193), "Sai - quay lui lại bước trước đó"),
+            "dung": ((195, 247, 202), "Đúng"),
+            "thu" :(((255, 255, 204), "Thử giá trị (hợp lệ)"))
         }
         mau, trang_thai_text = mau_map.get(trang_thai, ((255, 255, 255), ""))
 
@@ -464,7 +477,6 @@ class Ai_Screen:
                     self.ten_delay = t["text"] # hiển thị lên giao diện 
                     # cập nhật lại từng ô trong bảng giải 
                     self.hien_bang_delay = False
-                    self.update_sudoku_board()  # Cập nhật lại bảng Sudoku
                     break
         
 

@@ -33,17 +33,20 @@ def giai_sudoku_backtracking(bang, size, delay, cap_nhat_gui=None , isSolve = Fa
                             so_buoc += 1
 
                             if cap_nhat_gui:
-                                cap_nhat_gui(row, col, num, "dung", so_buoc)
+                                cap_nhat_gui(row, col, num, "thu", so_buoc)
                                 time.sleep(delay)
 
                             if solve(bang):
+                                if cap_nhat_gui:
+                                    cap_nhat_gui(row, col, num, "dung", so_buoc)
+                                    time.sleep(delay)
                                 return True
 
                             # Quay lui
                             bang[row][col] = 0
                             so_buoc += 1
                             if cap_nhat_gui:
-                                cap_nhat_gui(row, col, 0, "sai", so_buoc)
+                                cap_nhat_gui(row, col, num, "sai", so_buoc)
                                 time.sleep(delay)
                     return False
         return True
@@ -88,12 +91,14 @@ def ghi_log_backtracking(b, size):
                             b[r][c] = n
                             buoc += 1
                             t = time.perf_counter() - start
-                            ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Đúng")
-                            if solve(b): return True
+                            ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Thử giá trị")
+                            if solve(b): 
+                                ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Đúng")
+                                return True
                             b[r][c] = 0
                             buoc += 1
                             t = time.perf_counter() - start
-                            ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Sai")
+                            ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Sai - backtracking step")
                     return False
         return True
 
