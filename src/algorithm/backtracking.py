@@ -6,7 +6,8 @@ from src.utils.utils_ai_screen import *
 import time
 
 # Trả về bảng giải, số bước và log (nếu có)
-def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.0, isSolve = False):
+def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.5 , isSolve = False):
+    
     KT_box = math.isqrt(size)
     def hop_le(bang, row, col, num):
         for i in range(size):
@@ -20,8 +21,6 @@ def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.0, isSolve =
         return True
 
     so_buoc = 0
-    ds_log = []
-    start_time = time.perf_counter()
 
     def solve(bang):
         nonlocal so_buoc
@@ -33,128 +32,71 @@ def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.0, isSolve =
                             bang[row][col] = num
                             so_buoc += 1
 
-                            # Nếu có GUI -> cập nhật hiệu ứng
                             if cap_nhat_gui:
-                                current_time = time.perf_counter()
-                                ds_log.append((so_buoc, current_time - start_time))
-                                cap_nhat_gui(row, col, num, "thu", so_buoc)
+                                cap_nhat_gui(row, col, num, "dung", so_buoc)
                                 time.sleep(delay)
 
                             if solve(bang):
-                                if cap_nhat_gui:
-                                    cap_nhat_gui(row, col, num, "dung", so_buoc)
                                 return True
 
+                            # Quay lui
                             bang[row][col] = 0
+                            so_buoc += 1
                             if cap_nhat_gui:
                                 cap_nhat_gui(row, col, 0, "sai", so_buoc)
                                 time.sleep(delay)
                     return False
         return True
 
+
     bang_copy = [row[:] for row in bang]  # Copy bảng ban đầu để giữ nguyên
     if solve(bang_copy):
-        isSolve = True
+        isSolve = True  
 
-    if cap_nhat_gui:
-        return bang_copy, so_buoc, ds_log, isSolve
-    else:
-        return bang_copy, so_buoc, None, isSolve
-
-# import sys, os, math
-# import time
-
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-# from src.algorithm.generate_sudoku import *
-# from src.utils.utils_ai_screen import *
-
-# # Trả về bảng giải, số bước và log (nếu có)
-# def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.0, isSolve=False):
-#     KT_box = math.isqrt(size)
-
-#     def hop_le(bang, row, col, num):
-#         for i in range(size):
-#             if bang[row][i] == num or bang[i][col] == num:
-#                 return False
-#         start_row, start_col = KT_box * (row // KT_box), KT_box * (col // KT_box)
-#         for i in range(start_row, start_row + KT_box):
-#             for j in range(start_col, start_col + KT_box):
-#                 if bang[i][j] == num:
-#                     return False
-#         return True
-
-#     def tim_o_trong_it_lua_chon_nhat(bang):
-#         min_options = size 
-#         best_cell = None
-#         for row in range(size):
-#             for col in range(size):
-#                 if bang[row][col] == 0:
-#                     count = 0
-#                     for num in range(1, size + 1):
-#                         if hop_le(bang, row, col, num):
-#                             count += 1
-#                     if count < min_options:
-#                         min_options = count
-#                         best_cell = (row, col)
-#                         if min_options == 1:
-#                             return best_cell
-#         return best_cell
-
-#     so_buoc = 0
-#     ds_log = []
-#     start_time = time.perf_counter()  # Bắt đầu đo thời gian
-
-#     def solve(bang):
-#         nonlocal so_buoc
-#         empty_cell = tim_o_trong_it_lua_chon_nhat(bang)
-#         if not empty_cell:
-#             return True  # Đã giải xong
-
-#         row, col = empty_cell
-
-#         for num in range(1, size + 1):
-#             if hop_le(bang, row, col, num):
-#                 bang[row][col] = num
-#                 so_buoc += 1
-
-#                 # Không cập nhật GUI khi đo thời gian
-#                 if cap_nhat_gui:
-#                     cap_nhat_gui(row, col, num, "thu", so_buoc)
-
-#                 if solve(bang):
-#                     if cap_nhat_gui:
-#                         cap_nhat_gui(row, col, num, "dung", so_buoc)
-#                     return True
-
-#                 bang[row][col] = 0
-#                 if cap_nhat_gui:
-#                     cap_nhat_gui(row, col, 0, "sai", so_buoc)
-
-#         return False
-
-#     bang_copy = [row[:] for row in bang]  # Copy bảng ban đầu để giữ nguyên
-#     solve(bang_copy)
-
-#     end_time = time.perf_counter()  # Kết thúc đo thời gian
-#     elapsed_time = end_time - start_time
-
-#     if cap_nhat_gui:
-#         return bang_copy, so_buoc, ds_log, isSolve, elapsed_time
-#     else:
-#         return bang_copy, so_buoc, None, isSolve, elapsed_time
+    return bang_copy, so_buoc, isSolve
 
 
-# def test_giai_sudoku(bang, size, repeat_times=10):
-#     total_time = 0
-#     for _ in range(repeat_times):
-#         _, _, _, _, elapsed_time = giai_sudoku_backtracking(bang, size, cap_nhat_gui=None)
-#         total_time +=     elapsed_time
+def ghi_log_backtracking(b, size):
+    from src.utils.utils_ai_screen import get_relative_path
+    import os, math, time
 
-#     avg_time = total_time / repeat_times
-#     print(f"Thời gian trung bình cho {repeat_times} lần chạy: {avg_time:.6f} giây")
+    log_path = get_relative_path("data", "log_giai_sudoku.txt")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    with open(log_path, "w", encoding="utf-8"): pass  # clear log
 
-# # Chạy thử
-# bang = [[...]]  # Bảng Sudoku cần giải
-# size = 9  # Kích thước Sudoku (9x9)
+    box = math.isqrt(size)
 
-# test_giai_sudoku(bang, size, repeat_times=5)  # Lặp lại 5 lần để tính thời gian trung bình
+    def ghi_log(dong):
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(dong + "\n")
+
+    def hop_le(b, r, c, n):
+        if any(b[r][i] == n or b[i][c] == n for i in range(size)): return False
+        sr, sc = box * (r // box), box * (c // box)
+        return all(b[i][j] != n for i in range(sr, sr + box) for j in range(sc, sc + box))
+
+    buoc = 0
+    start = time.perf_counter()
+
+    def solve(b):
+        nonlocal buoc
+        for r in range(size):
+            for c in range(size):
+                if b[r][c] == 0:
+                    for n in range(1, size + 1):
+                        if hop_le(b, r, c, n):
+                            b[r][c] = n
+                            buoc += 1
+                            t = time.perf_counter() - start
+                            ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Đúng")
+                            if solve(b): return True
+                            b[r][c] = 0
+                            buoc += 1
+                            t = time.perf_counter() - start
+                            ghi_log(f"[Bước {buoc}] [Time: {t:.4f}s] ({r},{c}) <- {n} --> Sai")
+                    return False
+        return True
+
+    b_copy = [row[:] for row in b]  # tránh thay đổi bảng gốc
+    solve(b_copy)
+    return time.perf_counter() - start

@@ -95,13 +95,24 @@ def ve_nut_ai(screen, size):
     # Vẽ icon lên màn hình
     screen.blit(icon_if, rect_nut_thong_tin)
 
+    # nút mở rộng (xem chi tiết các bước giải)
+    icon_log = get_relative_path("..", "assets", "log.png")
+    img_log = pygame.image.load(icon_log).convert_alpha()
+    # Vị trí icon
+    x = RONG - 50
+    y = (CAO - 2*DEM) // 2 
+    # Lấy rect từ icon và đặt vị trí
+    rect_nut_log = img_log.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(img_log, rect_nut_log)
+
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
     pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
     text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin
+    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin, rect_nut_log
 
 def to_o_giai(screen, bang_goc, bang_giai, size):
     KT_O = (RONG - 2*DEM) // size
