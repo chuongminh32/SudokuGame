@@ -21,6 +21,7 @@ class Ai_Screen:
         pygame.display.set_caption("Sudoku - Chơi Game")
         self.font = pygame.font.SysFont("verdana", 25)
         self.font_text = pygame.font.SysFont("verdana", 20)  
+        self.tg_delay = 0.5
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
@@ -95,6 +96,13 @@ class Ai_Screen:
         self.bang_chon_size = []
         self.ten_size = "9x9"
         self.KT_O = (RONG - 2 * DEM) // 9  
+
+        # nút điều chỉnh tốc độ hiện log 
+        self.nut_dd_delay = None
+        self.hien_bang_delay = False 
+        self.bang_chon_delay = []
+        self.ten_delay = "0.5s"
+       
          
 
 
@@ -232,7 +240,7 @@ class Ai_Screen:
     # hàm giải sudoku theo thuật toán 
     def giai_sudoku_theo_ten_alg(self, bang, cap_nhat_gui):
         if self.gia_tri_alg == "B":
-            bang_giai, so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(bang,self.size, cap_nhat_gui)
+            bang_giai, so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(bang,self.size, self.tg_delay, cap_nhat_gui)
             self.thoi_gian_giai = ghi_log_backtracking(self.bang, self.size)
             return bang_giai, so_buoc
         # elif self.gia_tri_alg == "HC":
@@ -243,6 +251,7 @@ class Ai_Screen:
         #     return bang_giai, so_buoc
         
     def ve_log_giao_dien(self):
+       
         log_x = DEM + self.size * self.KT_O + 70
         log_y = DEM
         log_width = RONG * 0.70 
@@ -320,7 +329,9 @@ class Ai_Screen:
             self.dang_tao_de = True
             # Xóa số trong grid hiện tại (reset grid) use list comprehension
             self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]  # Giả sử grid là 9x9
-    
+
+        elif self.nut_dd_delay and self.nut_dd_delay.collidepoint(vitri_click):
+            self.hien_bang_delay = not self.hien_bang_delay
           
         # click nút cấp độ 
         elif self.nut_dd_cap_do.collidepoint(vitri_click):
@@ -444,7 +455,19 @@ class Ai_Screen:
                     self.hien_bang_chon_size = False
                     self.update_sudoku_board()  # Cập nhật lại bảng Sudoku
                     break
+
+         # Xử lí sự kiện click chọn time delay
+        elif self.hien_bang_delay == True:
+            for t in self.bang_chon_delay:
+                if t["rect"].collidepoint(vitri_click):
+                    self.tg_delay = t["value"] # cập nhất giá trị cấp độ đã chọn 
+                    self.ten_delay = t["text"] # hiển thị lên giao diện 
+                    # cập nhật lại từng ô trong bảng giải 
+                    self.hien_bang_delay = False
+                    self.update_sudoku_board()  # Cập nhật lại bảng Sudoku
+                    break
         
+
         # click nut view log 
         elif self.nut_log and self.nut_log.collidepoint(vitri_click):
             self.hien_log = not self.hien_log
@@ -468,7 +491,9 @@ class Ai_Screen:
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
         self.nut_dd_size = ve_nut_dd_bang_size(self.screen, self.ten_size)
         self.ve_log_giao_dien()
-    
+        (self.screen, self.KT_O, self.size)
+        self.nut_dd_delay = ve_nut_dd_bang_speedDelay(self.screen, self.KT_O, self.size, self.ten_delay)
+
     def run(self):
         while self.dangChayGame:
             self.screen.fill(TRANG)
@@ -512,6 +537,10 @@ class Ai_Screen:
             # ve bảng chọn size 
             if self.hien_bang_chon_size:
                 self.bang_chon_size = ve_bang_chon_size(self.screen)
+
+            # vẽ bảng chọn mức delay 
+            if self.hien_bang_delay:
+                self.bang_chon_delay = ve_bang_chon_speedDelay(self.screen, self.KT_O, self.size)
             pygame.display.update()
                 
 

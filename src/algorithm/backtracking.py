@@ -6,7 +6,7 @@ from src.utils.utils_ai_screen import *
 import time
 
 # Trả về bảng giải, số bước và log (nếu có)
-def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.5 , isSolve = False):
+def giai_sudoku_backtracking(bang, size, delay, cap_nhat_gui=None , isSolve = False):
     
     KT_box = math.isqrt(size)
     def hop_le(bang, row, col, num):

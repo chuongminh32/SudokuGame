@@ -364,6 +364,72 @@ def ve_bang_chon_size(screen):
         
     return bang_size  # Trả về danh sách các nút kích thước
 
+
+# Vẽ dropdown chọn kích thước bảng Sudoku
+def ve_nut_dd_bang_speedDelay(screen, KT_O, size, delay = "0.5s"):
+    """Vẽ nút dropdown cho delay hiện log."""
+    
+    # Vị trí và kích thước của combobox
+    box_x, box_y = DEM + KT_O*size + 70, 20 
+    box_rong, box_cao = 80, 30
+    box_rect = pygame.Rect(box_x, box_y, box_rong, box_cao)
+    
+    # Vẽ nền và viền
+    pygame.draw.rect(screen, TRANG, box_rect, border_radius=5)
+    pygame.draw.rect(screen, XAM, box_rect, 2, border_radius=5)
+    
+    # Vẽ văn bản và mũi tên
+    font = pygame.font.SysFont("verdana", 15)
+    text_surf = font.render(delay, True, DEN)
+
+    # Căn giữa chữ trong box, -10 - tránh đụng vào icon mũi tên xuống 
+    text_x = box_x + (box_rong - text_surf.get_width()) // 2 - 10
+    text_y = box_y + (box_cao - text_surf.get_height()) // 2
+
+    screen.blit(text_surf, (text_x, text_y))
+    
+    # Vẽ mũi tên xuống
+    arrow_points = [
+        (box_x + box_rong - 20, box_y + box_cao//2 - 3),
+        (box_x + box_rong - 10, box_y + box_cao//2 - 3),
+        (box_x + box_rong - 15, box_y + box_cao//2 + 5)
+    ]
+    pygame.draw.polygon(screen, DEN, arrow_points)
+    
+    return box_rect  # Trả về hình chữ nhật của combobox để phát hiện sự kiện click
+
+# Vẽ bảng chọn kích thước cho Sudoku
+def ve_bang_chon_speedDelay(screen, KT_O, size):
+    """Vẽ combobox chọn delay bảng log  (0.1, 0.5, 1)."""
+    box_x, box_y = DEM + size * KT_O + 70, 55
+    # box_x, box_y = RONG - 280, 55
+    box_rong, box_cao = 90, 30
+    bang_size = [
+        {"text": "0.1s", "value": 0.1, "rect": pygame.Rect(box_x, box_y + 10, 80, 40)},
+        {"text": "0.5s", "value": 0.5, "rect": pygame.Rect(box_x, box_y + 60, 80, 40)},
+        {"text": "1s", "value": 1, "rect": pygame.Rect(box_x, box_y + 110, 80, 40)},
+    ]
+    
+    font = pygame.font.SysFont("verdana", 18)
+
+    # Vẽ bảng trắng
+    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, 160), border_radius=10)
+
+    # Vẽ các nút kích thước
+    for size in bang_size:
+        pygame.draw.rect(screen, TRANG, size["rect"], border_radius=5)
+        pygame.draw.rect(screen, XAM, size["rect"], 2, border_radius=5)
+        
+        # Hiển thị văn bản căn giữa
+        text_surf = font.render(size["text"], True, DEN)
+        screen.blit(text_surf, (
+            size["rect"].x + (size["rect"].width - text_surf.get_width()) // 2,
+            size["rect"].y + (size["rect"].height - text_surf.get_height()) // 2
+        ))
+        
+    return bang_size  # Trả về danh sách các nút kích thước
+
+
 def ve_highlight_cho_o(screen, row, col, grid, size):
     base = math.isqrt(size)
     KT_O = (RONG - 2 * DEM) // size 
