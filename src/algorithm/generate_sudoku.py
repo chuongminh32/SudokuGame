@@ -40,48 +40,67 @@ def xoa_o_ngau_nhien(board, so_o_can_xoa):
 
 def tao_sudoku_theo_cap_do(size, level="E"):
     """Hàm tạo một bảng Sudoku thiếu với cấp độ khó từ cấp độ 'E', 'M', 'H'."""
-    total_cells = size * size  # Tổng số ô trong bảng
-    tile_to_remove = {
-        "E": int(total_cells * 0.2),  # Cấp độ dễ, xóa 20% số ô
-        "M": int(total_cells * 0.4),  # Cấp độ trung bình, xóa 40% số ô
-        "H": int(total_cells * 1)   # Cấp độ khó, xóa 80% số ô
+    tong_so_o = size * size  # Tổng số ô trong bảng
+    cap_do = {
+        "E": int(tong_so_o * 0.2),  # Cấp độ dễ, xóa 20% số ô
+        "M": int(tong_so_o * 0.4),  # Cấp độ trung bình, xóa 40% số ô
+        "H": int(tong_so_o * 0.6)   # Cấp độ khó, xóa 60% số ô
     }
     sudoku_day_du = sinh_bang_sudoku_day_du(size)  # Sinh bảng Sudoku đầy đủ
-    sudoku_thieu = xoa_o_ngau_nhien(sudoku_day_du, tile_to_remove[level])  # Xóa các ô ngẫu nhiên theo cấp độ
-    return sudoku_thieu  # Trả về bảng Sudoku thiếu
+    sudoku_thieu = xoa_o_ngau_nhien(sudoku_day_du, cap_do[level])  # Xóa các ô ngẫu nhiên theo cấp độ
+    return sudoku_thieu  # Trả về bảng Sudoku thiếu -> đề 
 
-def sinh_va_luu_de(size=9, num_bo_moi_cap_do=100):
-    """Hàm sinh và lưu bộ dữ liệu Sudoku vào file JSON."""
-    file_name = f"sudoku_{size}x{size}_dataset.json"  # Đặt tên file lưu dữ liệu
-    output_path = os.path.join("Sudoku", "data", file_name)  # Đường dẫn file
+def sinh_va_luu_de(size=9, tong_so_de=100):
+    """Hàm sinh và lưu đề Sudoku + lời giải vào file JSON."""
+    file_name = f"sudoku_{size}x{size}_dataset.json"
+    output_path = os.path.join("Sudoku", "data", file_name)
+    print(output_path)
 
-    dataset = {"E": [], "M": [], "H": []}  # Khởi tạo từ điển để lưu bộ dữ liệu cho từng cấp độ
-    for level in ["E", "M", "H"]:  # Lặp qua các cấp độ dễ, trung bình và khó
-        print(f"Sinh {num_bo_moi_cap_do} đề cấp độ {level} ({size}x{size})...")  # In thông báo sinh dữ liệu
-        for _ in range(num_bo_moi_cap_do):  # Lặp số lần cần sinh bộ đề
-            board = tao_sudoku_theo_cap_do(size, level)  # Sinh một bảng Sudoku thiếu theo cấp độ
-            dataset[level].append(board)  # Thêm bảng vào danh sách cấp độ tương ứng
+    dataset = {"E": [], "M": [], "H": []}
 
+    for level in ["E", "M", "H"]:
+        print(f"Sinh {tong_so_de} đề cấp độ {level} ({size}x{size})...")
+        tong_so_o = size * size
+        # từ điển ánh xạ tương ứng với cấp độ 
+        so_o_xoa = {
+            "E": int(tong_so_o * 0.2),
+            "M": int(tong_so_o * 0.4),
+            "H": int(tong_so_o * 0.6)
+        }[level]
+
+        for _ in range(tong_so_de):
+            bang_giai = sinh_bang_sudoku_day_du(size)
+            bang_de = xoa_o_ngau_nhien(bang_giai, so_o_xoa)
+            dataset[level].append({
+                "question": bang_de,
+                "solution": bang_giai
+            })
+    #os.makedirs(...): Tạo toàn bộ đường dẫn thư mục nếu chưa tồn tại.
+    #os.path.dirname(output_path): Lấy ra thư mục cha của file output_path
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(dataset, f)  # Lưu bộ dữ liệu vào file JSON
-    print(f"Đã lưu vào: {output_path}")  # In thông báo hoàn thành lưu file
+        json.dump(dataset, f)
+
+    print(f"Đã lưu dữ liệu Sudoku vào: {output_path}")
+
 
 def tao_sudoku_theo_cap_do(size, level):
-    """Lấy ngẫu nhiên 1 đề từ file JSON tương ứng với size và cấp độ."""
-    file_path = os.path.join("Sudoku", "data", f"sudoku_{size}x{size}_dataset.json")  # Đường dẫn tới file dữ liệu
+    """Lấy ngẫu nhiên 1 đề + lời giải từ file JSON."""
+    file_path = os.path.join("Sudoku", "data", f"sudoku_{size}x{size}_dataset.json")
 
-    if not os.path.exists(file_path):  # Kiểm tra xem file có tồn tại không
-        raise FileNotFoundError(f"Không tìm thấy file: {file_path}")  # Nếu không có file, ném lỗi
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Không tìm thấy file: {file_path}")
 
     with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)  # Đọc dữ liệu từ file JSON
+        data = json.load(f)
 
-    if level not in data:  # Kiểm tra xem cấp độ có hợp lệ không
-        raise ValueError(f"Cấp độ '{level}' không hợp lệ. Các cấp độ hợp lệ: {list(data.keys())}")  # Nếu không hợp lệ, ném lỗi
+    if level not in data:
+        raise ValueError(f"Cấp độ '{level}' không hợp lệ. Các cấp độ hợp lệ: {list(data.keys())}")
 
-    danh_sach_de = data[level]  # Lấy danh sách các đề của cấp độ
-    de_ngau_nhien = random.choice(danh_sach_de)  # Chọn ngẫu nhiên một đề từ danh sách
-    return de_ngau_nhien  # Trả về đề ngẫu nhiên
+    danh_sach_de = data[level]
+    de_ngau_nhien = random.choice(danh_sach_de)
+
+    return de_ngau_nhien["question"], de_ngau_nhien["solution"]
 
 # ======= Chạy =======
 if __name__ == "__main__":
