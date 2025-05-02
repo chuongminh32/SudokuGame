@@ -231,10 +231,10 @@ class Ai_Screen:
             return bang_giai, so_buoc
         # elif self.gia_tri_alg == "HC":
         #     self.bang_giai = giai_sudoku_hillclimbing(bang)
-        # elif self.gia_tri_alg == "SA":
-            # # self.bang_giai, so_buoc, self.ds_log, self.daGiaiThanhCong = giai_sudoku_simulatedanealing(bang, self.size, cap_nhat_gui, delay=0.05)
-            # print(self.ds_log)
-            # return bang_giai, so_buoc
+        elif self.gia_tri_alg == "SA":
+            bang_giai, so_buoc, self.ds_log, self.daGiaiThanhCong = giai_sudoku_simulatedanealing(bang, self.size, cap_nhat_gui, delay=0.05)
+            print(self.ds_log)
+            return bang_giai, so_buoc
 
     def cap_nhat_gui(self, row, col, value, trang_thai, so_buoc):
         if trang_thai == "thu":

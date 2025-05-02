@@ -28,13 +28,25 @@ def giai_sudoku_simulatedanealing(bang, size, cap_nhat_gui=None, delay=0.0, isSo
                     fixed_sudoku[i, j] = 1
         return fixed_sudoku
 
+    # def Random_3x3Blocks(sudoku, listOfBlocks):
+        # for block in listOfBlocks:
+            # for box in block:
+                # if sudoku[box[0], box[1]] == 0:
+                    # currentBlock = sudoku[block[0][0]:(block[-1][0]+1), block[0][1]:(block[-1][1]+1)]
+                    # sudoku[box[0], box[1]] = random.choice([i for i in range(1, 10) if i not in currentBlock])
+        # return sudoku
     def Random_3x3Blocks(sudoku, listOfBlocks):
-        for block in listOfBlocks:
-            for box in block:
-                if sudoku[box[0], box[1]] == 0:
-                    currentBlock = sudoku[block[0][0]:(block[-1][0]+1), block[0][1]:(block[-1][1]+1)]
-                    sudoku[box[0], box[1]] = random.choice([i for i in range(1, 10) if i not in currentBlock])
-        return sudoku
+      for block in listOfBlocks:
+        nums = [sudoku[r, c] for r, c in block if sudoku[r, c] != 0]
+        available_nums = [i for i in range(1, 10) if i not in nums]
+        random.shuffle(available_nums)
+        idx = 0
+        for (r, c) in block:
+            if sudoku[r, c] == 0:
+                sudoku[r, c] = available_nums[idx]
+                idx += 1
+      return sudoku
+
 
     def Tinh_So_trung_ColRow(row, col, sudoku):
         return (9 - len(np.unique(sudoku[row, :]))) + (9 - len(np.unique(sudoku[:, col])))
@@ -89,9 +101,14 @@ def giai_sudoku_simulatedanealing(bang, size, cap_nhat_gui=None, delay=0.0, isSo
     decreaseFactor = 0.99
     stuckCount = 0
 
+    max_steps = 100000  # tối đa 100k bước
+    max_time = 60  # tối đa 300 giây (5 phút)
+
+    start_time = time.perf_counter()
+    so_buoc = 0
     solutionFound = (score == 0)
 
-    while not solutionFound:
+    while not solutionFound and so_buoc < max_steps and (time.perf_counter() - start_time) < max_time:
         previousScore = score
         for _ in range(ChooseNumberOfItterations(fixedSudoku)):
             proposal, boxes = ProposedState(sudoku_np, fixedSudoku, listOfBlocks)
@@ -128,7 +145,7 @@ def giai_sudoku_simulatedanealing(bang, size, cap_nhat_gui=None, delay=0.0, isSo
         else:
             stuckCount = 0
         if stuckCount > 80:
-            sigma += 2
+            sigma += 10
 
     bang_giai = sudoku_np.tolist()
     if solutionFound:
