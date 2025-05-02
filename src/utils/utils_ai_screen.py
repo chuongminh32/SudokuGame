@@ -405,15 +405,16 @@ def ve_bang_chon_speedDelay(screen, KT_O, size):
     # box_x, box_y = RONG - 280, 55
     box_rong, box_cao = 90, 30
     bang_size = [
-        {"text": "0.1s", "value": 0.1, "rect": pygame.Rect(box_x, box_y + 10, 80, 40)},
-        {"text": "0.5s", "value": 0.5, "rect": pygame.Rect(box_x, box_y + 60, 80, 40)},
-        {"text": "1s", "value": 1, "rect": pygame.Rect(box_x, box_y + 110, 80, 40)},
+        {"text": "0.01s", "value": 0.01, "rect": pygame.Rect(box_x, box_y + 10, 80, 40)},
+        {"text": "0.1s", "value": 0.1, "rect": pygame.Rect(box_x, box_y + 60, 80, 40)},
+        {"text": "0.5s", "value": 0.5, "rect": pygame.Rect(box_x, box_y + 110, 80, 40)},
+         {"text": "1s", "value": 1, "rect": pygame.Rect(box_x, box_y + 160, 80, 40)},
     ]
     
     font = pygame.font.SysFont("verdana", 18)
 
     # Vẽ bảng trắng
-    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, 160), border_radius=10)
+    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, 210), border_radius=10)
 
     # Vẽ các nút kích thước
     for size in bang_size:
@@ -568,43 +569,6 @@ def ve_thong_bao_loi(screen, giatritrung):
     screen.blit(text_btn, (btn_x + 30, btn_y + 8))
 
     return thoat_btn
-
-
-# Vẽ log giao diện với thanh cuộn 
-def ve_log_giao_dien(screen, KT_O, size, max_lines_log, danh_sach_log, log_scroll):
-    log_x = DEM + size * KT_O + 70
-    log_y = DEM
-    log_width = RONG * 0.70 
-    log_height = CAO - 3 * DEM
-    line_height = 22
-    font = pygame.font.SysFont("consolas", 18)
-
-    # Vẽ nền log
-    pygame.draw.rect(screen, (30, 30, 30), (log_x, log_y, log_width, log_height))
-
-    # Tính số dòng có thể hiển thị
-    max_lines = int(log_height // line_height)
-    max_lines_log = max_lines  # lưu lại để xử lý scroll
-
-    # Cắt dòng hiển thị theo scroll
-    start = max(0, len(danh_sach_log) - max_lines - log_scroll)
-    end = start + max_lines
-    logs_to_draw = danh_sach_log[start:end]
-
-    # Vẽ log
-    y = log_y + 5
-    x = log_x + 10
-    for dong in logs_to_draw:
-        text = font.render(dong.strip(), True, (255, 255, 255))
-        screen.blit(text, (x, y))
-        y += line_height
-
-    # Thanh cuộn (tùy chọn)
-    # if len(danh_sach_log) > max_lines:
-    #     scroll_bar_height = log_height * (max_lines / len(danh_sach_log))
-    #     scroll_bar_y = log_y + (log_height - scroll_bar_height) * (log_scroll / (len(danh_sach_log) - max_lines))
-    #     pygame.draw.rect(screen, (180, 180, 180), (log_x + log_width - 8, scroll_bar_y, 6, scroll_bar_height))
-
 
 # _____________________vẽ biểu đồ ____________________________________
 def ve_bieu_do_tong_thoi_gian_so_buoc(ds_log):
