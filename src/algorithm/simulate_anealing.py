@@ -102,8 +102,8 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
             continue
         i1, j1 = vi_tri[0]
         i2, j2 = vi_tri[1]
-        v1 = sudoku[i1, j1]
-        v2 = sudoku[i2, j2]
+        v1 = de_xuat[i1, j1]
+        v2 = de_xuat[i2, j2]
 
         loi_moi = tinh_loi(de_xuat)
         delta = loi_moi - score
@@ -137,4 +137,3 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
         f.write(f"Hoàn tất sau {buoc} bước. Tổng thời gian: {tong_thoi_gian:.4f} giây.\n")
 
     return ket_qua, buoc, isSolve, tong_thoi_gian
-
