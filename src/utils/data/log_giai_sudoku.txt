@@ -1,0 +1,96 @@
+[Bước 1] [Time: 0.0001s] (0,0) <- 5 --> Thử giá trị
+[Bước 2] [Time: 0.0006s] (0,2) <- 2 --> Thử giá trị
+[Bước 3] [Time: 0.0011s] (0,5) <- 6 --> Thử giá trị
+[Bước 4] [Time: 0.0019s] (0,6) <- 4 --> Thử giá trị
+[Bước 5] [Time: 0.0027s] (0,6) <- 4 --> Sai - backtracking step
+[Bước 6] [Time: 0.0032s] (0,5) <- 6 --> Sai - backtracking step
+[Bước 7] [Time: 0.0035s] (0,5) <- 7 --> Thử giá trị
+[Bước 8] [Time: 0.0036s] (0,6) <- 4 --> Thử giá trị
+[Bước 9] [Time: 0.0037s] (0,7) <- 6 --> Thử giá trị
+[Bước 10] [Time: 0.0039s] (1,4) <- 3 --> Thử giá trị
+[Bước 11] [Time: 0.0040s] (1,5) <- 5 --> Thử giá trị
+[Bước 12] [Time: 0.0041s] (2,0) <- 7 --> Thử giá trị
+[Bước 13] [Time: 0.0042s] (2,5) <- 6 --> Thử giá trị
+[Bước 14] [Time: 0.0043s] (2,6) <- 3 --> Thử giá trị
+[Bước 15] [Time: 0.0044s] (3,0) <- 1 --> Thử giá trị
+[Bước 16] [Time: 0.0045s] (3,4) <- 7 --> Thử giá trị
+[Bước 17] [Time: 0.0046s] (3,5) <- 2 --> Thử giá trị
+[Bước 18] [Time: 0.0047s] (3,6) <- 6 --> Thử giá trị
+[Bước 19] [Time: 0.0048s] (3,7) <- 4 --> Thử giá trị
+[Bước 20] [Time: 0.0049s] (3,7) <- 4 --> Sai - backtracking step
+[Bước 21] [Time: 0.0050s] (3,7) <- 9 --> Thử giá trị
+[Bước 22] [Time: 0.0053s] (3,8) <- 4 --> Thử giá trị
+[Bước 23] [Time: 0.0054s] (4,0) <- 9 --> Thử giá trị
+[Bước 24] [Time: 0.0055s] (4,4) <- 5 --> Thử giá trị
+[Bước 25] [Time: 0.0056s] (4,4) <- 5 --> Sai - backtracking step
+[Bước 26] [Time: 0.0057s] (4,0) <- 9 --> Sai - backtracking step
+[Bước 27] [Time: 0.0058s] (3,8) <- 4 --> Sai - backtracking step
+[Bước 28] [Time: 0.0059s] (3,7) <- 9 --> Sai - backtracking step
+[Bước 29] [Time: 0.0060s] (3,6) <- 6 --> Sai - backtracking step
+[Bước 30] [Time: 0.0061s] (3,6) <- 9 --> Thử giá trị
+[Bước 31] [Time: 0.0062s] (3,7) <- 4 --> Thử giá trị
+[Bước 32] [Time: 0.0063s] (3,7) <- 4 --> Sai - backtracking step
+[Bước 33] [Time: 0.0065s] (3,6) <- 9 --> Sai - backtracking step
+[Bước 34] [Time: 0.0066s] (3,5) <- 2 --> Sai - backtracking step
+[Bước 35] [Time: 0.0067s] (3,5) <- 9 --> Thử giá trị
+[Bước 36] [Time: 0.0068s] (3,6) <- 6 --> Thử giá trị
+[Bước 37] [Time: 0.0070s] (3,7) <- 4 --> Thử giá trị
+[Bước 38] [Time: 0.0072s] (3,7) <- 4 --> Sai - backtracking step
+[Bước 39] [Time: 0.0073s] (3,6) <- 6 --> Sai - backtracking step
+[Bước 40] [Time: 0.0074s] (3,5) <- 9 --> Sai - backtracking step
+[Bước 41] [Time: 0.0075s] (3,4) <- 7 --> Sai - backtracking step
+[Bước 42] [Time: 0.0076s] (3,0) <- 1 --> Sai - backtracking step
+[Bước 43] [Time: 0.0077s] (3,0) <- 9 --> Thử giá trị
+[Bước 44] [Time: 0.0078s] (3,4) <- 7 --> Thử giá trị
+[Bước 45] [Time: 0.0079s] (3,5) <- 2 --> Thử giá trị
+[Bước 46] [Time: 0.0080s] (3,6) <- 6 --> Thử giá trị
+[Bước 47] [Time: 0.0081s] (3,7) <- 1 --> Thử giá trị
+[Bước 48] [Time: 0.0082s] (3,8) <- 4 --> Thử giá trị
+[Bước 49] [Time: 0.0083s] (4,0) <- 1 --> Thử giá trị
+[Bước 50] [Time: 0.0084s] (4,4) <- 5 --> Thử giá trị
+[Bước 51] [Time: 0.0085s] (4,5) <- 9 --> Thử giá trị
+[Bước 52] [Time: 0.0086s] (4,6) <- 7 --> Thử giá trị
+[Bước 53] [Time: 0.0087s] (5,6) <- 5 --> Thử giá trị
+[Bước 54] [Time: 0.0088s] (5,7) <- 9 --> Thử giá trị
+[Bước 55] [Time: 0.0089s] (6,7) <- 3 --> Thử giá trị
+[Bước 56] [Time: 0.0090s] (6,8) <- 7 --> Thử giá trị
+[Bước 57] [Time: 0.0091s] (7,0) <- 3 --> Thử giá trị
+[Bước 58] [Time: 0.0092s] (7,1) <- 2 --> Thử giá trị
+[Bước 59] [Time: 0.0093s] (7,4) <- 1 --> Thử giá trị
+[Bước 60] [Time: 0.0094s] (7,5) <- 8 --> Thử giá trị
+[Bước 61] [Time: 0.0095s] (7,6) <- 9 --> Thử giá trị
+[Bước 62] [Time: 0.0095s] (7,7) <- 4 --> Thử giá trị
+[Bước 63] [Time: 0.0096s] (8,1) <- 9 --> Thử giá trị
+[Bước 64] [Time: 0.0097s] (8,3) <- 7 --> Thử giá trị
+[Bước 64] [Time: 0.0097s] (8,3) <- 7 --> Đúng
+[Bước 64] [Time: 0.0096s] (8,1) <- 9 --> Đúng
+[Bước 64] [Time: 0.0095s] (7,7) <- 4 --> Đúng
+[Bước 64] [Time: 0.0095s] (7,6) <- 9 --> Đúng
+[Bước 64] [Time: 0.0094s] (7,5) <- 8 --> Đúng
+[Bước 64] [Time: 0.0093s] (7,4) <- 1 --> Đúng
+[Bước 64] [Time: 0.0092s] (7,1) <- 2 --> Đúng
+[Bước 64] [Time: 0.0091s] (7,0) <- 3 --> Đúng
+[Bước 64] [Time: 0.0090s] (6,8) <- 7 --> Đúng
+[Bước 64] [Time: 0.0089s] (6,7) <- 3 --> Đúng
+[Bước 64] [Time: 0.0088s] (5,7) <- 9 --> Đúng
+[Bước 64] [Time: 0.0087s] (5,6) <- 5 --> Đúng
+[Bước 64] [Time: 0.0086s] (4,6) <- 7 --> Đúng
+[Bước 64] [Time: 0.0085s] (4,5) <- 9 --> Đúng
+[Bước 64] [Time: 0.0084s] (4,4) <- 5 --> Đúng
+[Bước 64] [Time: 0.0083s] (4,0) <- 1 --> Đúng
+[Bước 64] [Time: 0.0082s] (3,8) <- 4 --> Đúng
+[Bước 64] [Time: 0.0081s] (3,7) <- 1 --> Đúng
+[Bước 64] [Time: 0.0080s] (3,6) <- 6 --> Đúng
+[Bước 64] [Time: 0.0079s] (3,5) <- 2 --> Đúng
+[Bước 64] [Time: 0.0078s] (3,4) <- 7 --> Đúng
+[Bước 64] [Time: 0.0077s] (3,0) <- 9 --> Đúng
+[Bước 64] [Time: 0.0043s] (2,6) <- 3 --> Đúng
+[Bước 64] [Time: 0.0042s] (2,5) <- 6 --> Đúng
+[Bước 64] [Time: 0.0041s] (2,0) <- 7 --> Đúng
+[Bước 64] [Time: 0.0040s] (1,5) <- 5 --> Đúng
+[Bước 64] [Time: 0.0039s] (1,4) <- 3 --> Đúng
+[Bước 64] [Time: 0.0037s] (0,7) <- 6 --> Đúng
+[Bước 64] [Time: 0.0036s] (0,6) <- 4 --> Đúng
+[Bước 64] [Time: 0.0035s] (0,5) <- 7 --> Đúng
+[Bước 64] [Time: 0.0006s] (0,2) <- 2 --> Đúng
+[Bước 64] [Time: 0.0001s] (0,0) <- 5 --> Đúng

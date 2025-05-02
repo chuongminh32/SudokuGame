@@ -11,9 +11,9 @@ class SudokuGame:
         pygame.display.set_caption("Sudoku - Chơi Game")
         self.font = pygame.font.SysFont("verdana", 25)
         self.font_text = pygame.font.SysFont("verdana", 20)  
-        self.bang_goc = layBangSuDoKuTheoCapDo()
+        self.bang_goc,_ = tao_sudoku_theo_cap_do(9, "E")
         self.bang = [row[:] for row in self.bang_goc]
-        self.bang_giai = giai_sudoku_backtracking(self.bang_goc)
+        self.bang_giai,a,b = giai_sudoku_backtracking(self.bang_goc)
    
         
         # phân cấp độ 
@@ -159,7 +159,6 @@ class SudokuGame:
         self.exit_btn = None 
         
 
-
     def xuLiSuKien(self):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -297,17 +296,17 @@ class SudokuGame:
                 if cap_do["rect"].collidepoint(vitri_click):
                     self.chon_che_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
                     self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
-                    self.bang_cap_do = layBangSuDoKuTheoCapDo(self.chon_che_do)
+                    self.bang_cap_do,_ = tao_sudoku_theo_cap_do(9, self.chon_che_do)
                     self.bang_goc = self.bang_cap_do
                     self.bang = [row[:] for row in self.bang_goc]
                     # cập nhật lại từng ô trong bảng giải 
-                    self.bang_giai = giai_sudoku_backtracking(self.bang)
+                    self.bang_giai,a,b = giai_sudoku_backtracking(self.bang)
                     self.o_chinh_sua = [(i,j) for i in range(KT_LUOI) for j in range (KT_LUOI) if self.bang_goc[i][j] == 0]
                     self.hien_bang_cap_do = False
                     break
         
     def veCauTrucBang(self):
-        ve_luoi(self.screen)
+        ve_luoi(self.screen, 9)
         # vẽ số khi chưa click pause hoặc (khi bảng thắng/thua hiện + cờ pause sẽ bật -> vẫn vẽ số để xem lời giải )
         if self.isPause == False or (self.isPause == True and (self.da_thang == True or self.da_thua == True)):
             ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)
@@ -356,7 +355,7 @@ class SudokuGame:
             # Highlight nếu có ô chọn
             if self.o_chon and not self.ket_thuc:
                 dong, cot = self.o_chon
-                ve_highlight_cho_o(self.screen, dong, cot, self.bang)
+                ve_highlight_cho_o_game(self.screen, dong, cot, self.bang)
                  # Vẽ nền, lưới và số
                 self.veCauTrucBang()
 
