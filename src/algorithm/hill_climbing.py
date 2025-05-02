@@ -30,7 +30,7 @@ def hill_climbing_solving(board, n, log_callback=None):
     
     Args:
         board (list): Bảng Sudoku ban đầu, là một danh sách 2D chứa các giá trị.
-        n (int): Kích thước bảng Sudoku (4 hoặc 9).
+        n (int): Kích thước bảng Sudoku.
         log_callback (function, optional): Hàm callback để ghi log quá trình giải. Mặc định là None.
 
     Returns:
@@ -129,7 +129,7 @@ def test_hill_climbing():
     print("Testing Hill Climbing algorithm on Sudoku from JSON data...")
     # Lấy đề từ file JSON
     level = "E"  # Bạn có thể thay đổi cấp độ ở đây (E, M, H)
-    size = 9  # Kích thước bảng Sudoku
+    size = 16  # Kích thước bảng Sudoku
     question, solution = tao_sudoku_theo_cap_do(size, level)
 
     print("Initial Sudoku Board (Question):")
