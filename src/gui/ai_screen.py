@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter import messagebox
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.algorithm.simulate_anealing import *
 from src.utils.utils_ai_screen import *
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
@@ -21,21 +20,17 @@ class Ai_Screen:
         self.screen = init_pygame()
         pygame.display.set_caption("Sudoku - Chơi Game")
         self.font = pygame.font.SysFont("verdana", 25)
-
-        self.font_text = pygame.font.SysFont("verdana", 20)  
+        self.font_text = pygame.font.SysFont("verdana", 20)
         self.tg_delay = 0.5
-
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
         self.bang,_ = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]
-
-        self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
+        # self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
+        self.bang_giai = None
         self.bang_sudoku = None # grid -> bắt sk click ngoài
 
-        self.bang_giai = None
-        
         #------ chon cap do -------
         # khung bao quanh bang cap do
         self.rect_bang_cap_do = None
@@ -59,14 +54,15 @@ class Ai_Screen:
 
         self.dangChayGame = True
 
-
-        # nút 
+        # nút
         self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin, self.nut_log = [None] * 10
 
         # view log (bật giao diện xem tiến trình giải)
         self.hien_log = False
         self.danh_sach_log = []
         self.log_limit = int((CAO - 3 * DEM) // 22)
+
+
 
 
         # -----------thông báo giải xong -------------
@@ -99,15 +95,15 @@ class Ai_Screen:
         self.hien_bang_chon_size = False
         self.bang_chon_size = []
         self.ten_size = "9x9"
-        self.KT_O = (RONG - 2 * DEM) // 9  
+        self.KT_O = (RONG - 2 * DEM) // 9
 
-        # nút điều chỉnh tốc độ hiện log 
+        # nút điều chỉnh tốc độ hiện log
         self.nut_dd_delay = None
-        self.hien_bang_delay = False 
+        self.hien_bang_delay = False
         self.bang_chon_delay = []
         self.ten_delay = "0.5s"
-        
-        # thanh cuộn 
+
+        # thanh cuộn
         self.log_scroll = 0  # chỉ số cuộn log
 
 
@@ -216,12 +212,6 @@ class Ai_Screen:
         self.hien_bang_chon_bieu_do = False
         self.hien_thong_bao_ai = False
 
-        # Reset bảng Sudoku mới theo tên cấp độ đã chọn
-        self.bang = layBangSuDoKuTheoCapDo(self.size, self.gia_tri_cap_do)
-
-        # Reset bảng lời giải
-        self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
-        
         # Reset bảng
         self.update_sudoku_board()
 
@@ -256,52 +246,20 @@ class Ai_Screen:
 
         pygame.display.update()
 
-
-    # hàm giải sudoku theo thuật toán 
+    # hàm giải sudoku theo thuật toán
     def giai_sudoku_theo_ten_alg(self):
         if self.gia_tri_alg == "B":
            self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(self.bang,self.size, self.tg_delay, self.cap_nhat_gui1)
            self.thoi_gian_giai = ghi_log_backtracking(self.bang, self.size)
            print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
         # elif self.gia_tri_alg == "HC":
-        #     self.bang_giai = giai_sudoku_hillclimbing(bang)
-        elif self.gia_tri_alg == "SA":
-            bang_giai, so_buoc, self.ds_log, self.daGiaiThanhCong = giai_sudoku_simulatedanealing(bang, self.size, cap_nhat_gui, delay=0.05)
-            print(self.ds_log)
-            return bang_giai, so_buoc
-
-    def cap_nhat_gui(self, row, col, value, trang_thai, so_buoc):
-        if trang_thai == "thu":
-            mau = (255, 243, 176)
-            trang_thai_text = "Thử"
-        elif trang_thai == "sai":
-            mau = (255, 193, 193)
-            trang_thai_text = "Sai"
-        elif trang_thai == "dung":
-            mau = (195, 247, 202)  # Màu xanh nhạt khi đúng
-            trang_thai_text = "Đúng"
-            self.bang[row][col] = value  # Cập nhật giá trị vào bảng
-        else:
-            mau = TRANG  # Màu mặc định cho ô
-            trang_thai_text = ""
-
-        # Tạo dòng log chi tiết
-        dong_log = f"[Bước {so_buoc:04d}] ({row},{col}) <- {value} --> {trang_thai_text}"
-
-        # ghi file log
-        log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
-        os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-        with open(log_file_path, "a", encoding="utf-8") as f:
-            f.write(dong_log + "\n")
-
-        # Tô màu ô
         #    self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_hill_climbing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui)
         #    self.thoi_gian_giai = ghi_log_hill_climbing(self.bang, self.size)
-        #    print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)    
+        #    print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
         elif self.gia_tri_alg == "SA":
             self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui2, self.tg_delay)
             print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
-    
+
     def ve_log_giao_dien(self):
         log_x = DEM + self.size * self.KT_O + 70
         log_y = DEM
@@ -427,8 +385,10 @@ class Ai_Screen:
             # Xóa số trong grid hiện tại (reset grid) use list comprehension
             self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]  # Giả sử grid là 9x9
 
-          
-        # click nút cấp độ 
+        elif self.nut_dd_delay and self.nut_dd_delay.collidepoint(vitri_click):
+            self.hien_bang_delay = not self.hien_bang_delay
+
+        # click nút cấp độ
         elif self.nut_dd_cap_do.collidepoint(vitri_click):
             self.hien_bang_cap_do = not self.hien_bang_cap_do # toggle hien bang cap do
 
@@ -459,7 +419,7 @@ class Ai_Screen:
             self.bang_goc = [row[:] for row in self.bang]
             self.dang_tao_de = False
 
-            # Chạy với cập nhật GUI để trực quan hóa 
+            # Chạy với cập nhật GUI để trực quan hóa
             self.giai_sudoku_theo_ten_alg()  # CÓ cập nhật GUI
 
             # hiện thông báo giải xong
@@ -468,8 +428,7 @@ class Ai_Screen:
             # Cập nhật bảng giải cho bảng chính
             self.bang = [row[:] for row in self.bang_giai]
 
-        # click nút thoát -> ẩn bảng thông báo 
-
+        # click nút thoát -> ẩn bảng thông báo
         elif self.thoat_btn != None:
             if self.thoat_btn.collidepoint(vitri_click):
                 self.hien_thong_bao_ai = False
@@ -509,9 +468,8 @@ class Ai_Screen:
                 self.reset_game()
             for cap_do in self.bang_cap_do:
                 if cap_do["rect"].collidepoint(vitri_click):
-
-                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
-                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
+                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn
+                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện
                     # self.bang = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
                     # print(self.size, self.gia_tri_cap_do)
                     # print(self.bang)
@@ -519,7 +477,7 @@ class Ai_Screen:
                     self.update_sudoku_board()
                     print(self.bang)
 
-                    # cập nhật lại từng ô trong bảng giải 
+                    # cập nhật lại từng ô trong bảng giải
                     # self.bang_giai, _ = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
                     self.hien_bang_cap_do = False
                     break
@@ -549,26 +507,26 @@ class Ai_Screen:
         elif self.hien_bang_delay == True:
             for t in self.bang_chon_delay:
                 if t["rect"].collidepoint(vitri_click):
-                    self.tg_delay = t["value"] # cập nhất giá trị cấp độ đã chọn 
-                    self.ten_delay = t["text"] # hiển thị lên giao diện 
-                    # cập nhật lại từng ô trong bảng giải 
+                    self.tg_delay = t["value"] # cập nhất giá trị cấp độ đã chọn
+                    self.ten_delay = t["text"] # hiển thị lên giao diện
+                    # cập nhật lại từng ô trong bảng giải
                     self.hien_bang_delay = False
                     break
-        
 
-        # click nut view log 
+
+        # click nut view log
         elif self.nut_log and self.nut_log.collidepoint(vitri_click):
             self.hien_log = not self.hien_log
             if self.hien_log:
                 self.screen = pygame.display.set_mode((RONG * 2 , CAO))
             else:
                 self.screen = pygame.display.set_mode((RONG, CAO))
-     
+
         # click ra ngoai luoi -> xoa o dang chon
         elif self.bang_sudoku and not self.bang_sudoku.collidepoint(vitri_click):
             self.o_chon = None
 
-            
+
     def veCauTrucBang(self):
         if self.daGiaiThanhCong and self.click_giai:
             to_o_giai(self.screen, self.bang_goc, self.bang_giai, self.size)
@@ -581,7 +539,6 @@ class Ai_Screen:
         self.ve_log_giao_dien()
         (self.screen, self.KT_O, self.size)
         self.nut_dd_delay = ve_nut_dd_bang_speedDelay(self.screen, self.KT_O, self.size, self.ten_delay)
-
 
     def run(self):
         while self.dangChayGame:
@@ -627,7 +584,7 @@ class Ai_Screen:
             if self.hien_bang_chon_size:
                 self.bang_chon_size = ve_bang_chon_size(self.screen)
 
-            # vẽ bảng chọn mức delay 
+            # vẽ bảng chọn mức delay
             if self.hien_bang_delay:
                 self.bang_chon_delay = ve_bang_chon_speedDelay(self.screen, self.KT_O, self.size)
             pygame.display.update()
