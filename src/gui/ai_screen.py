@@ -332,6 +332,7 @@ class Ai_Screen:
         # Tạo và lưu log
         dong_log = f" {buoc}:({r1},{c1})={v1} <=> ({r2},{c2})={v2} | e:{score:2} | cf:{conflicts} t:{thoi_gian_tong:.3f}s | s:{sigma:.3f}\n"
         self.danh_sach_log.append(dong_log)
+
         # Vẽ ô và số
         pygame.draw.rect(self.screen, mau, pygame.Rect(
             DEM + c1 * self.KT_O + 1,
