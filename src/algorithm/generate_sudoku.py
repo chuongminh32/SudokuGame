@@ -1,3 +1,4 @@
+
 import json  # Thư viện để làm việc với định dạng dữ liệu JSON
 import random  # Thư viện để sinh số ngẫu nhiên
 import math  # Thư viện toán học, dùng để tính căn bậc hai
@@ -48,7 +49,7 @@ def tao_sudoku_theo_cap_do(size, level="E"):
     }
     sudoku_day_du = sinh_bang_sudoku_day_du(size)  # Sinh bảng Sudoku đầy đủ
     sudoku_thieu = xoa_o_ngau_nhien(sudoku_day_du, cap_do[level])  # Xóa các ô ngẫu nhiên theo cấp độ
-    return sudoku_thieu  # Trả về bảng Sudoku thiếu -> đề 
+    return sudoku_thieu  # Trả về bảng Sudoku thiếu -> đề
 
 def sinh_va_luu_de(size=9, tong_so_de=100):
     """Hàm sinh và lưu đề Sudoku + lời giải vào file JSON."""
@@ -61,7 +62,7 @@ def sinh_va_luu_de(size=9, tong_so_de=100):
     for level in ["E", "M", "H"]:
         print(f"Sinh {tong_so_de} đề cấp độ {level} ({size}x{size})...")
         tong_so_o = size * size
-        # từ điển ánh xạ tương ứng với cấp độ 
+        # từ điển ánh xạ tương ứng với cấp độ
         so_o_xoa = {
             "E": int(tong_so_o * 0.2),
             "M": int(tong_so_o * 0.4),
@@ -104,6 +105,7 @@ def tao_sudoku_theo_cap_do(size, level):
 
 # ======= Chạy =======
 if __name__ == "__main__":
+    sinh_va_luu_de(size=4)
     sinh_va_luu_de(size=9)
     sinh_va_luu_de(size=16)
     sinh_va_luu_de(size=25)

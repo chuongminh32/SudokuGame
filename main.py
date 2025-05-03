@@ -1,4 +1,4 @@
-import pygame, sys, os 
+import pygame, sys, os
 # Thêm đường dẫn gốc vào sys.path để có thể import module từ thư mục cha
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.gui.home_screen import HomeScreen
@@ -12,4 +12,4 @@ def main():
     home_screen.run()
 
 if __name__ == "__main__":
-    main() 
+    main()
