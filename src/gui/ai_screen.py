@@ -240,7 +240,7 @@ class Ai_Screen:
         except Exception as e:
             print("Không thể xóa log:", e)
 
-        # Sau cùng vẽ lại màn hình 
+        # Sau cùng vẽ lại màn hình
         self.veCauTrucBang()
         pygame.display.update()
 
@@ -260,7 +260,7 @@ class Ai_Screen:
            print(self.so_buoc)
         elif self.gia_tri_alg == "SA":
             self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui_sa, self.tg_delay)
-    
+
     def ve_log_giao_dien(self):
         log_x = DEM + self.size * self.KT_O + 70
         log_y = DEM
@@ -288,7 +288,7 @@ class Ai_Screen:
             text = font.render(dong.strip(), True, (255, 255, 255))
             self.screen.blit(text, (x, y))
             y += line_height
-    
+
     def cap_nhat_gui_hc(self, r, c, n, status, buoc,t, conflicts):
         mau_map = {
             "conflict": ((255, 193, 193), "Lỗi - Vi phạm quy tắc"),
@@ -319,7 +319,7 @@ class Ai_Screen:
 
         self.ve_log_giao_dien()
         pygame.display.update()
-        pygame.time.delay(10)   
+        pygame.time.delay(10)
 
     def cap_nhat_gui_b(self, row, col, value,  trang_thai, so_buoc):
         mau_map = {
@@ -416,7 +416,7 @@ class Ai_Screen:
         elif self.nut_tao_de_sudoku.collidepoint(vitri_click):
             self.dang_tao_de = True
             # Xóa số trong grid hiện tại (reset grid) use list comprehension
-            self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]  
+            self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]
 
         elif self.nut_dd_delay and self.nut_dd_delay.collidepoint(vitri_click):
             self.hien_bang_delay = not self.hien_bang_delay
@@ -443,7 +443,7 @@ class Ai_Screen:
         # cick nút biểu đồ
         #elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click) and self.gia_tri_alg=="SA":
-            ve_biu_do_phan_tich_sa("Sudoku/data/log_giai_sudoku.txt")
+            ve_biu_do_phan_tich_sa("SudokuGame/data/log_giai_sudoku.txt")
         #    ve_bieu_do_tong_thoi_gian_so_buoc(self.ds_log)
 
        # click nút giải
@@ -459,7 +459,7 @@ class Ai_Screen:
 
             # hiện thông báo giải xong
             self.hien_thong_bao_ai = True
-            
+
             # Cập nhật bảng giải cho bảng chính
             self.bang = [row[:] for row in self.bang_giai]
 
@@ -506,8 +506,8 @@ class Ai_Screen:
                 self.reset_game()
             for cap_do in self.bang_cap_do:
                 if cap_do["rect"].collidepoint(vitri_click):
-                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
-                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
+                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn
+                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện
                     self.update_sudoku_board()
                     self.hien_bang_cap_do = False
                     break

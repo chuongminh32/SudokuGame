@@ -8,7 +8,7 @@ import random
 import numpy as np
 
 def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, isSolve=False):
-    log_path = os.path.join("Sudoku", "data", "log_giai_sudoku.txt")
+    log_path = os.path.join("SudokuGame", "data", "log_giai_sudoku.txt")
 
     n = int(size ** 0.5)  # Kích thước khối (block)
     sigma = 100
