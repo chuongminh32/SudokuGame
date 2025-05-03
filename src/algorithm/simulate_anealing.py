@@ -85,7 +85,7 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
 
     sigma = max(sigma * 0.99, 0.001)  # giữ sigma ≥ 0.001
     max_steps = 10000
-    max_time = 1200
+    max_time = 1300
 
     score = tinh_loi(sudoku)
     buoc = 0
