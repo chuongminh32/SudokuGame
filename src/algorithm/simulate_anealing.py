@@ -1,3 +1,6 @@
+# viết như cấu trúc backtracking
+# vẽ đồ thị phân tích trong utils_ai_screen.py phần biểu đồ (vẽ theo logic thuật toán: biểu diễn số bước , thời gian ,...)
+
 import os
 import time
 import math
@@ -8,6 +11,7 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
     log_path = os.path.join("Sudoku", "data", "log_giai_sudoku.txt")
 
     n = int(size ** 0.5)  # Kích thước khối (block)
+    sigma = 100
 
     def tao_khoi_nxn():
         blocks = []
@@ -24,13 +28,26 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
     def dien_ngau_nhien_vao_khoi(sudoku, khoi):
         for block in khoi:
             cac_gia_tri = set(range(1, size + 1))
-            co_dinh = [sudoku[i, j] for i, j in block if sudoku[i, j] != 0]
-            chua_dien = [pos for pos in block if sudoku[pos[0], pos[1]] == 0]
-            gia_tri_con_lai = list(cac_gia_tri - set(co_dinh))
+
+            da_co = set()
+            o_can_dien = []
+            for i, j in block:
+                if fixed[i, j]:
+                    da_co.add(sudoku[i, j])
+                else:
+                    sudoku[i, j] = 0  # đảm bảo reset các ô không cố định
+                    o_can_dien.append((i, j))
+
+            gia_tri_con_lai = list(cac_gia_tri - da_co)
+
+            if len(gia_tri_con_lai) != len(o_can_dien):
+                raise ValueError("Khối có các giá trị cố định không hợp lệ (trùng lặp).")
+
             random.shuffle(gia_tri_con_lai)
-            for (i, j), val in zip(chua_dien, gia_tri_con_lai):
+            for (i, j), val in zip(o_can_dien, gia_tri_con_lai):
                 sudoku[i, j] = val
         return sudoku
+
 
     def tinh_loi(sudoku):
         loi = 0
@@ -61,13 +78,14 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
         moi[i1, j1], moi[i2, j2] = moi[i2, j2], moi[i1, j1]
         return moi, ((i1, j1), (i2, j2))
 
-    # Khởi tạo sudoku
     sudoku = np.array(bang)
     fixed = danh_dau_o_co_dinh(sudoku)
     khoi = tao_khoi_nxn()
     sudoku = dien_ngau_nhien_vao_khoi(sudoku, khoi)
 
     sigma = max(sigma * 0.99, 0.001)  # giữ sigma ≥ 0.001
+    max_steps = 10000
+    max_time = 1200
 
     score = tinh_loi(sudoku)
     buoc = 0
@@ -76,15 +94,15 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
     with open(log_path, "w", encoding="utf-8") as f:
         f.write(f"=== Log giải Sudoku {size}x{size} bằng Simulated Annealing ===\n")
 
-    while score > 0:
+    while score > 0 and buoc < max_steps and (time.perf_counter() - start_time) < max_time:
 
         de_xuat, vi_tri = hoan_vi_trong_khoi(sudoku, fixed, khoi)
         if vi_tri is None:
             continue
         i1, j1 = vi_tri[0]
         i2, j2 = vi_tri[1]
-        v1 = sudoku[i1, j1]
-        v2 = sudoku[i2, j2]
+        v1 = de_xuat[i1, j1]
+        v2 = de_xuat[i2, j2]
 
         loi_moi = tinh_loi(de_xuat)
         delta = loi_moi - score
@@ -118,3 +136,4 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
         f.write(f"Hoàn tất sau {buoc} bước. Tổng thời gian: {tong_thoi_gian:.4f} giây.\n")
 
     return ket_qua, buoc, isSolve, tong_thoi_gian
+
