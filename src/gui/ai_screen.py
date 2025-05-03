@@ -443,7 +443,7 @@ class Ai_Screen:
         # cick nút biểu đồ
         #elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click) and self.gia_tri_alg=="SA":
-            ve_biu_do_phan_tich_sa("SudokuGame/data/log_giai_sudoku.txt")
+            ve_biu_do_phan_tich_sa("SudokuGame/data/log_giai_sudoku_SA.txt")
         #    ve_bieu_do_tong_thoi_gian_so_buoc(self.ds_log)
 
        # click nút giải
