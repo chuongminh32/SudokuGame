@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.utils.utils_ai_screen import * 
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
+from src.algorithm.dancing_links import *
 from src.algorithm.simulate_anealing import *
 from src.algorithm.hill_climbing import *
 # Đường dẫn gốc đến thư mục gốc của dự án (Sudoku)
@@ -25,7 +26,7 @@ class Ai_Screen:
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
-        self.bang,_ = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
+        self.bang,self.solution = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]
         # self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
         self.bang_giai = None
@@ -241,9 +242,8 @@ class Ai_Screen:
         except Exception as e:
             print("Không thể xóa log:", e)
 
-        # Sau cùng vẽ lại màn hình (nếu muốn)
+        # Sau cùng vẽ lại màn hình 
         self.veCauTrucBang()
-
         pygame.display.update()
 
     # hàm giải sudoku theo thuật toán 
@@ -252,6 +252,11 @@ class Ai_Screen:
            self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(self.bang,self.size, self.tg_delay, self.cap_nhat_gui1)
            self.thoi_gian_giai = ghi_log_backtracking(self.bang, self.size)
            print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
+           print(self.solution)
+        # if self.gia_tri_alg == "B":
+        #    self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(self.bang,self.size, self.tg_delay, self.cap_nhat_gui1)
+        #    self.thoi_gian_giai = ghi_log_backtracking(self.bang, self.size)
+        #    print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
         # elif self.gia_tri_alg == "HC":
         #    self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_hill_climbing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui)
         #    self.thoi_gian_giai = ghi_log_hill_climbing(self.bang, self.size)
@@ -259,11 +264,12 @@ class Ai_Screen:
         elif self.gia_tri_alg == "SA":
             self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui2, self.tg_delay)
             print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
+            
     
     def ve_log_giao_dien(self):
         log_x = DEM + self.size * self.KT_O + 70
         log_y = DEM
-        log_width = RONG * 0.9
+        log_width = RONG * 0.85
         log_height = CAO - 3 * DEM
         line_height = 22
         font = pygame.font.SysFont("consolas", 18)
@@ -470,15 +476,7 @@ class Ai_Screen:
                 if cap_do["rect"].collidepoint(vitri_click):
                     self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
                     self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
-                    # self.bang = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
-                    # print(self.size, self.gia_tri_cap_do)
-                    # print(self.bang)
-                    print(self.bang)
                     self.update_sudoku_board()
-                    print(self.bang)
-
-                    # cập nhật lại từng ô trong bảng giải 
-                    # self.bang_giai, _ = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
                     self.hien_bang_cap_do = False
                     break
 
@@ -518,7 +516,7 @@ class Ai_Screen:
         elif self.nut_log and self.nut_log.collidepoint(vitri_click):
             self.hien_log = not self.hien_log
             if self.hien_log:
-                self.screen = pygame.display.set_mode((RONG * 2 , CAO))
+                self.screen = pygame.display.set_mode((RONG * 1.9 , CAO))
             else:
                 self.screen = pygame.display.set_mode((RONG, CAO))
      
