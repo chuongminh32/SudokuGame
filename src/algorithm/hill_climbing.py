@@ -23,6 +23,21 @@ def count_conflicts(board, n):
 
     return conflicts
 
+def get_block_used_numbers(board, n, row, col):
+    """
+    Trả về tập hợp các số đã dùng trong khối con sqrt(n) x sqrt(n) chứa ô (row, col)
+    """
+    sqrt_n = int(math.sqrt(n))
+    block_values = set()
+    start_row, start_col = (row // sqrt_n) * sqrt_n, (col // sqrt_n) * sqrt_n
+    for i in range(sqrt_n):
+        for j in range(sqrt_n):
+            val = board[start_row + i][start_col + j]
+            if val != 0:
+                block_values.add(val)
+    return block_values
+
+
 # Hàm giải Sudoku bằng thuật toán Hill Climbing và ghi log
 def hill_climbing_solving(board, n, log_callback=None):
     """
@@ -48,7 +63,8 @@ def hill_climbing_solving(board, n, log_callback=None):
             for j in range(n):
                 if board[i][j] == 0:
                     original_value = board[i][j]
-                    available_values = list(range(1, n + 1))
+                    used_in_block = get_block_used_numbers(board, n, i, j)
+                    available_values = [val for val in range(1, n + 1) if val not in used_in_block]
                     random.shuffle(available_values)
 
                     for new_value in available_values:
@@ -129,7 +145,7 @@ def test_hill_climbing():
     print("Testing Hill Climbing algorithm on Sudoku from JSON data...")
     # Lấy đề từ file JSON
     level = "E"  # Bạn có thể thay đổi cấp độ ở đây (E, M, H)
-    size = 16  # Kích thước bảng Sudoku
+    size = 9  # Kích thước bảng Sudoku
     question, solution = tao_sudoku_theo_cap_do(size, level)
 
     print("Initial Sudoku Board (Question):")
