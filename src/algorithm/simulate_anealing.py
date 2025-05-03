@@ -8,7 +8,7 @@ import random
 import numpy as np
 
 def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, isSolve=False):
-    log_path = os.path.join("Sudoku", "data", "log_giai_sudoku.txt")
+    log_path = os.path.join("SudokuGame", "data", "log_giai_sudoku_SA.txt")
 
     n = int(size ** 0.5)  # Kích thước khối (block)
     sigma = 100
@@ -85,7 +85,7 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
 
     sigma = max(sigma * 0.99, 0.001)  # giữ sigma ≥ 0.001
     max_steps = 10000
-    max_time = 1200
+    max_time = 1300
 
     score = tinh_loi(sudoku)
     buoc = 0
