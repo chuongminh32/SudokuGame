@@ -80,13 +80,14 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
         moi[i1, j1], moi[i2, j2] = moi[i2, j2], moi[i1, j1]
         return moi, ((i1, j1), (i2, j2))
 
-    # Khởi tạo sudoku
     sudoku = np.array(bang)
     fixed = danh_dau_o_co_dinh(sudoku)
     khoi = tao_khoi_nxn()
     sudoku = dien_ngau_nhien_vao_khoi(sudoku, khoi)
 
     sigma = max(sigma * 0.99, 0.001)  # giữ sigma ≥ 0.001
+    max_steps = 10000
+    max_time = 1200
 
     score = tinh_loi(sudoku)
     buoc = 0
@@ -95,7 +96,7 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
     with open(log_path, "w", encoding="utf-8") as f:
         f.write(f"=== Log giải Sudoku {size}x{size} bằng Simulated Annealing ===\n")
 
-    while score > 0:
+    while score > 0 and buoc < max_steps and (time.perf_counter() - start_time) < max_time:
 
         de_xuat, vi_tri = hoan_vi_trong_khoi(sudoku, fixed, khoi)
         if vi_tri is None:
