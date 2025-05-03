@@ -7,7 +7,6 @@ import math
 import random
 import numpy as np
 
-import statistics
 def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, isSolve=False):
     log_path = os.path.join("Sudoku", "data", "log_giai_sudoku.txt")
 
@@ -137,3 +136,4 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
         f.write(f"Hoàn tất sau {buoc} bước. Tổng thời gian: {tong_thoi_gian:.4f} giây.\n")
 
     return ket_qua, buoc, isSolve, tong_thoi_gian
+

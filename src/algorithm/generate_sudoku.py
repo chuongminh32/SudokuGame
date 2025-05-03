@@ -105,6 +105,7 @@ def tao_sudoku_theo_cap_do(size, level):
 
 # ======= Chạy =======
 if __name__ == "__main__":
+    sinh_va_luu_de(size=4)
     sinh_va_luu_de(size=9)
     sinh_va_luu_de(size=16)
     sinh_va_luu_de(size=25)

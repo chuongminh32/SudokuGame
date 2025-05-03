@@ -25,9 +25,8 @@ class Ai_Screen:
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
-        self.bang,_ = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
+        self.bang,self.solution = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]
-        # self.bang_giai = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
         self.bang_giai = None
         self.bang_sudoku = None # grid -> bắt sk click ngoài
 
@@ -241,29 +240,31 @@ class Ai_Screen:
         except Exception as e:
             print("Không thể xóa log:", e)
 
-        # Sau cùng vẽ lại màn hình (nếu muốn)
+        # Sau cùng vẽ lại màn hình 
         self.veCauTrucBang()
-
         pygame.display.update()
 
     # hàm giải sudoku theo thuật toán
     def giai_sudoku_theo_ten_alg(self):
         if self.gia_tri_alg == "B":
-           self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(self.bang,self.size, self.tg_delay, self.cap_nhat_gui1)
+           self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_backtracking(self.bang,self.size, self.tg_delay, self.cap_nhat_gui_b)
            self.thoi_gian_giai = ghi_log_backtracking(self.bang, self.size)
-           print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
-        # elif self.gia_tri_alg == "HC":
-        #    self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_hill_climbing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui)
-        #    self.thoi_gian_giai = ghi_log_hill_climbing(self.bang, self.size)
-        #    print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
+        elif self.gia_tri_alg == "HC":
+           self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_hill_climbing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui_hc)
+           self.thoi_gian_giai = ghi_log_hill_climbing(self.bang, self.size)
+           print(self.bang)
+           print(self.bang_giai)
+           print(self.bang_goc)
+           print(self.daGiaiThanhCong)
+           print(self.size)
+           print(self.so_buoc)
         elif self.gia_tri_alg == "SA":
-            self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui2, self.tg_delay)
-            print(self.bang_giai, self.so_buoc, self.daGiaiThanhCong)
-
+            self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui_sa, self.tg_delay)
+    
     def ve_log_giao_dien(self):
         log_x = DEM + self.size * self.KT_O + 70
         log_y = DEM
-        log_width = RONG * 0.9
+        log_width = RONG * 0.85
         log_height = CAO - 3 * DEM
         line_height = 22
         font = pygame.font.SysFont("consolas", 18)
@@ -287,9 +288,40 @@ class Ai_Screen:
             text = font.render(dong.strip(), True, (255, 255, 255))
             self.screen.blit(text, (x, y))
             y += line_height
+    
+    def cap_nhat_gui_hc(self, r, c, n, status, buoc,t, conflicts):
+        mau_map = {
+            "conflict": ((255, 193, 193), "Lỗi - Vi phạm quy tắc"),
+            "improved": ((195, 247, 202), "Cải thiện"),
+            "no_improvement" :(((255, 255, 204), "Không cải thiện"))
+        }
+        mau, trang_thai_text = mau_map.get(status, ((255, 255, 255), ""))
 
+        # Tạo và lưu log -> ds_log -> gui
+        dong_log = f"[{buoc}:{t:.4f}(s)] | conflicts: {conflicts} | ({r},{c}) <- {n} --> {trang_thai_text}\n"
+        self.danh_sach_log.append(dong_log)
 
-    def cap_nhat_gui1(self, row, col, value,  trang_thai, so_buoc):
+        # Vẽ ô và số
+        pygame.draw.rect(self.screen, mau, pygame.Rect(
+            DEM + c * self.KT_O + 1,
+            DEM + r * self.KT_O + 1,
+            self.KT_O - 2, self.KT_O - 2
+        ))
+
+        if n != 0:
+            font = pygame.font.SysFont(None, int(self.KT_O * 0.6))
+            text = font.render(str(n), True, (0, 0, 0))
+            rect = text.get_rect(center=(
+                DEM + c * self.KT_O + self.KT_O // 2,
+                DEM + r * self.KT_O + self.KT_O // 2
+            ))
+            self.screen.blit(text, rect)
+
+        self.ve_log_giao_dien()
+        pygame.display.update()
+        pygame.time.delay(10)   
+
+    def cap_nhat_gui_b(self, row, col, value,  trang_thai, so_buoc):
         mau_map = {
             "sai": ((255, 193, 193), "Sai - Quay lui"),
             "dung": ((195, 247, 202), "Đúng"),
@@ -321,7 +353,7 @@ class Ai_Screen:
         pygame.display.update()
         pygame.time.delay(10)
 
-    def cap_nhat_gui2(self, r1, c1, r2, c2, v1, v2, score, conflicts,  thoi_gian_tong, sigma, trang_thai, buoc):
+    def cap_nhat_gui_sa(self, r1, c1, r2, c2, v1, v2, score, conflicts,  thoi_gian_tong, sigma, trang_thai, buoc):
         mau_map = {
             "sai": ((255, 193, 193), "Sai - Quay lui"),
             "dung": ((195, 247, 202), "Đúng"),
@@ -384,7 +416,7 @@ class Ai_Screen:
         elif self.nut_tao_de_sudoku.collidepoint(vitri_click):
             self.dang_tao_de = True
             # Xóa số trong grid hiện tại (reset grid) use list comprehension
-            self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]  # Giả sử grid là 9x9
+            self.bang = [[0 for _ in range(self.size)] for _ in range(self.size)]  
 
         elif self.nut_dd_delay and self.nut_dd_delay.collidepoint(vitri_click):
             self.hien_bang_delay = not self.hien_bang_delay
@@ -427,9 +459,12 @@ class Ai_Screen:
 
             # hiện thông báo giải xong
             self.hien_thong_bao_ai = True
-
+            
             # Cập nhật bảng giải cho bảng chính
             self.bang = [row[:] for row in self.bang_giai]
+
+            # pygame.display.update()
+
 
         # click nút thoát -> ẩn bảng thông báo
         elif self.thoat_btn != None:
@@ -471,17 +506,9 @@ class Ai_Screen:
                 self.reset_game()
             for cap_do in self.bang_cap_do:
                 if cap_do["rect"].collidepoint(vitri_click):
-                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn
-                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện
-                    # self.bang = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
-                    # print(self.size, self.gia_tri_cap_do)
-                    # print(self.bang)
-                    print(self.bang)
+                    self.gia_tri_cap_do = cap_do["value"] # cập nhất giá trị cấp độ đã chọn 
+                    self.ten_cap_do = cap_do["text"] # hiển thị lên giao diện 
                     self.update_sudoku_board()
-                    print(self.bang)
-
-                    # cập nhật lại từng ô trong bảng giải
-                    # self.bang_giai, _ = self.giai_sudoku_theo_ten_alg(self.bang, cap_nhat_gui=None)
                     self.hien_bang_cap_do = False
                     break
 
@@ -521,7 +548,7 @@ class Ai_Screen:
         elif self.nut_log and self.nut_log.collidepoint(vitri_click):
             self.hien_log = not self.hien_log
             if self.hien_log:
-                self.screen = pygame.display.set_mode((RONG * 2 , CAO))
+                self.screen = pygame.display.set_mode((RONG * 1.9 , CAO))
             else:
                 self.screen = pygame.display.set_mode((RONG, CAO))
 
@@ -531,7 +558,7 @@ class Ai_Screen:
 
 
     def veCauTrucBang(self):
-        if self.daGiaiThanhCong and self.click_giai:
+        if self.click_giai:
             to_o_giai(self.screen, self.bang_goc, self.bang_giai, self.size)
         ve_so_ai(self.screen, self.bang, self.size)
         self.bang_sudoku = ve_luoi(self.screen, self.size)
@@ -570,7 +597,7 @@ class Ai_Screen:
 
             # Nếu giải xong thì hiện thông báo
             if self.hien_thong_bao_ai:
-                self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg, self.so_buoc)
+                self.thoat_btn = ve_thong_bao_giai_xong(self.screen, RONG, CAO, self.thoi_gian_giai, self.ten_alg, self.so_buoc, self.daGiaiThanhCong)
 
             # Nếu lỗi -> hiện thông báo lỗi
             if self.hien_bang_thong_bao_loi:

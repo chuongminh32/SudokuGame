@@ -342,15 +342,16 @@ def ve_bang_chon_size(screen):
     box_x, box_y = RONG - 280, 55
     box_rong, box_cao = 120, 100
     bang_size = [
-        {"text": "9x9", "value": 9, "rect": pygame.Rect(box_x + 23 , box_y + 10, 80, 40)},
-        {"text": "16x16", "value": 16, "rect": pygame.Rect(box_x + 23, box_y + 60, 80, 40)},
-        {"text": "25x25", "value": 25, "rect": pygame.Rect(box_x + 23, box_y + 110, 80, 40)},
+        {"text": "4x4", "value": 4, "rect": pygame.Rect(box_x + 23, box_y + 10, 80, 40)},
+        {"text": "9x9", "value": 9, "rect": pygame.Rect(box_x + 23 , box_y + 60, 80, 40)},
+        {"text": "16x16", "value": 16, "rect": pygame.Rect(box_x + 23, box_y + 110, 80, 40)},
+        {"text": "25x25", "value": 25, "rect": pygame.Rect(box_x + 23, box_y + 160, 80, 40)},
     ]
 
     font = pygame.font.SysFont("verdana", 18)
 
     # Vẽ bảng trắng
-    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, 160), border_radius=10)
+    pygame.draw.rect(screen, TRANG, pygame.Rect(box_x, box_y, box_rong, 210), border_radius=10)
 
     # Vẽ các nút kích thước
     for size in bang_size:
@@ -481,7 +482,7 @@ def ve_highlight_cho_o(screen, row, col, grid, size):
                 if (grid[r][c] == gia_tri_o_dang_duoc_chon):
                     pygame.draw.rect(screen, (187, 222, 251), pygame.Rect(DEM + c* KT_O, DEM + r * KT_O, KT_O, KT_O))
 
-def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
+def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc, da_giai_thanh_cong):
     """Hiển thị bảng thông báo giải xong."""
 
     # Tạo lớp nền mờ
@@ -499,12 +500,20 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
                                        pygame.Rect(box_x, box_y, box_rong, box_cao), border_radius=10)
 
     # Vẽ chữ thông báo
-    font = pygame.font.SysFont("verdana", 28)
+    font1 = pygame.font.SysFont("verdana", 28)
+    font2 = pygame.font.SysFont("Segoe UI Emoji", 28)  # Font hỗ trợ emoji trên Windows
     font_sub = pygame.font.SysFont("verdana", 20)
-    text = font.render("Đã giải thành công!", True, (52, 72, 97))
+    if da_giai_thanh_cong == True:
+            text = font1.render("Đã giải thành công ", True, (52, 72, 97))
+            icon = font2.render("✅", True, (52, 72, 97))
+    else: 
+        text = font1.render("Không giải được", True, (52, 72, 97))
+        icon = font2.render("❌", True, (52, 72, 97))
     text_sub = font_sub.render(f"Thuật toán sử dụng: {ten_alg}", True, (148, 163, 183))
-    screen.blit(text, (box_x + 105, box_y + 20))
-    screen.blit(text_sub, (box_x + 100, box_y + 70))
+    vitri_text_x = box_x + (box_rong - text.get_width()) // 2
+    screen.blit(text, (vitri_text_x, box_y + 20))
+    screen.blit(icon, (vitri_text_x+text.get_width(), box_y + 20))
+    screen.blit(text_sub, (box_x + (box_rong - text_sub.get_width()) // 2, box_y + 70))
 
     # Tính giây và mili giây
     time_text = f"Thời gian giải: {tg_giai:.6f} (giây)"
@@ -514,12 +523,12 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
     # Vẽ thời gian
     font_time = pygame.font.SysFont("verdana", 18)
     time_render = font_time.render(time_text, True, (52, 72, 97))
-    screen.blit(time_render, (box_x + 100, box_y + 100))
+    screen.blit(time_render, (box_x + (box_rong - time_render.get_width()) // 2, box_y + 100))
 
     # Vẽ số bước
     font_step = pygame.font.SysFont("verdana", 18)
     step_render = font_step.render(step, True, (52, 72, 97))
-    screen.blit(step_render, (box_x + 100, box_y + 130))
+    screen.blit(step_render, (box_x + (box_rong - step_render.get_width()) // 2, box_y + 130))
 
     # Vẽ nút "Thoát" ở giữa
     btn_width, btn_height = 150, 50
@@ -528,7 +537,7 @@ def ve_thong_bao_giai_xong(screen, RONG, CAO, tg_giai, ten_alg, so_buoc):
     thoat_btn = pygame.draw.rect(screen, (90, 123, 192),
                                  pygame.Rect(btn_x, btn_y, btn_width, btn_height), border_radius=10)
 
-    text = font.render("Thoát", True, (255, 255, 255))
+    text = font1.render("Thoát", True, (255, 255, 255))
     screen.blit(text, (btn_x + 30, btn_y + 5))
 
     return thoat_btn

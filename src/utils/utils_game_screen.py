@@ -157,7 +157,7 @@ def ve_bang_chia_cap_do(screen):
         
     return bang_cap_do, bang_bao_quanh
 
-def ve_highlight_cho_o(screen, row, col, grid):
+def ve_highlight_cho_o_game(screen, row, col, grid):
 
     sr = (row // 3) * 3  # Xác định hàng đầu của ô 3x3
     sc = (col // 3) * 3  # Xác định cột đầu của ô 3x3
