@@ -1,5 +1,7 @@
 import pygame, sys, os, math
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+import numpy as np
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
@@ -588,4 +590,89 @@ def ve_bieu_do_tong_thoi_gian_so_buoc(ds_log):
     plt.xlabel('Số bước thử')
     plt.ylabel('Tổng thời gian (giây)')
     plt.grid(True)
+    plt.show()
+
+def ve_biu_do_phan_tich_sa(log_path):
+
+    # Lấy dữ liệu từ log
+    def phan_tich_log(log_path):
+        buoc = []
+        loi = []
+        conflicts = []
+        thoi_gian = []
+        sigma = []
+
+        with open(log_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('Bước'):
+                    parts = line.split('|')
+                    buoc.append(int(parts[0].split(':')[0].split()[1]))
+                    loi.append(int(parts[1].split(':')[1].strip().split()[0]))
+                    conflicts.append(int(parts[2].split(':')[1].strip()))
+                    thoi_gian.append(float(parts[3].split(':')[1].strip().split('s')[0]))
+                    sigma.append(float(parts[4].split(':')[1].strip()))
+
+        return {
+            'buoc': buoc,
+            'loi': loi,
+            'conflicts': conflicts,
+            'thoi_gian': thoi_gian,
+            'sigma': sigma
+        }
+
+    log_data = phan_tich_log(log_path)
+    if not log_data['buoc']:
+        print("Không có dữ liệu log để vẽ.")
+        return
+
+    thoi_gian_tich_luy = np.cumsum(np.diff(log_data['thoi_gian'], prepend=0))
+    avg_time_per_step = np.mean(np.diff(thoi_gian_tich_luy))
+    std_time_per_step = np.std(np.diff(thoi_gian_tich_luy))
+
+    plt.figure(figsize=(8, 6))
+    plt.suptitle('PHÂN TÍCH THUẬT TOÁN SIMULATED ANNEALING',
+                fontsize=18, y=1.02, fontweight='bold')
+
+    # Subplot 1: Tiến triển giải thuật
+    ax1 = plt.subplot(2, 2, 1)
+    ax1.plot(log_data['buoc'], log_data['loi'], 'r-', label='Số lỗi', linewidth=2)
+    ax1.plot(log_data['buoc'], log_data['conflicts'], 'b--', label='Số conflicts', linewidth=2)
+    ax1.set_title('TIẾN TRIỂN GIẢI THUẬT', pad=12)
+    ax1.set_xlabel('Số bước', fontsize=10)
+    ax1.set_ylabel('Giá trị', fontsize=10)
+    ax1.grid(True, linestyle='--', alpha=0.7)
+    ax1.legend(loc='upper right')
+    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    # Subplot 2: Quá trình làm nguội
+    ax2 = plt.subplot(2, 2, 2)
+    ax2.plot(log_data['buoc'], log_data['sigma'], 'g-', linewidth=2)
+    ax2.set_title('QUÁ TRÌNH LÀM NGUỘI (SIGMA)', pad=12)
+    ax2.set_xlabel('Số bước', fontsize=10)
+    ax2.set_ylabel('Giá trị sigma', fontsize=10)
+    ax2.grid(True, linestyle='--', alpha=0.7)
+    ax2.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    # Subplot 3: Thời gian tích lũy
+    ax3 = plt.subplot(2, 2, 3)
+    ax3.plot(log_data['buoc'], thoi_gian_tich_luy, 'm-o', markersize=4, linewidth=2)
+    ax3.set_title('THỜI GIAN TÍCH LŨY', pad=12)
+    ax3.set_xlabel('Số bước', fontsize=10)
+    ax3.set_ylabel('Thời gian (giây)', fontsize=10)
+    ax3.grid(True, linestyle='--', alpha=0.7)
+    ax3.text(0.02, 0.85,
+            f'Thời gian/bước: {avg_time_per_step:.4f}s ± {std_time_per_step:.4f}s',
+            transform=ax3.transAxes,
+            bbox={'facecolor': 'white', 'alpha': 0.7, 'pad': 5})
+
+    # Subplot 4: Quá trình giảm lỗi (log scale)
+    ax4 = plt.subplot(2, 2, 4)
+    ax4.semilogy(log_data['thoi_gian'], log_data['loi'], 'c-', linewidth=2)
+    ax4.set_title('GIẢM LỖI THEO THỜI GIAN (LOG SCALE)', pad=12)
+    ax4.set_xlabel('Thời gian (giây)', fontsize=10)
+    ax4.set_ylabel('Số lỗi', fontsize=10)
+    ax4.grid(True, which="both", linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92, hspace=0.3, wspace=0.25)
     plt.show()
