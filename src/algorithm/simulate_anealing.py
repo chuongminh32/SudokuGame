@@ -29,7 +29,6 @@ def giai_sudoku_simulated_annealing(bang, size, cap_nhat_gui=None, delay=0.0, is
         for block in khoi:
             cac_gia_tri = set(range(1, size + 1))
 
-            # Giá trị đã có trong khối do đề bài cho
             da_co = set()
             o_can_dien = []
             for i, j in block:

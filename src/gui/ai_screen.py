@@ -441,8 +441,10 @@ class Ai_Screen:
             self.o_chon = (dong, cot) # chọn ô
 
         # cick nút biểu đồ
-        elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
-            ve_bieu_do_tong_thoi_gian_so_buoc(self.ds_log)
+        #elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
+        elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click) and self.gia_tri_alg=="SA":
+            ve_biu_do_phan_tich_sa("Sudoku/data/log_giai_sudoku.txt")
+        #    ve_bieu_do_tong_thoi_gian_so_buoc(self.ds_log)
 
        # click nút giải
         elif self.ai_btn.collidepoint(vitri_click):
