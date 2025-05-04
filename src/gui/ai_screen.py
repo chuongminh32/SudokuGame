@@ -10,7 +10,6 @@ from src.algorithm.simulate_anealing import *
 from src.algorithm.hill_climbing import *
 # Đường dẫn gốc đến thư mục gốc của dự án (Sudoku)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 def get_relative_path(*paths):
     """Trả về đường dẫn tuyệt đối từ thư mục gốc dự án."""
     return os.path.join(BASE_DIR, *paths)
@@ -445,7 +444,8 @@ class Ai_Screen:
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click) and self.gia_tri_alg=="SA":
             ve_biu_do_phan_tich_sa("SudokuGame/data/log_giai_sudoku_SA.txt")
         #    ve_bieu_do_tong_thoi_gian_so_buoc(self.ds_log)
-
+        elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click) and self.gia_tri_alg=="HC":
+            ve_bieu_do_log_hc("Sudoku/data/log_hill_climbing.txt")
        # click nút giải
         elif self.ai_btn.collidepoint(vitri_click):
             # Xóa log cũ nếu có
