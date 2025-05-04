@@ -47,20 +47,17 @@ Nếu không có trạng thái tốt hơn → mắc kẹt → kết thúc hoặc
 README.md
 |----requirements.txt  # Danh sách thư viện cần thiết
 |----.gitignore  # Bỏ qua tệp không cần thiết khi commit
-|
-+---assets  # Chứa hình ảnh, icon, v.v.
-|
-+---data  # Chứa dữ liệu liên quan (nếu có)
-|
+|---assets  # Chứa hình ảnh, icon, v.v.
+|---data  # Chứa dữ liệu log giải thuật, đề + giải sudoku
+|----main.py  # Điểm bắt đầu để chạy chương trình
 +---src  # Thư mục chứa mã nguồn chính
-|   |   main.py  # Điểm bắt đầu để chạy chương trình
 |   |   
 |   +---algorithm  # Chứa các thuật toán giải sudoku
 |   |   |   __init__.py  # Đánh dấu thư mục là module
 |   |   |   backtracking.py  
 |   |   |   hill_climbing.py  
 |   |   |   generate_sudoku.py  # Sinh đề bài Sudoku
-|   |   |   simulated_anealing.py  # Sinh đề bài Sudoku
+|   |   |   simulated_anealing.py  
 |   |   |
 |   +---gui  # Chứa các thành phần giao diện
 |   |   |   __init__.py  # Đánh dấu thư mục là module
@@ -70,8 +67,8 @@ README.md
 |   |   |-- ai_screen.py  # Màn hình ai chơi game 
 |   |   |
 |   +---utils  # Chứa các hàm tiện ích dùng chung 
-|   |   |    utils_ai_screen.py  # Các hàm hỗ trợ chung cho ai screen  
-|   |   |    utils_game_screen.py  # Các hàm hỗ trợ chung cho game screen diện: vẽ giao diện 
+|   |   |    utils_ai_screen.py  # Các hàm hỗ trợ cho ai screen  
+|   |   |    utils_game_screen.py  # Các hàm hỗ trợ cho game screen diện
 |   |   |
 |   +---tests  # Thư mục chứa các bài kiểm thử
 |       |    test_solver.py  # Kiểm thử thuật toán giải Sudoku

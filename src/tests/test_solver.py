@@ -1,7 +1,3 @@
-# Bước 1: Nhập vào một số bài Sudoku có đáp án
-# Bước 2: Kiểm tra xem thuật toán có giải đúng không
-# Bước 3: Đánh giá độ chính xác & tốc độ
-
 import sys, os, math
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.algorithm.generate_sudoku import *
@@ -58,7 +54,7 @@ def giai_sudoku_backtracking(bang, size, cap_nhat_gui=None, delay=0.01, isSolve=
                             bang[row][col] = 0
                             so_buoc += 1 
                             elapsed = time.perf_counter() - start_time
-                            print(f"[Bước {so_buoc}] ({row},{col}) <- {num} --> Sai ❌")
+                            print(f"[Bước {so_buoc}] ({row},{col}) <- {num} --> Sai ")
                             dong_log = f"[Bước {so_buoc}] [Time: {elapsed:.4f}s] ({row},{col}) <- {num} --> Sai"
                             log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
                             os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
@@ -143,12 +139,12 @@ def main():
         in_bang(ket_qua)
 
         dung = so_sanh_bang(ket_qua, bai["dap_an"])
-        print("✅ Kết quả:", "ĐÚNG" if dung else "SAI")
-        print(f"⏱ Thời gian: {thoi_gian:.4f} giây")
-        print(f"🧮 Số bước: {so_buoc}\n")
+        print(" Kết quả:", "ĐÚNG" if dung else "SAI")
+        print(f" Thời gian: {thoi_gian:.4f} giây")
+        print(f" Số bước: {so_buoc}\n")
 
         if danh_sach_log:
-            print("📜 Log giải:")
+            print(" Log giải:")
             for dong in danh_sach_log:
                 print(dong)
             print()

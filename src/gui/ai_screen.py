@@ -252,12 +252,6 @@ class Ai_Screen:
         elif self.gia_tri_alg == "HC":
            self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_hill_climbing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui_hc)
            self.thoi_gian_giai = ghi_log_hill_climbing(self.bang, self.size)
-           print(self.bang)
-           print(self.bang_giai)
-           print(self.bang_goc)
-           print(self.daGiaiThanhCong)
-           print(self.size)
-           print(self.so_buoc)
         elif self.gia_tri_alg == "SA":
             self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui_sa, self.tg_delay)
     

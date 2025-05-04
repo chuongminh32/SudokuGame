@@ -1,4 +1,3 @@
-
 import sys, os, math, random, time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.algorithm.generate_sudoku import *
