@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 === Log giải Sudoku 16x16 bằng Simulated Annealing ===
 Bước 1: Swap (4,2) = 2 <=> (5,0) = 1 | Lỗi: 131 | Conflicts: 185 | Tổng: 0.0010s | Sigma: 99.0000
 Bước 2: Swap (11,9) = 1 <=> (10,11) = 12 | Lỗi: 133 | Conflicts: 186 | Tổng: 0.5164s | Sigma: 98.0100
@@ -2247,3 +2249,4 @@ Bước 2245: Swap (2,12) = 4 <=> (2,13) = 16 | Lỗi:  8 | Conflicts: 16 | Tổ
 Bước 2246: Swap (15,13) = 12 <=> (15,15) = 15 | Lỗi:  8 | Conflicts: 16 | Tổng: 1199.0521s | Sigma: 0.0000
 Bước 2247: Swap (11,15) = 1 <=> (11,12) = 5 | Lỗi:  8 | Conflicts: 16 | Tổng: 1199.5915s | Sigma: 0.0000
 Hoàn tất sau 2247 bước. Tổng thời gian: 1200.1067 giây.
+>>>>>>> 1aed059c0491dc7f0fc2b719170bbe61e816a71b
