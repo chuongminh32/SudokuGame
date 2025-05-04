@@ -685,3 +685,42 @@ def ve_biu_do_phan_tich_sa(log_path):
     plt.tight_layout()
     plt.subplots_adjust(top=0.92, hspace=0.3, wspace=0.25)
     plt.show()
+
+
+def ve_bieu_do_log_hc(log_path):
+    buoc = []
+    conflicts = []
+    trang_thai = []
+
+    with open(log_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if "Conflicts" in line:
+                parts = line.strip().split(" | ")
+                step = int(parts[0].split(":")[0])
+                conflict = int(parts[1].split(":")[1])
+                status = parts[2].split("-->")[1].strip()
+
+                buoc.append(step)
+                conflicts.append(conflict)
+                trang_thai.append(status)
+
+    # Ánh xạ trạng thái sang màu
+    mau = {
+        "Cải thiện": "green",
+        "Lỗi - Vi phạm quy tắc": "red",
+        "Không cải thiện": "orange"
+    }
+    colors = [mau.get(s, "gray") for s in trang_thai]
+
+    plt.figure(figsize=(10, 6))
+    plt.scatter(buoc, conflicts, c=colors, label="Số xung đột")
+    plt.plot(buoc, conflicts, color="blue", linewidth=1, alpha=0.5)
+
+    plt.title("Phân tích quá trình giải Sudoku bằng Hill Climbing")
+    plt.xlabel("Bước thực hiện")
+    plt.ylabel("Số xung đột")
+    plt.grid(True)
+    plt.legend(["Số xung đột theo bước"], loc="upper right")
+    plt.tight_layout()
+    plt.show()
+
