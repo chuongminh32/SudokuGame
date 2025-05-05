@@ -1,125 +1,82 @@
-import sys, os, math, random, time
+import unittest, os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.algorithm.generate_sudoku import *
-from src.utils.utils_ai_screen import *
+from src.algorithm.simulate_anealing import (
+    simulated_annealing_core,
+    giai_sudoku_simulated_annealing,
+    ghi_log_simulated_annealing
+)
 
+class TestSimulatedAnnealingSudoku(unittest.TestCase):
+    def setUp(self):
+        # Bảng Sudoku hợp lệ (từ Leetcode)
+        self.valid_board = [
+            [5, 3, 0, 0, 7, 0, 0, 0, 0],
+            [6, 0, 0, 1, 9, 5, 0, 0, 0],
+            [0, 9, 8, 0, 0, 0, 0, 6, 0],
+            [8, 0, 0, 0, 6, 0, 0, 0, 3],
+            [4, 0, 0, 8, 0, 3, 0, 0, 1],
+            [7, 0, 0, 0, 2, 0, 0, 0, 6],
+            [0, 6, 0, 0, 0, 0, 2, 8, 0],
+            [0, 0, 0, 4, 1, 9, 0, 0, 5],
+            [0, 0, 0, 0, 8, 0, 0, 7, 9]
+        ]
 
- # Hàm kiểm tra tính hợp lệ của bảng Sudoku
-def is_valid_sudoku(board, n):
-     # Kiểm tra các hàng
-     for i in range(n):
-         if len(set(board[i])) != n:
-             return False
- 
-     # Kiểm tra các cột
-     for i in range(n):
-         if len(set(board[j][i] for j in range(n))) != n:
-             return False
- 
-     # Kiểm tra các khối con sqrt(n) x sqrt(n)
-     sqrt_n = int(math.sqrt(n))
-     for row_start in range(0, n, sqrt_n):
-         for col_start in range(0, n, sqrt_n):
-             block = []
-             for i in range(sqrt_n):
-                 for j in range(sqrt_n):
-                     block.append(board[row_start + i][col_start + j])
-             if len(set(block)) != n:
-                 return False
- 
-     return True
+        # Bảng Sudoku không hợp lệ (trùng số 5)
+        self.invalid_board = [
+            [5, 5, 0, 0, 7, 0, 0, 0, 0],
+            [6, 0, 0, 1, 9, 5, 0, 0, 0],
+            [0, 9, 8, 0, 0, 0, 0, 6, 0],
+            [8, 0, 0, 0, 6, 0, 0, 0, 3],
+            [4, 0, 0, 8, 0, 3, 0, 0, 1],
+            [7, 0, 0, 0, 2, 0, 0, 0, 6],
+            [0, 6, 0, 0, 0, 0, 2, 8, 0],
+            [0, 0, 0, 4, 1, 9, 0, 0, 5],
+            [0, 0, 0, 0, 8, 0, 0, 7, 9]
+        ]
 
- # Hàm tính số lỗi trong bảng (số vi phạm quy tắc về hàng, cột và vùng)
-def count_conflicts(board, n):
-     conflicts = 0
- 
-     # Kiểm tra hàng và cột
-     for i in range(n):
-         conflicts += n - len(set(board[i]))  # Vi phạm trong hàng
-         conflicts += n - len(set([board[j][i] for j in range(n)]))  # Vi phạm trong cột
- 
-     # Kiểm tra các khối con sqrt(n) x sqrt(n)
-     sqrt_n = int(math.sqrt(n))
-     for row_start in range(0, n, sqrt_n):
-         for col_start in range(0, n, sqrt_n):
-             block = []
-             for i in range(sqrt_n):
-                 for j in range(sqrt_n):
-                     block.append(board[row_start + i][col_start + j])
-             conflicts += n - len(set(block))  # Vi phạm trong khối con
- 
-     return conflicts
+    def test_simulated_annealing_core_valid(self):
+        """
+        Test simulated_annealing_core với bảng hợp lệ.
+        Kỳ vọng: giải được, số bước > 0, thời gian hợp lý.
+        """
+        solved, steps, is_solved, duration = simulated_annealing_core(self.valid_board, 9)
+        self.assertTrue(is_solved)
+        self.assertGreater(steps, 0)
+        self.assertLess(duration, 5.0)
 
-def hill_climbing_core(board, size, callback=None, delay=0):
-    start = time.perf_counter()
-    buoc = 0
-    current_conflicts = count_conflicts(board, size)
-    best_board = [row[:] for row in board]
-    best_conflicts = current_conflicts
+    def test_simulated_annealing_core_invalid(self):
+        """
+        Với bảng không hợp lệ, kỳ vọng giải vẫn kết thúc nhưng không đảm bảo chính xác.
+        """
+        with self.assertRaises(ValueError):
+            simulated_annealing_core(self.invalid_board, 9)
+        # solved, steps, is_solved, duration = simulated_annealing_core(self.invalid_board, 9)
+        #SA có thể cố gắng giải nhưng không đảm bảo chính xác
+        # self.assertIsInstance(solved, list)
+        # self.assertGreaterEqual(duration, 0)
+        # self.assertGreater(steps, 0)
 
-    while current_conflicts > 0:
-        improved = False
+    def test_giai_sudoku_simulated_annealing(self):
+        """
+        Test hàm giai_sudoku_simulated_annealing với bảng hợp lệ.
+        Kỳ vọng: không còn ô trống, isSolve = True.
+        """
+        result, steps, is_solved = giai_sudoku_simulated_annealing(self.valid_board)
+        self.assertTrue(is_solved)
+        for row in result:
+            self.assertNotIn(0, row)
 
-        for r in range(size):
-            for c in range(size):
-                if board[r][c] == 0:
-                    original = board[r][c]
-                    for n in range(1, size + 1):
-                        board[r][c] = n
-                        new_conflicts = count_conflicts(board, size)
-                        buoc += 1
+    def test_ghi_log_simulated_annealing(self):
+        """
+        Test ghi_log_simulated_annealing: kiểm tra thời gian trả về > 0.
+        """
+        duration = ghi_log_simulated_annealing(self.valid_board, 9)
+        self.assertGreater(duration, 0)
+        log_file = os.path.join("SudokuGame", "data", "log_SA.txt")
+        self.assertTrue(os.path.exists(log_file))
+        with open(log_file, "r", encoding="utf-8") as f:
+            content = f.read()
+            self.assertIn("Log giải Sudoku bằng Simulated Annealing", content)
 
-                        # ====== gui =====
-                        if callback:
-                            if new_conflicts < current_conflicts:
-                                callback(r, c, n, "improved", buoc, time.perf_counter() - start, new_conflicts)
-                            else:
-                                callback(r, c, n, "conflict", buoc, time.perf_counter() - start, new_conflicts)
-                        if delay > 0:
-                            time.sleep(delay)
-                        # ====== gui =====
-
-                        if new_conflicts < current_conflicts:
-                            current_conflicts = new_conflicts
-                            best_conflicts = new_conflicts
-                            best_board = [row[:] for row in board]
-                            improved = True
-                            break
-
-                    if not improved:
-                        board[r][c] = original
-            if improved:
-                break
-
-        if not improved:
-            if callback:
-                callback(r, c, board[r][c], "no_improvement", buoc, time.perf_counter() - start, current_conflicts)
-            break
-
-    return best_board, buoc, time.perf_counter() - start
-
-def print_board(board):
-    for row in board:
-        print(" ".join(str(cell) if cell != 0 else "." for cell in row))
-    print()
-
-def test_hill_climbing_4x4():
-    board_4x4 = [
-        [1, 0, 0, 4],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [3, 0, 0, 2]
-    ]
-
-    print("Input Board:")
-    print_board(board_4x4)
-
-    result_board, steps, elapsed = hill_climbing_core(board_4x4, 4)
-
-    print("Result Board:")
-    print_board(result_board)
-
-    print(f"Solved in {steps} steps, Time: {elapsed:.4f} seconds")
-
-# Chạy test
-test_hill_climbing_4x4()
+if __name__ == '__main__':
+    unittest.main()
