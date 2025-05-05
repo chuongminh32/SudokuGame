@@ -47,7 +47,7 @@ class Ai_Screen:
         self.dangChayGame = True
 
         # nút
-        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin, self.nut_log = [None] * 10
+        self.nut_ss, self.reset_btn, self.ai_btn, self.back_btn, self.nut_dd_cap_do, self.nut_dd_alg, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin, self.nut_log, self.nut_reset_bang = [None] * 11
 
         # view log (bật giao diện xem tiến trình giải)
         self.hien_log = False
@@ -121,8 +121,6 @@ class Ai_Screen:
                     self.log_scroll = max(0, self.log_scroll - 1) 
                 elif e.button == 5:  # Lăn xuống -> tăng chỉ số cuộn (đồng thời giữ nó k vượt qua chỉ số tối đa)
                     self.log_scroll = min(max_scroll, self.log_scroll + 1)
-
-
 
     def kiemTraHopLe(self, board, row, col, num):
         """
@@ -410,7 +408,6 @@ class Ai_Screen:
 
         # click ô
         elif DEM <= x <= DEM + self.size * self.KT_O and DEM <= y <= DEM + self.size * self.KT_O  and not self.hien_bang_cap_do and not self.hien_bang_chon_alg and not self.hien_thong_bao_ai  and not self.hien_bang_thong_bao_loi and not self.hien_bang_chon_size:
-            print(self.KT_O, self.size)
             cot = (x - DEM) // self.KT_O
             dong = (y - DEM) // self.KT_O
             self.o_chon = (dong, cot) # chọn ô
@@ -527,9 +524,14 @@ class Ai_Screen:
             else:
                 self.screen = pygame.display.set_mode((RONG, CAO))
 
-        # click ra ngoai luoi -> xoa o dang chon
+        # click nút reset bảng 
+        elif self.nut_reset_bang.collidepoint(vitri_click):
+            self.bang = [row[:] for row in self.bang_goc]  # Lưu bảng gốc để so sánh sau này
+            self.bang_giai = None  # Reset bảng giải
+            self.veCauTrucBang()
         elif self.bang_sudoku and not self.bang_sudoku.collidepoint(vitri_click):
             self.o_chon = None
+        
 
 
     def veCauTrucBang(self):
@@ -537,7 +539,7 @@ class Ai_Screen:
             to_o_giai(self.screen, self.bang_goc, self.bang_giai, self.size)
         ve_so_ai(self.screen, self.bang, self.size)
         self.bang_sudoku = ve_luoi(self.screen, self.size)
-        self.reset_btn, self.ai_btn, self.back_btn, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin, self.nut_log = ve_nut_ai(self.screen, self.size)
+        self.reset_btn, self.ai_btn, self.back_btn, self.nut_bieu_do, self.nut_tao_de_sudoku, self.nut_thong_tin, self.nut_log, self.nut_reset_bang = ve_nut_ai(self.screen, self.size)
         self.nut_dd_cap_do = ve_nut_dd_bang_cap_do(self.screen, self.ten_cap_do)
         self.nut_dd_alg = ve_nut_dd_bang_alg(self.screen, self.ten_alg)
         self.nut_dd_size = ve_nut_dd_bang_size(self.screen, self.ten_size)

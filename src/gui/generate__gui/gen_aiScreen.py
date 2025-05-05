@@ -83,7 +83,7 @@ def ve_nut_ai(screen, size):
     # Vẽ icon lên màn hình
     screen.blit(icon_if, rect_nut_thong_tin)
 
-    # nút mở rộng (xem chi tiết các bước giải)
+    # nút log (xem chi tiết các bước giải)
     icon_log = get_relative_path("..","..", "assets", "log.png")
     img_log = pygame.image.load(icon_log).convert_alpha()
     # Vị trí icon
@@ -94,13 +94,24 @@ def ve_nut_ai(screen, size):
     # Vẽ icon lên màn hình
     screen.blit(img_log, rect_nut_log)
 
+    # nút reset bảng 
+    path_icon_reset_path = get_relative_path("..","..", "assets", "reset_board.png")
+    icon_reset = pygame.image.load(path_icon_reset_path).convert_alpha()
+    # Vị trí icon
+    x = RONG - 50
+    y = (CAO - 2*DEM) // 2 - 50
+    # Lấy rect từ icon và đặt vị trí
+    rect_btn_reset_board = icon_reset.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_reset, rect_btn_reset_board)
+
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
     pygame.draw.rect(screen, (98,123,192), nut_ai, border_radius=8)
     text_lam_moi = font.render("Giải", True, TRANG)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin, rect_nut_log
+    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin, rect_nut_log, rect_btn_reset_board
 
 def to_o_giai(screen, bang_goc, bang_giai, size):
     KT_O = (RONG - 2*DEM) // size
@@ -114,6 +125,17 @@ def to_o_giai(screen, bang_goc, bang_giai, size):
                         (204, 255, 229),  # Màu xanh nhạt (hoặc màu bạn muốn)
                         (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
                     )
+def to_lai_o_cho_bang_reset(screen, bang_goc, size):
+    KT_O = (RONG - 2*DEM) // size
+    for i in range(size):
+        for j in range(size):
+            if bang_goc[i][j] == 0:  # Kiểm tra ô có giá trị trong bảng giải nhưng không có trong bảng ban đầu
+                # Vẽ hình chữ nhật với màu để tô ô
+                pygame.draw.rect(
+                    screen,
+                    (255, 255, 255),  # Màu xanh nhạt (hoặc màu bạn muốn)
+                    (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
+                )
 
 def to_o_loi(screen, ds_loi, size):
     KT_O = (RONG - 2*DEM) // size
