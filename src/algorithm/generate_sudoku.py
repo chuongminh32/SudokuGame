@@ -54,7 +54,7 @@ def tao_sudoku_theo_cap_do(size, level="E"):
 def sinh_va_luu_de(size=9, tong_so_de=100):
     """Hàm sinh và lưu đề Sudoku + lời giải vào file JSON."""
     file_name = f"sudoku_{size}x{size}_dataset.json"
-    output_path = os.path.join("Sudoku", "data", file_name)
+    output_path = os.path.join("SudokuGame", "data", file_name)
     print(output_path)
 
     dataset = {"E": [], "M": [], "H": []}
@@ -87,7 +87,7 @@ def sinh_va_luu_de(size=9, tong_so_de=100):
 
 def tao_sudoku_theo_cap_do(size, level):
     """Lấy ngẫu nhiên 1 đề + lời giải từ file JSON."""
-    file_path = os.path.join("Sudoku", "data", f"sudoku_{size}x{size}_dataset.json")
+    file_path = os.path.join("SudokuGame", "data", f"sudoku_{size}x{size}_dataset.json")
 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Không tìm thấy file: {file_path}")
