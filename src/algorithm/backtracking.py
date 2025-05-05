@@ -91,7 +91,7 @@ def giai_sudoku_backtracking(bang, size=9, delay=0, cap_nhat_gui=None, isSolve=F
 
 # Ghi log lời giải
 def ghi_log_backtracking(bang, size):
-    log_path = os.path.join("Sudoku", "data", "log_giai_sudoku_B.txt")
+    log_path = os.path.join("SudokuGame", "data", "log_B.txt")
     with open(log_path, "w", encoding="utf-8") as f:
         f.write("")
 

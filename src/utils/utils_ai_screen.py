@@ -2,6 +2,8 @@ import pygame, sys, os, math
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
+import re
+import seaborn as sns
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
@@ -582,26 +584,72 @@ def ve_thong_bao_loi(screen, giatritrung):
     return thoat_btn
 
 # _____________________vẽ biểu đồ ____________________________________
-def ve_bieu_do_tong_thoi_gian_so_buoc(ds_log):
-    if not ds_log:
-        print("Không có dữ liệu log để vẽ.")
-        return
 
-    so_buoc = [item[0] for item in ds_log]  # Lấy số bước thử từ log
-    thoi_gian = [item[1] for item in ds_log]  # Lấy thời gian từ log
+def ve_bieu_do_phan_tich_b(file_path):
+    steps = []
+    times = []
+    rows = []
+    cols = []
+    values = []
 
-    # Vẽ biểu đồ
-    plt.figure(figsize=(10, 6))
-    plt.plot(so_buoc, thoi_gian, marker='o', linestyle='-', color='b')
+    # Regex để bắt thông tin trong dòng log
+    pattern = r"(\d+):([\d.]+) \((\d+),(\d+)\) <- (\d+)"
 
-    # Thêm tiêu đề và nhãn cho các trục
-    plt.title('Biểu đồ thời gian và số bước giải Sudoku')
-    plt.xlabel('Số bước thử')
-    plt.ylabel('Tổng thời gian (giây)')
-    plt.grid(True)
+    # Đọc file và parse
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            match = re.search(pattern, line)
+            if match:
+                step = int(match.group(1))
+                time = float(match.group(2))
+                row = int(match.group(3))
+                col = int(match.group(4))
+                value = int(match.group(5))
+
+                steps.append(step)
+                times.append(time)
+                rows.append(row)
+                cols.append(col)
+                values.append(value)
+
+    # Tạo figure với 2 hàng 2 cột
+    fig, axs = plt.subplots(2, 2, figsize=(10, 6))
+    fig.suptitle("GIẢI SUDOKU VỚI BACKTRACKING", fontsize=16,fontweight='bold')
+
+    # 1. Biểu đồ thời gian theo bước
+    axs[0, 0].plot(steps, times, marker='o')
+    axs[0, 0].set_xlabel("Bước")
+    axs[0, 0].set_ylabel("Thời gian (giây)")
+    axs[0, 0].set_title("Thời gian theo bước")
+    axs[0, 0].grid(True)
+
+    # 2. Scatter vị trí các ô thử giá trị
+    sc = axs[0, 1].scatter(cols, rows, c=steps, cmap='viridis', s=100)
+    axs[0, 1].invert_yaxis()
+    axs[0, 1].set_xlabel("Cột")
+    axs[0, 1].set_ylabel("Hàng")
+    axs[0, 1].set_title("Vị trí các ô thử giá trị")
+    fig.colorbar(sc, ax=axs[0, 1], label='Bước')
+
+    # 3. Heatmap giá trị đã thử trên lưới Sudoku
+    grid = np.zeros((9, 9), dtype=int)
+    for r, c, v in zip(rows, cols, values):
+        grid[r][c] = v
+    sns.heatmap(grid, annot=True, fmt='d', cmap='YlGnBu', cbar=False, ax=axs[1, 0])
+    axs[1, 0].set_title("Lưới Sudoku sau khi thử các giá trị")
+
+    # 4. Biểu đồ cột giá trị được thử theo bước
+    axs[1, 1].bar(steps, values)
+    axs[1, 1].set_xlabel("Bước")
+    axs[1, 1].set_ylabel("Giá trị được thử")
+    axs[1, 1].set_title("Giá trị được thử theo từng bước")
+    axs[1, 1].set_yticks(range(1, max(values)+1))
+    axs[1, 1].grid(True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # dành chỗ cho tiêu đề chung
     plt.show()
 
-def ve_biu_do_phan_tich_sa(log_path):
+def ve_bieu_do_phan_tich_sa(log_path):
 
     # Lấy dữ liệu từ log
     def phan_tich_log(log_path):
@@ -638,15 +686,15 @@ def ve_biu_do_phan_tich_sa(log_path):
     avg_time_per_step = np.mean(np.diff(thoi_gian_tich_luy))
     std_time_per_step = np.std(np.diff(thoi_gian_tich_luy))
 
-    plt.figure(figsize=(8, 6))
-    plt.suptitle('PHÂN TÍCH THUẬT TOÁN SIMULATED ANNEALING',
-                fontsize=18, y=1.02, fontweight='bold')
+    plt.figure(figsize=(8 , 6))
+    plt.suptitle('GIẢI SUDOKU VỚI SIMULATED ANEALING',
+                fontsize=10, y=0.99, fontweight='bold')
 
     # Subplot 1: Tiến triển giải thuật
     ax1 = plt.subplot(2, 2, 1)
     ax1.plot(log_data['buoc'], log_data['loi'], 'r-', label='Số lỗi', linewidth=2)
     ax1.plot(log_data['buoc'], log_data['conflicts'], 'b--', label='Số conflicts', linewidth=2)
-    ax1.set_title('TIẾN TRIỂN GIẢI THUẬT', pad=12)
+    ax1.set_title('TIẾN TRIỂN GIẢI THUẬT', pad=5)
     ax1.set_xlabel('Số bước', fontsize=10)
     ax1.set_ylabel('Giá trị', fontsize=10)
     ax1.grid(True, linestyle='--', alpha=0.7)
@@ -656,7 +704,7 @@ def ve_biu_do_phan_tich_sa(log_path):
     # Subplot 2: Quá trình làm nguội
     ax2 = plt.subplot(2, 2, 2)
     ax2.plot(log_data['buoc'], log_data['sigma'], 'g-', linewidth=2)
-    ax2.set_title('QUÁ TRÌNH LÀM NGUỘI (SIGMA)', pad=12)
+    ax2.set_title('QUÁ TRÌNH LÀM NGUỘI (SIGMA)', pad=5)
     ax2.set_xlabel('Số bước', fontsize=10)
     ax2.set_ylabel('Giá trị sigma', fontsize=10)
     ax2.grid(True, linestyle='--', alpha=0.7)
@@ -665,7 +713,7 @@ def ve_biu_do_phan_tich_sa(log_path):
     # Subplot 3: Thời gian tích lũy
     ax3 = plt.subplot(2, 2, 3)
     ax3.plot(log_data['buoc'], thoi_gian_tich_luy, 'm-o', markersize=4, linewidth=2)
-    ax3.set_title('THỜI GIAN TÍCH LŨY', pad=12)
+    ax3.set_title('THỜI GIAN TÍCH LŨY', pad=5)
     ax3.set_xlabel('Số bước', fontsize=10)
     ax3.set_ylabel('Thời gian (giây)', fontsize=10)
     ax3.grid(True, linestyle='--', alpha=0.7)
@@ -677,7 +725,7 @@ def ve_biu_do_phan_tich_sa(log_path):
     # Subplot 4: Quá trình giảm lỗi (log scale)
     ax4 = plt.subplot(2, 2, 4)
     ax4.semilogy(log_data['thoi_gian'], log_data['loi'], 'c-', linewidth=2)
-    ax4.set_title('GIẢM LỖI THEO THỜI GIAN (LOG SCALE)', pad=12)
+    ax4.set_title('GIẢM LỖI THEO THỜI GIAN (LOG SCALE)', pad=5)
     ax4.set_xlabel('Thời gian (giây)', fontsize=10)
     ax4.set_ylabel('Số lỗi', fontsize=10)
     ax4.grid(True, which="both", linestyle='--', alpha=0.7)
@@ -685,3 +733,41 @@ def ve_biu_do_phan_tich_sa(log_path):
     plt.tight_layout()
     plt.subplots_adjust(top=0.92, hspace=0.3, wspace=0.25)
     plt.show()
+
+def ve_bieu_do_phan_tich_hc(log_path):
+    buoc = []
+    conflicts = []
+    trang_thai = []
+
+    with open(log_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if "Conflicts" in line:
+                parts = line.strip().split(" | ")
+                step = int(parts[0].split(":")[0])
+                conflict = int(parts[1].split(":")[1])
+                status = parts[2].split("-->")[1].strip()
+
+                buoc.append(step)
+                conflicts.append(conflict)
+                trang_thai.append(status)
+
+    # Ánh xạ trạng thái sang màu
+    mau = {
+        "Cải thiện": "green",
+        "Lỗi - Vi phạm quy tắc": "red",
+        "Không cải thiện": "orange"
+    }
+    colors = [mau.get(s, "gray") for s in trang_thai]
+
+    plt.figure(figsize=(10, 6))
+    plt.scatter(buoc, conflicts, c=colors, label="Số xung đột")
+    plt.plot(buoc, conflicts, color="blue", linewidth=1, alpha=0.5)
+
+    plt.title("GIẢI SUDOKU VỚI HILL CLIMBING")
+    plt.xlabel("Bước thực hiện")
+    plt.ylabel("Số xung đột")
+    plt.grid(True)
+    plt.legend(["Số xung đột theo bước"], loc="upper right")
+    plt.tight_layout()
+    plt.show()
+

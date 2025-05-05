@@ -10,7 +10,6 @@ from src.algorithm.simulate_anealing import *
 from src.algorithm.hill_climbing import *
 # Đường dẫn gốc đến thư mục gốc của dự án (Sudoku)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 def get_relative_path(*paths):
     """Trả về đường dẫn tuyệt đối từ thư mục gốc dự án."""
     return os.path.join(BASE_DIR, *paths)
@@ -253,7 +252,8 @@ class Ai_Screen:
            self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_hill_climbing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui_hc)
            self.thoi_gian_giai = ghi_log_hill_climbing(self.bang, self.size)
         elif self.gia_tri_alg == "SA":
-            self.bang_giai, self.so_buoc , self.daGiaiThanhCong, self.thoi_gian_giai = giai_sudoku_simulated_annealing(self.bang,self.size,self.cap_nhat_gui_sa, self.tg_delay)
+            self.bang_giai, self.so_buoc, self.daGiaiThanhCong = giai_sudoku_simulated_annealing(self.bang,self.size, self.tg_delay, self.cap_nhat_gui_sa)
+            self.thoi_gian_giai = ghi_log_simulated_annealing(self.bang, self.size)
 
     def ve_log_giao_dien(self):
         log_x = DEM + self.size * self.KT_O + 70
@@ -438,8 +438,12 @@ class Ai_Screen:
         #elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
             if self.gia_tri_alg=="SA":
-                ve_biu_do_phan_tich_sa("SudokuGame/data/log_giai_sudoku_SA.txt")
-
+                ve_bieu_do_phan_tich_sa("SudokuGame/data/log_SA.txt")
+            elif self.gia_tri_alg == "HC":
+                ve_bieu_do_phan_tich_hc("SudokuGame/data/log_HC.txt")
+            elif self.gia_tri_alg == "B":
+               ve_bieu_do_phan_tich_b("SudokuGame/data/log_B.txt")
+            
        # click nút giải
         elif self.ai_btn.collidepoint(vitri_click):
             # Xóa log cũ nếu có
@@ -456,9 +460,6 @@ class Ai_Screen:
 
             # Cập nhật bảng giải cho bảng chính
             self.bang = [row[:] for row in self.bang_giai]
-
-            # pygame.display.update()
-
 
         # click nút thoát -> ẩn bảng thông báo
         elif self.thoat_btn != None:

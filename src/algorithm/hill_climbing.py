@@ -122,7 +122,7 @@ def giai_sudoku_hill_climbing(bang, size=9, delay=0, cap_nhat_gui=None, isSolve=
 
 # Ghi log quá trình Hill Climbing và kiểm tra hợp lệ cuối cùng
 def ghi_log_hill_climbing(bang, size):
-    log_path = os.path.join("Sudoku", "data", "log_hill_climbing.txt")
+    log_path = os.path.join("SudokuGame", "data", "log_HC.txt")
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     with open(log_path, "w", encoding="utf-8") as f:

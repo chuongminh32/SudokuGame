@@ -1,0 +1,18 @@
+1:0.0002s | Conflicts: 15 | (0,6) <- 9 --> Cải thiện
+2:0.0006s | Conflicts: 14 | (1,4) <- 3 --> Cải thiện
+3:0.0009s | Conflicts: 13 | (1,7) <- 6 --> Cải thiện
+4:0.0013s | Conflicts: 12 | (3,0) <- 7 --> Cải thiện
+5:0.0017s | Conflicts: 11 | (3,2) <- 1 --> Cải thiện
+6:0.0019s | Conflicts: 10 | (3,3) <- 3 --> Cải thiện
+7:0.0022s | Conflicts: 9 | (3,8) <- 2 --> Cải thiện
+8:0.0025s | Conflicts: 8 | (4,1) <- 5 --> Cải thiện
+9:0.0028s | Conflicts: 7 | (4,2) <- 2 --> Cải thiện
+10:0.0031s | Conflicts: 6 | (6,7) <- 9 --> Cải thiện
+11:0.0034s | Conflicts: 5 | (7,1) <- 9 --> Cải thiện
+12:0.0037s | Conflicts: 4 | (7,3) <- 8 --> Cải thiện
+13:0.0041s | Conflicts: 3 | (7,5) <- 3 --> Cải thiện
+14:0.0045s | Conflicts: 2 | (7,6) <- 5 --> Cải thiện
+15:0.0051s | Conflicts: 1 | (8,3) <- 4 --> Cải thiện
+16:0.0055s | Conflicts: 0 | (8,4) <- 9 --> Cải thiện
+
+==> Lời giải HỢP LỆ sau 0.0058s
