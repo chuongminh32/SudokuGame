@@ -1,36 +1,30 @@
-import pygame, sys, os, time, random, textwrap
-import matplotlib.pyplot as plt
-import tkinter as tk
-from tkinter import messagebox
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.utils.utils_ai_screen import *
+import pygame, os, sys 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.gui.generate__gui.gen_aiScreen import *
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
 from src.algorithm.simulate_anealing import *
 from src.algorithm.hill_climbing import *
-# Đường dẫn gốc đến thư mục gốc của dự án (Sudoku)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-def get_relative_path(*paths):
-    """Trả về đường dẫn tuyệt đối từ thư mục gốc dự án."""
-    return os.path.join(BASE_DIR, *paths)
+
 class Ai_Screen:
     def __init__(self):
-
         self.screen = init_pygame()
         pygame.display.set_caption("Sudoku - Chơi Game")
         self.font = pygame.font.SysFont("verdana", 25)
         self.font_text = pygame.font.SysFont("verdana", 20)
+        # --------- khởi tạo giá trị mặc định -----------
         self.tg_delay = 0.5
         self.size = 9
         self.gia_tri_cap_do = "E"
         self.gia_tri_alg = "B"
+
         self.bang,self.solution = tao_sudoku_theo_cap_do(self.size, self.gia_tri_cap_do)
         self.bang_goc = [row[:] for row in self.bang]
         self.bang_giai = None
         self.bang_sudoku = None # grid -> bắt sk click ngoài
 
-        #------ chon cap do -------
-        # khung bao quanh bang cap do
+        #------ chọn cấp độ -------
+        # khung bao quanh bảng cấp độ 
         self.rect_bang_cap_do = None
         # phân cấp độ
         self.hien_bang_cap_do = False # mặc định không hiện bảng cấp độ
@@ -38,8 +32,8 @@ class Ai_Screen:
         self.ten_cap_do = "Dễ"
         self.bang_cap_do = [] # luu ds cac lv
 
-        #------ chon alg ------
-        # khung bao quanh bang alg
+        #------ chọn alg ------
+        # khung bao quanh bảng alg
         self.rect_bang_alg = None
         # phân cấp độ
         self.hien_bang_chon_alg = False # mặc định không hiện bảng cấp độ
@@ -59,9 +53,6 @@ class Ai_Screen:
         self.hien_log = False
         self.danh_sach_log = []
         self.log_limit = int((CAO - 3 * DEM) // 22)
-
-
-
 
         # -----------thông báo giải xong -------------
         self.hien_thong_bao_ai = False
@@ -102,7 +93,7 @@ class Ai_Screen:
         self.ten_delay = "0.5s"
 
         # thanh cuộn
-        self.log_scroll = 0  # chỉ số cuộn log
+        self.log_scroll = 0  # chỉ số cuộn log_scroll = 1 → hiển thị dòng 1 đến 10
 
 
     def update_sudoku_board(self):
@@ -124,10 +115,11 @@ class Ai_Screen:
             elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                 self.xuLiSuKienClickChuot(e.pos)
             elif e.type == pygame.MOUSEBUTTONDOWN:
+                #  Ví dụ: Nếu có 30 dòng log và chỉ hiển thị được 10 dòng, thì max_scroll = 20.
                 max_scroll = max(0, len(self.danh_sach_log) - self.max_lines_log)
-                if e.button == 4:  # Lăn lên
-                    self.log_scroll = max(0, self.log_scroll - 1)
-                elif e.button == 5:  # Lăn xuống
+                if e.button == 4:  # Lăn lên -> giảm chỉ số cuộn (đồng thời giữ nó k âm)
+                    self.log_scroll = max(0, self.log_scroll - 1) 
+                elif e.button == 5:  # Lăn xuống -> tăng chỉ số cuộn (đồng thời giữ nó k vượt qua chỉ số tối đa)
                     self.log_scroll = min(max_scroll, self.log_scroll + 1)
 
 
@@ -215,9 +207,7 @@ class Ai_Screen:
 
         # Reset các trạng thái giải AI
         self.so_buoc = 0
-        self.ds_log = []
-        self.log_sau_cung = ""
-        self.dong_log_gan_nhat = ""
+        self.danh_sach_log = []
         self.thoi_gian_giai = 0
         self.daGiaiThanhCong = False
         self.click_giai = False
@@ -229,16 +219,7 @@ class Ai_Screen:
 
         # Không có ô nào đang chọn
         self.o_chon = None
-
-        # Xóa log cũ nếu có
-        try:
-            log_file_path = get_relative_path("data", "log_giai_sudoku.txt")
-            os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-            with open(log_file_path, "w", encoding="utf-8") as f:
-                f.write("")
-        except Exception as e:
-            print("Không thể xóa log:", e)
-
+       
         # Sau cùng vẽ lại màn hình
         self.veCauTrucBang()
         pygame.display.update()
@@ -435,7 +416,6 @@ class Ai_Screen:
             self.o_chon = (dong, cot) # chọn ô
 
         # cick nút biểu đồ
-        #elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
         elif self.nut_bieu_do and self.nut_bieu_do.collidepoint(vitri_click):
             if self.gia_tri_alg=="SA":
                 ve_bieu_do_phan_tich_sa("SudokuGame/data/log_SA.txt")

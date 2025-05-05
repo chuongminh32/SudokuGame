@@ -1,4 +1,4 @@
-import pygame, sys, os, math
+import pygame, os, math
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
@@ -7,17 +7,9 @@ import seaborn as sns
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
-# KT_O = (RONG - 2 * DEM) // KT_LUOI
 CAO_NUT, KC_NUT = 40, 20
-TRANG, DEN, XAM, XAM_SANG = (255,255,255), (0,0,0), (200,200,200), (220,220,220)
-XANH_DUONG, DO, XANH_LA = (0,0,255), (255,0,0), (0,128,0)
-MAU_NUT, MAU_CHU_NUT, MAU_NEN = (90, 123, 192), TRANG, TRANG
-MAU_NEN_NUT_HOVER = (67, 99, 167)
-# Màu nút và chữ trên nút
-MAU_NUT_BACK, MAU_ICON_BACK = (100, 100, 255), (80, 80, 80)  # Màu nút quay lại và biểu tượng
-MAU_NUT_CAIDAT, MAU_KHI_DUOC_CHON = (60, 60, 60), (180, 230, 255)  # Màu biểu tượng cài đặt và tùy chọn được chọn
-KT_NUT_BACK, DEM_NUT_BACK_x, DEM_NUT_BACK_y = 40, 20, 20  # Kích thước và vị trí của biểu tượng quay lại
-KT_NUT_CAIDAT, DEM_NUT_CAIDAT = 37, 10  # Kích thước và khoảng cách của biểu tượng cài đặt
+TRANG, DEN, XAM = (255,255,255), (0,0,0), (200,200,200)
+
 
 # Tạo đường dẫn tương đối từ thư mục này
 def get_relative_path(*paths):
@@ -38,16 +30,8 @@ def ve_nut_ai(screen, size):
     font_size = 24  # Cỡ chữ cho các nút
     font = pygame.font.SysFont("verdana", font_size)
 
-    # nút so sánh
-    # icon_ss_path = get_relative_path("..", "assets", "icons8-compare-50.png")
-    # icon_ss = pygame.image.load(icon_ss_path).convert_alpha()
-    # x = RONG - 160
-    # y = CAO - 90
-    # rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
-    # screen.blit(icon_ss, rect_nut_ss)
-
     # nút làm mới
-    icon_ss_path = get_relative_path("..", "assets", "icons8-refresh-48.png")
+    icon_ss_path = get_relative_path("..","..", "assets", "icons8-refresh-48.png")
     icon_lam_moi = pygame.image.load(icon_ss_path).convert_alpha()
     x = 120
     y = CAO - 90
@@ -55,7 +39,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_lam_moi, rect_nut_lam_moi)
 
     # nut back
-    icon_ss_path = get_relative_path("..", "assets", "icons8-go-back-48.png")
+    icon_ss_path = get_relative_path("..","..", "assets", "icons8-go-back-48.png")
     icon_back = pygame.image.load(icon_ss_path).convert_alpha()
     # Vị trí icon
     x = 12
@@ -66,7 +50,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_back, rect_nut_back)
 
     # nut chart
-    icon_chart_path = get_relative_path("..", "assets", "chart.png")
+    icon_chart_path = get_relative_path("..","..", "assets", "chart.png")
     icon_chart = pygame.image.load(icon_chart_path).convert_alpha()
     icon_chart = pygame.transform.scale(icon_chart, (40, 40))
     # Vị trí icon
@@ -78,7 +62,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_chart, rect_btn_chart)
 
     # nut tao de bai
-    icon_create_topic = get_relative_path("..", "assets", "icons8-plus-50.png")
+    icon_create_topic = get_relative_path("..","..", "assets", "icons8-plus-50.png")
     icon_topic = pygame.image.load(icon_create_topic).convert_alpha()
     # Vị trí icon
     x = RONG - 340
@@ -89,7 +73,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_topic, rect_nut_tao_de_bai)
 
     # nut info
-    icon_info = get_relative_path("..", "assets", "info.png")
+    icon_info = get_relative_path("..","..", "assets", "info.png")
     icon_if = pygame.image.load(icon_info).convert_alpha()
     # Vị trí icon
     x = RONG - 400
@@ -100,7 +84,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_if, rect_nut_thong_tin)
 
     # nút mở rộng (xem chi tiết các bước giải)
-    icon_log = get_relative_path("..", "assets", "log.png")
+    icon_log = get_relative_path("..","..", "assets", "log.png")
     img_log = pygame.image.load(icon_log).convert_alpha()
     # Vị trí icon
     x = RONG - 50
@@ -112,8 +96,8 @@ def ve_nut_ai(screen, size):
 
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
-    pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
-    text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
+    pygame.draw.rect(screen, (98,123,192), nut_ai, border_radius=8)
+    text_lam_moi = font.render("Giải", True, TRANG)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
     return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin, rect_nut_log
@@ -734,40 +718,67 @@ def ve_bieu_do_phan_tich_sa(log_path):
     plt.subplots_adjust(top=0.92, hspace=0.3, wspace=0.25)
     plt.show()
 
-def ve_bieu_do_phan_tich_hc(log_path):
-    buoc = []
+def ve_bieu_do_phan_tich_hc(file_path):
+    steps = []
+    times = []
+    rows = []
+    cols = []
+    values = []
     conflicts = []
-    trang_thai = []
 
-    with open(log_path, "r", encoding="utf-8") as f:
+    # Regex để bắt thông tin từ log dạng Hill Climbing
+    pattern = r"(\d+):([\d.]+)s \| Conflicts: (\d+) \| \((\d+),(\d+)\) <- (\d+)"
+
+    with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            if "Conflicts" in line:
-                parts = line.strip().split(" | ")
-                step = int(parts[0].split(":")[0])
-                conflict = int(parts[1].split(":")[1])
-                status = parts[2].split("-->")[1].strip()
+            match = re.search(pattern, line)
+            if match:
+                step = int(match.group(1))
+                time = float(match.group(2))
+                conflict = int(match.group(3))
+                row = int(match.group(4))
+                col = int(match.group(5))
+                value = int(match.group(6))
 
-                buoc.append(step)
+                steps.append(step)
+                times.append(time)
                 conflicts.append(conflict)
-                trang_thai.append(status)
+                rows.append(row)
+                cols.append(col)
+                values.append(value)
 
-    # Ánh xạ trạng thái sang màu
-    mau = {
-        "Cải thiện": "green",
-        "Lỗi - Vi phạm quy tắc": "red",
-        "Không cải thiện": "orange"
-    }
-    colors = [mau.get(s, "gray") for s in trang_thai]
+    # Vẽ 4 biểu đồ
+    fig, axs = plt.subplots(2, 2, figsize=(12, 7))
+    fig.suptitle("PHÂN TÍCH GIẢI SUDOKU BẰNG HILL CLIMBING", fontsize=16, fontweight='bold')
 
-    plt.figure(figsize=(10, 6))
-    plt.scatter(buoc, conflicts, c=colors, label="Số xung đột")
-    plt.plot(buoc, conflicts, color="blue", linewidth=1, alpha=0.5)
+    # 1. Thời gian theo bước
+    axs[0, 0].plot(steps, times, marker='o', color='purple')
+    axs[0, 0].set_title("Thời gian tích lũy theo bước")
+    axs[0, 0].set_xlabel("Bước")
+    axs[0, 0].set_ylabel("Thời gian (s)")
+    axs[0, 0].grid(True)
 
-    plt.title("GIẢI SUDOKU VỚI HILL CLIMBING")
-    plt.xlabel("Bước thực hiện")
-    plt.ylabel("Số xung đột")
-    plt.grid(True)
-    plt.legend(["Số xung đột theo bước"], loc="upper right")
-    plt.tight_layout()
+    # 2. Vị trí các ô được gán
+    sc = axs[0, 1].scatter(cols, rows, c=steps, cmap='viridis', s=100)
+    axs[0, 1].invert_yaxis()
+    axs[0, 1].set_title("Vị trí các ô được gán giá trị")
+    axs[0, 1].set_xlabel("Cột")
+    axs[0, 1].set_ylabel("Hàng")
+    fig.colorbar(sc, ax=axs[0, 1], label="Bước")
+
+    # 3. Heatmap giá trị đã gán
+    grid = np.zeros((9, 9), dtype=int)
+    for r, c, v in zip(rows, cols, values):
+        grid[r][c] = v
+    sns.heatmap(grid, annot=True, fmt='d', cmap='YlGnBu', cbar=False, ax=axs[1, 0])
+    axs[1, 0].set_title("Lưới Sudoku sau các bước gán")
+
+    # 4. Số xung đột theo bước
+    axs[1, 1].plot(steps, conflicts, marker='o', color='red')
+    axs[1, 1].set_title("Số xung đột theo bước")
+    axs[1, 1].set_xlabel("Bước")
+    axs[1, 1].set_ylabel("Số xung đột")
+    axs[1, 1].grid(True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
-

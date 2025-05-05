@@ -3,7 +3,7 @@ import sys # thư viện để thoát game
 import os # thư viện để xử lý đường dẫn file 
 
 # thêm đường dẫn để import các file khác trong dự án 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 # kích thước cửa sổ game 
 RONG_HOME = 650 
@@ -161,12 +161,12 @@ class HomeScreen:
     
     # Hàm bắt sự kiện click nút chơi game 
     def bat_dau_choi_btn_click(self):
-        from src.gui import game_screen
+        from src.gui.manage__gui import game_screen
         game_screen.khoiDongManHinhChoiGame()
     
     # Hàm bắt sự kiện click nút hướng dẫn  
     def huong_dan_btn_click(self):
-        from src.gui import tutorial_screen
+        from src.gui.manage__gui import tutorial_screen
         tutorial_screen.KhoiDongManHinhHD()
 
     # Hàm bắt sự kiện click thoát game 
@@ -176,7 +176,7 @@ class HomeScreen:
 
     # Hàm click nút ai 
     def ai_btn_click(self):
-        from src.gui import ai_screen
+        from src.gui.manage__gui import ai_screen
         ai_screen.KhoiDongManHinhAI()
 
     # Hàm xử lí sự kiện click chuột 

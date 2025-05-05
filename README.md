@@ -1,41 +1,21 @@
 # Sudoku AI - Hill Climbing
 
 ##  Giới thiệu
-Đây là một ứng dụng giải quyết bài toán Sudoku sử dụng thuật toán **Hill Climbing**. Chương trình cung cấp giao diện trực quan với **Pygame**, cho phép người dùng nhập bài toán, chọn mức độ khó và yêu cầu thuật toán giải tự động, chế độ riêng ai để phân tích 
-
-* ALG 
-1. Mục tiêu
-Sử dụng thuật toán tối ưu cục bộ Hill-Climbing để giải bài toán Sudoku 9x9 — một bài toán ràng buộc cổ điển, đòi hỏi mỗi hàng, cột và vùng 3x3 đều chứa các số từ 1 đến 9, không lặp.
-
-2. Ý tưởng chính
-Thay vì tìm lời giải bằng cách thử tất cả khả năng, Hill-Climbing bắt đầu từ một lời giải hợp lệ về mặt cấu trúc (đầy đủ các số trong từng block) và dần dần cải thiện nó bằng các phép hoán đổi thông minh, nhằm giảm số lượng lỗi trong hàng và cột.
-Tối ưu hóa trên không gian bị ràng buộc:
-Giữ nguyên các ô gốc.
-Chỉ cho phép hoán đổi giá trị trong cùng block 3x3 để bảo toàn tính hợp lệ block.
-Từ đó, tìm lời giải hợp lệ toàn cục bằng cách tối thiểu hóa số lỗi (xung đột).
-
-3. Cách tiếp cận
-Khởi tạo lời giải khả thi:
-Mỗi block 3x3 được điền ngẫu nhiên nhưng đảm bảo không trùng số bên trong.
-Hàm đánh giá (Heuristic):
-Đếm số lần trùng số trong các hàng và cột (conflict count).
-Tạo lân cận:
-Chọn 2 ô có thể hoán đổi trong cùng block.
-Đánh giá lại nghiệm mới.
-Leo dốc (Hill-Climbing):
-Di chuyển sang trạng thái lân cận tốt nhất.
-
-Nếu không có trạng thái tốt hơn → mắc kẹt → kết thúc hoặc khởi động lại.
+Đây là một ứng dụng giải quyết bài toán Sudoku sử dụng thuật toán **Hill Climbing**. Chương trình cung cấp giao diện trực quan với **Pygame**, cho phép người dùng có thể chơi game sudoku 9x9 ở chế độ chơi game; đọc hướng dẫn; Nhập bài toán, chọn mức độ khó và yêu cầu thuật toán giải tự động trong chế độ ai để phân tích 
 
 ##  Tính năng chính
-* chế độ chơi 
--  Tạo đề Sudoku ngẫu nhiên với 3 mức độ: **Dễ, Trung bình, Khó**.
+* Chế độ chơi game
+- Người chơi có thể chơi game, sử dụng gợi ý hoặc giải ngay nếu muốn
+- Chương trình sẽ mặc định lấy thuật toán Backtrackiing để giải (đảm bảo giải được tất cả mực độ 9x9) 
+- Có thể chọn đề Sudoku 9x9 ngẫu nhiên với 3 mức độ: **Dễ, Trung bình, Khó**.
 - Hỗ trợ nhập số vào bảng Sudoku.
-- Sử dụng **Hill Climbing, SA,..** để tìm lời giải cho Sudoku.
-- Hiển thị lời giải trực tiếp lên giao diện đồ họa.
 - Cho phép xóa bảng và chọn lại bài toán mới.
-* chế độ AI (đang thực hiện)
-- xem tiến trình giải, chọn thuật toán - cấp độ, thời gian, so sánh lời giải với các thuật toán,.. 
+* chế độ AI 
+- Chọn thuật toán, cấp độ, kích thước bảng sudoku, đề sudoku theo cấp độ ngẫu nhiên
+- Xem log giải thuật - có thể điều chỉnh thời gian delay -> xem rõ tiến trình giải, biểu đồ phân tích giải thuật
+- Xem thông tin giải thuật sudoku: thời gian + số bước thử giá trị vào bảng
+- xem tiến trình giải, chọn thuật toán - cấp độ, thời gian, kích thước bảng sudoku
+- Có thể tự tạo đề sudoku cho thuật toán giải 
 
 ## 🛠 Công nghệ sử dụng
 - Python 3.12
@@ -68,11 +48,13 @@ README.md
 |   |   |
 |   +---utils  # Chứa các hàm tiện ích dùng chung 
 |   |   |    utils_ai_screen.py  # Các hàm hỗ trợ cho ai screen  
-|   |   |    utils_game_screen.py  # Các hàm hỗ trợ cho game screen diện
+|   |   |    utils_game_screen.py  # Các hàm hỗ trợ cho game screen
 |   |   |
 |   +---tests  # Thư mục chứa các bài kiểm thử
-|       |    test_solver.py  # Kiểm thử thuật toán giải Sudoku
-|       |--- test_sudoku.py  # Kiểm thử lớp Sudoku
+|       |    
+|       |--- test_B.py  # Kiểm thử thuật toán Backtracking giải Sudoku
+|       |--- test_HC.py  # Kiểm thử thuật toán Hill_Climbing giải Sudoku
+|       |--- test_SA.py  # Kiểm thử thuật toán Simulated_Anealing giải Sudoku
 |
 |
 +---docs  # Tài liệu dự án

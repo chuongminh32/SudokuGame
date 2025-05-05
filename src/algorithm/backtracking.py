@@ -1,6 +1,6 @@
-import  os, math
+import os, math
 from src.algorithm.generate_sudoku import *
-from src.utils.utils_ai_screen import *
+from src.gui.generate__gui.gen_aiScreen import *
 import time
 def backtracking_core(board, size, callback=None, delay=0):
     SIZE_BOX = math.isqrt(size)
@@ -107,3 +107,14 @@ def ghi_log_backtracking(bang, size):
     bang_copy = [row[:] for row in bang]
     _, _, duration = backtracking_core(bang_copy, size, log_callback)
     return duration
+
+
+"""
+- Tài liệu tham khảo:
+GeeksForGeeks: https://www.geeksforgeeks.org/sudoku-backtracking-7/
+
+Peter Norvig, "Solving Every Sudoku Puzzle", 2006 – Bài viết hướng dẫn chi tiết về Backtracking kết hợp MRV và kỹ thuật loại trừ (constraint propagation).
+https://norvig.com/sudoku.html
+
+Wikipedia - Sudoku Solving Algorithms – Tổng quan nhiều thuật toán giải Sudoku, bao gồm Backtracking, MRV, Forward Checking.
+https://en.wikipedia.org/wiki/Sudoku_solving_algorithms"""

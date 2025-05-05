@@ -1,7 +1,7 @@
 import sys, os, math, random, time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.algorithm.generate_sudoku import *
-from src.utils.utils_ai_screen import *
+from src.gui.generate__gui.gen_aiScreen import *
 
 # Trả về các giá trị hợp lệ chưa xuất hiện trong hàng, cột, và ô vuông
 def get_safe_values(board, n, row, col):
