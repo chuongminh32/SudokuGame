@@ -1,2 +1,4 @@
 numpy>=1.26.0
 pygame>=2.5.0
+matplotlib>=3.7.0
+seaborn>=0.12.0

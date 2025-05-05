@@ -9,7 +9,7 @@ from src.algorithm.hill_climbing import *
 class Ai_Screen:
     def __init__(self):
         self.screen = init_pygame()
-        pygame.display.set_caption("Sudoku - Chơi Game")
+        pygame.display.set_caption("Sudoku - AI")
         self.font = pygame.font.SysFont("verdana", 25)
         self.font_text = pygame.font.SysFont("verdana", 20)
         # --------- khởi tạo giá trị mặc định -----------
@@ -335,7 +335,7 @@ class Ai_Screen:
         mau, trang_thai_text = mau_map.get(trang_thai, ((255, 255, 255), ""))
 
         # Tạo và lưu log
-        dong_log = f" {buoc}:({r1},{c1})={v1} <=> ({r2},{c2})={v2} | e:{score:2} | cf:{conflicts} t:{thoi_gian_tong:.3f}s | s:{sigma:.3f}\n"
+        dong_log = f" {buoc}:({r1},{c1})={v1} <=> ({r2},{c2})={v2} | e:{score:2} | cf:{conflicts} | s:{sigma:.3f}\n"
         self.danh_sach_log.append(dong_log)
 
         # Vẽ ô và số
