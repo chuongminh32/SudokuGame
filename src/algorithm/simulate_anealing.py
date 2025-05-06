@@ -118,6 +118,9 @@ def simulated_annealing_core(bang, size, callback=None, delay=0.0, max_steps=100
             if delay > 0:
                 time.sleep(delay)
 
+            if buoc >= max_steps or thoi_gian_tong >= max_time:
+                return sudoku.tolist(), buoc, False, thoi_gian_tong
+
         # Giảm nhiệt độ sau mỗi bước
         sigma = max(sigma * 0.99, 0.001)
 
@@ -125,6 +128,7 @@ def simulated_annealing_core(bang, size, callback=None, delay=0.0, max_steps=100
     isSolve = True
     tong_thoi_gian = time.perf_counter() - start_time
     return sudoku.tolist(), buoc, isSolve, tong_thoi_gian
+
 
 # Hàm giải Sudoku bằng Simulated Annealing kèm GUI (nếu có)
 def giai_sudoku_simulated_annealing(bang, size=9, delay=0.0, cap_nhat_gui=None, isSolve=False):
