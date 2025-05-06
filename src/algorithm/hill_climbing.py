@@ -1,7 +1,7 @@
 import sys, os, math, random, time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.algorithm.generate_sudoku import *
-from src.utils.utils_ai_screen import *
+from src.gui.generate__gui.gen_aiScreen import *
 
 # Trả về các giá trị hợp lệ chưa xuất hiện trong hàng, cột, và ô vuông
 def get_safe_values(board, n, row, col):
@@ -37,7 +37,7 @@ def count_conflicts(board, n):
     for i in range(n):
         nums = [x for x in board[i] if x != 0]
         conflicts += len(nums) - len(set(nums))  # Số lần trùng trong hàng
-
+    
     # Kiểm tra xung đột trong cột
     for j in range(n):
         nums = [board[i][j] for i in range(n) if board[i][j] != 0]
@@ -122,7 +122,7 @@ def giai_sudoku_hill_climbing(bang, size=9, delay=0, cap_nhat_gui=None, isSolve=
 
 # Ghi log quá trình Hill Climbing và kiểm tra hợp lệ cuối cùng
 def ghi_log_hill_climbing(bang, size):
-    log_path = os.path.join("Sudoku", "data", "log_hill_climbing.txt")
+    log_path = os.path.join("SudokuGame", "data", "log_HC.txt")
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     with open(log_path, "w", encoding="utf-8") as f:

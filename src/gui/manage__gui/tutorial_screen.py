@@ -82,7 +82,7 @@ class Tutorial_Screen:
                 vitri_y += 10
 
     def ve_nut_quay_lai(self):
-        icon = load_image_relative("..", "assets", "icons8-go-back-48.png")
+        icon = load_image_relative("..","..", "assets", "icons8-go-back-48.png")
         rect = icon.get_rect(topleft=(12, 15))
         self.screen.blit(icon, rect)
         self.nut_quay_lai = rect

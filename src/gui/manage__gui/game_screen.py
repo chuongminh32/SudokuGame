@@ -1,6 +1,6 @@
 import pygame, sys, os, time, random
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.utils.utils_game_screen import * 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.gui.generate__gui.gen_gameScreen import *
 from src.algorithm.generate_sudoku import *
 from src.algorithm.backtracking import *
 

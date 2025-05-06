@@ -52,7 +52,7 @@ def ve_nut(screen):
     screen.blit(text_ai, text_ai.get_rect(center=nut_ai.center))
 
     # Nút Back (mũi tên trái)
-    icon_path = get_relative_path("..", "assets", "icons8-go-back-48.png")
+    icon_path = get_relative_path("..","..", "assets", "icons8-go-back-48.png")
     icon_back = pygame.image.load(icon_path).convert_alpha()
     # Vị trí icon
     x = 12

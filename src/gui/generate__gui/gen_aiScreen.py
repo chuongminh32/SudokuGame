@@ -1,21 +1,15 @@
-import pygame, sys, os, math
+import pygame, os, math
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
+import re
+import seaborn as sns
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 RONG, CAO, DEM, KT_LUOI = 700, 750, 60, 9
-# KT_O = (RONG - 2 * DEM) // KT_LUOI
 CAO_NUT, KC_NUT = 40, 20
-TRANG, DEN, XAM, XAM_SANG = (255,255,255), (0,0,0), (200,200,200), (220,220,220)
-XANH_DUONG, DO, XANH_LA = (0,0,255), (255,0,0), (0,128,0)
-MAU_NUT, MAU_CHU_NUT, MAU_NEN = (90, 123, 192), TRANG, TRANG
-MAU_NEN_NUT_HOVER = (67, 99, 167)
-# Màu nút và chữ trên nút
-MAU_NUT_BACK, MAU_ICON_BACK = (100, 100, 255), (80, 80, 80)  # Màu nút quay lại và biểu tượng
-MAU_NUT_CAIDAT, MAU_KHI_DUOC_CHON = (60, 60, 60), (180, 230, 255)  # Màu biểu tượng cài đặt và tùy chọn được chọn
-KT_NUT_BACK, DEM_NUT_BACK_x, DEM_NUT_BACK_y = 40, 20, 20  # Kích thước và vị trí của biểu tượng quay lại
-KT_NUT_CAIDAT, DEM_NUT_CAIDAT = 37, 10  # Kích thước và khoảng cách của biểu tượng cài đặt
+TRANG, DEN, XAM = (255,255,255), (0,0,0), (200,200,200)
+
 
 # Tạo đường dẫn tương đối từ thư mục này
 def get_relative_path(*paths):
@@ -36,16 +30,8 @@ def ve_nut_ai(screen, size):
     font_size = 24  # Cỡ chữ cho các nút
     font = pygame.font.SysFont("verdana", font_size)
 
-    # nút so sánh
-    # icon_ss_path = get_relative_path("..", "assets", "icons8-compare-50.png")
-    # icon_ss = pygame.image.load(icon_ss_path).convert_alpha()
-    # x = RONG - 160
-    # y = CAO - 90
-    # rect_nut_ss = icon_ss.get_rect(topleft=(x, y))
-    # screen.blit(icon_ss, rect_nut_ss)
-
     # nút làm mới
-    icon_ss_path = get_relative_path("..", "assets", "icons8-refresh-48.png")
+    icon_ss_path = get_relative_path("..","..", "assets", "icons8-refresh-48.png")
     icon_lam_moi = pygame.image.load(icon_ss_path).convert_alpha()
     x = 120
     y = CAO - 90
@@ -53,7 +39,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_lam_moi, rect_nut_lam_moi)
 
     # nut back
-    icon_ss_path = get_relative_path("..", "assets", "icons8-go-back-48.png")
+    icon_ss_path = get_relative_path("..","..", "assets", "icons8-go-back-48.png")
     icon_back = pygame.image.load(icon_ss_path).convert_alpha()
     # Vị trí icon
     x = 12
@@ -64,7 +50,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_back, rect_nut_back)
 
     # nut chart
-    icon_chart_path = get_relative_path("..", "assets", "chart.png")
+    icon_chart_path = get_relative_path("..","..", "assets", "chart.png")
     icon_chart = pygame.image.load(icon_chart_path).convert_alpha()
     icon_chart = pygame.transform.scale(icon_chart, (40, 40))
     # Vị trí icon
@@ -76,7 +62,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_chart, rect_btn_chart)
 
     # nut tao de bai
-    icon_create_topic = get_relative_path("..", "assets", "icons8-plus-50.png")
+    icon_create_topic = get_relative_path("..","..", "assets", "icons8-plus-50.png")
     icon_topic = pygame.image.load(icon_create_topic).convert_alpha()
     # Vị trí icon
     x = RONG - 340
@@ -87,7 +73,7 @@ def ve_nut_ai(screen, size):
     screen.blit(icon_topic, rect_nut_tao_de_bai)
 
     # nut info
-    icon_info = get_relative_path("..", "assets", "info.png")
+    icon_info = get_relative_path("..","..", "assets", "info.png")
     icon_if = pygame.image.load(icon_info).convert_alpha()
     # Vị trí icon
     x = RONG - 400
@@ -97,8 +83,8 @@ def ve_nut_ai(screen, size):
     # Vẽ icon lên màn hình
     screen.blit(icon_if, rect_nut_thong_tin)
 
-    # nút mở rộng (xem chi tiết các bước giải)
-    icon_log = get_relative_path("..", "assets", "log.png")
+    # nút log (xem chi tiết các bước giải)
+    icon_log = get_relative_path("..","..", "assets", "log.png")
     img_log = pygame.image.load(icon_log).convert_alpha()
     # Vị trí icon
     x = RONG - 50
@@ -108,13 +94,24 @@ def ve_nut_ai(screen, size):
     # Vẽ icon lên màn hình
     screen.blit(img_log, rect_nut_log)
 
+    # nút reset bảng 
+    path_icon_reset_path = get_relative_path("..","..", "assets", "reset_board.png")
+    icon_reset = pygame.image.load(path_icon_reset_path).convert_alpha()
+    # Vị trí icon
+    x = RONG - 50
+    y = (CAO - 2*DEM) // 2 - 50
+    # Lấy rect từ icon và đặt vị trí
+    rect_btn_reset_board = icon_reset.get_rect(topleft=(x, y))
+    # Vẽ icon lên màn hình
+    screen.blit(icon_reset, rect_btn_reset_board)
+
     # Nút AI giải
     nut_ai = pygame.Rect(DEM + w_nut + KC_NUT, y_nut, w_nut, CAO_NUT)
-    pygame.draw.rect(screen, MAU_NUT, nut_ai, border_radius=8)
-    text_lam_moi = font.render("Giải", True, MAU_CHU_NUT)
+    pygame.draw.rect(screen, (98,123,192), nut_ai, border_radius=8)
+    text_lam_moi = font.render("Giải", True, TRANG)
     screen.blit(text_lam_moi, text_lam_moi.get_rect(center=nut_ai.center))
 
-    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin, rect_nut_log
+    return rect_nut_lam_moi, nut_ai, rect_nut_back, rect_btn_chart, rect_nut_tao_de_bai, rect_nut_thong_tin, rect_nut_log, rect_btn_reset_board
 
 def to_o_giai(screen, bang_goc, bang_giai, size):
     KT_O = (RONG - 2*DEM) // size
@@ -128,6 +125,17 @@ def to_o_giai(screen, bang_goc, bang_giai, size):
                         (204, 255, 229),  # Màu xanh nhạt (hoặc màu bạn muốn)
                         (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
                     )
+def to_lai_o_cho_bang_reset(screen, bang_goc, size):
+    KT_O = (RONG - 2*DEM) // size
+    for i in range(size):
+        for j in range(size):
+            if bang_goc[i][j] == 0:  # Kiểm tra ô có giá trị trong bảng giải nhưng không có trong bảng ban đầu
+                # Vẽ hình chữ nhật với màu để tô ô
+                pygame.draw.rect(
+                    screen,
+                    (255, 255, 255),  # Màu xanh nhạt (hoặc màu bạn muốn)
+                    (DEM + j * KT_O + 1, DEM + i * KT_O + 1, KT_O - 2, KT_O - 2)  # Tô trong ô
+                )
 
 def to_o_loi(screen, ds_loi, size):
     KT_O = (RONG - 2*DEM) // size
@@ -582,26 +590,72 @@ def ve_thong_bao_loi(screen, giatritrung):
     return thoat_btn
 
 # _____________________vẽ biểu đồ ____________________________________
-def ve_bieu_do_tong_thoi_gian_so_buoc(ds_log):
-    if not ds_log:
-        print("Không có dữ liệu log để vẽ.")
-        return
 
-    so_buoc = [item[0] for item in ds_log]  # Lấy số bước thử từ log
-    thoi_gian = [item[1] for item in ds_log]  # Lấy thời gian từ log
+def ve_bieu_do_phan_tich_b(file_path):
+    steps = []
+    times = []
+    rows = []
+    cols = []
+    values = []
 
-    # Vẽ biểu đồ
-    plt.figure(figsize=(10, 6))
-    plt.plot(so_buoc, thoi_gian, marker='o', linestyle='-', color='b')
+    # Regex để bắt thông tin trong dòng log
+    pattern = r"(\d+):([\d.]+) \((\d+),(\d+)\) <- (\d+)"
 
-    # Thêm tiêu đề và nhãn cho các trục
-    plt.title('Biểu đồ thời gian và số bước giải Sudoku')
-    plt.xlabel('Số bước thử')
-    plt.ylabel('Tổng thời gian (giây)')
-    plt.grid(True)
+    # Đọc file và parse
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            match = re.search(pattern, line)
+            if match:
+                step = int(match.group(1))
+                time = float(match.group(2))
+                row = int(match.group(3))
+                col = int(match.group(4))
+                value = int(match.group(5))
+
+                steps.append(step)
+                times.append(time)
+                rows.append(row)
+                cols.append(col)
+                values.append(value)
+
+    # Tạo figure với 2 hàng 2 cột
+    fig, axs = plt.subplots(2, 2, figsize=(10, 6))
+    fig.suptitle("GIẢI SUDOKU VỚI BACKTRACKING", fontsize=16,fontweight='bold')
+
+    # 1. Biểu đồ thời gian theo bước
+    axs[0, 0].plot(steps, times, marker='o')
+    axs[0, 0].set_xlabel("Bước")
+    axs[0, 0].set_ylabel("Thời gian (giây)")
+    axs[0, 0].set_title("Thời gian theo bước")
+    axs[0, 0].grid(True)
+
+    # 2. Scatter vị trí các ô thử giá trị
+    sc = axs[0, 1].scatter(cols, rows, c=steps, cmap='viridis', s=100)
+    axs[0, 1].invert_yaxis()
+    axs[0, 1].set_xlabel("Cột")
+    axs[0, 1].set_ylabel("Hàng")
+    axs[0, 1].set_title("Vị trí các ô thử giá trị")
+    fig.colorbar(sc, ax=axs[0, 1], label='Bước')
+
+    # 3. Heatmap giá trị đã thử trên lưới Sudoku
+    grid = np.zeros((9, 9), dtype=int)
+    for r, c, v in zip(rows, cols, values):
+        grid[r][c] = v
+    sns.heatmap(grid, annot=True, fmt='d', cmap='YlGnBu', cbar=False, ax=axs[1, 0])
+    axs[1, 0].set_title("Lưới Sudoku sau khi thử các giá trị")
+
+    # 4. Biểu đồ cột giá trị được thử theo bước
+    axs[1, 1].bar(steps, values)
+    axs[1, 1].set_xlabel("Bước")
+    axs[1, 1].set_ylabel("Giá trị được thử")
+    axs[1, 1].set_title("Giá trị được thử theo từng bước")
+    axs[1, 1].set_yticks(range(1, max(values)+1))
+    axs[1, 1].grid(True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # dành chỗ cho tiêu đề chung
     plt.show()
 
-def ve_biu_do_phan_tich_sa(log_path):
+def ve_bieu_do_phan_tich_sa(log_path):
 
     # Lấy dữ liệu từ log
     def phan_tich_log(log_path):
@@ -638,15 +692,15 @@ def ve_biu_do_phan_tich_sa(log_path):
     avg_time_per_step = np.mean(np.diff(thoi_gian_tich_luy))
     std_time_per_step = np.std(np.diff(thoi_gian_tich_luy))
 
-    plt.figure(figsize=(8, 6))
-    plt.suptitle('PHÂN TÍCH THUẬT TOÁN SIMULATED ANNEALING',
-                fontsize=18, y=1.02, fontweight='bold')
+    plt.figure(figsize=(8 , 6))
+    plt.suptitle('GIẢI SUDOKU VỚI SIMULATED ANEALING',
+                fontsize=10, y=0.99, fontweight='bold')
 
     # Subplot 1: Tiến triển giải thuật
     ax1 = plt.subplot(2, 2, 1)
     ax1.plot(log_data['buoc'], log_data['loi'], 'r-', label='Số lỗi', linewidth=2)
     ax1.plot(log_data['buoc'], log_data['conflicts'], 'b--', label='Số conflicts', linewidth=2)
-    ax1.set_title('TIẾN TRIỂN GIẢI THUẬT', pad=12)
+    ax1.set_title('TIẾN TRIỂN GIẢI THUẬT', pad=5)
     ax1.set_xlabel('Số bước', fontsize=10)
     ax1.set_ylabel('Giá trị', fontsize=10)
     ax1.grid(True, linestyle='--', alpha=0.7)
@@ -656,7 +710,7 @@ def ve_biu_do_phan_tich_sa(log_path):
     # Subplot 2: Quá trình làm nguội
     ax2 = plt.subplot(2, 2, 2)
     ax2.plot(log_data['buoc'], log_data['sigma'], 'g-', linewidth=2)
-    ax2.set_title('QUÁ TRÌNH LÀM NGUỘI (SIGMA)', pad=12)
+    ax2.set_title('QUÁ TRÌNH LÀM NGUỘI (SIGMA)', pad=5)
     ax2.set_xlabel('Số bước', fontsize=10)
     ax2.set_ylabel('Giá trị sigma', fontsize=10)
     ax2.grid(True, linestyle='--', alpha=0.7)
@@ -665,7 +719,7 @@ def ve_biu_do_phan_tich_sa(log_path):
     # Subplot 3: Thời gian tích lũy
     ax3 = plt.subplot(2, 2, 3)
     ax3.plot(log_data['buoc'], thoi_gian_tich_luy, 'm-o', markersize=4, linewidth=2)
-    ax3.set_title('THỜI GIAN TÍCH LŨY', pad=12)
+    ax3.set_title('THỜI GIAN TÍCH LŨY', pad=5)
     ax3.set_xlabel('Số bước', fontsize=10)
     ax3.set_ylabel('Thời gian (giây)', fontsize=10)
     ax3.grid(True, linestyle='--', alpha=0.7)
@@ -677,7 +731,7 @@ def ve_biu_do_phan_tich_sa(log_path):
     # Subplot 4: Quá trình giảm lỗi (log scale)
     ax4 = plt.subplot(2, 2, 4)
     ax4.semilogy(log_data['thoi_gian'], log_data['loi'], 'c-', linewidth=2)
-    ax4.set_title('GIẢM LỖI THEO THỜI GIAN (LOG SCALE)', pad=12)
+    ax4.set_title('GIẢM LỖI THEO THỜI GIAN (LOG SCALE)', pad=5)
     ax4.set_xlabel('Thời gian (giây)', fontsize=10)
     ax4.set_ylabel('Số lỗi', fontsize=10)
     ax4.grid(True, which="both", linestyle='--', alpha=0.7)
@@ -686,41 +740,67 @@ def ve_biu_do_phan_tich_sa(log_path):
     plt.subplots_adjust(top=0.92, hspace=0.3, wspace=0.25)
     plt.show()
 
-
-def ve_bieu_do_log_hc(log_path):
-    buoc = []
+def ve_bieu_do_phan_tich_hc(file_path):
+    steps = []
+    times = []
+    rows = []
+    cols = []
+    values = []
     conflicts = []
-    trang_thai = []
 
-    with open(log_path, "r", encoding="utf-8") as f:
+    # Regex để bắt thông tin từ log dạng Hill Climbing
+    pattern = r"(\d+):([\d.]+)s \| Conflicts: (\d+) \| \((\d+),(\d+)\) <- (\d+)"
+
+    with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            if "Conflicts" in line:
-                parts = line.strip().split(" | ")
-                step = int(parts[0].split(":")[0])
-                conflict = int(parts[1].split(":")[1])
-                status = parts[2].split("-->")[1].strip()
+            match = re.search(pattern, line)
+            if match:
+                step = int(match.group(1))
+                time = float(match.group(2))
+                conflict = int(match.group(3))
+                row = int(match.group(4))
+                col = int(match.group(5))
+                value = int(match.group(6))
 
-                buoc.append(step)
+                steps.append(step)
+                times.append(time)
                 conflicts.append(conflict)
-                trang_thai.append(status)
+                rows.append(row)
+                cols.append(col)
+                values.append(value)
 
-    # Ánh xạ trạng thái sang màu
-    mau = {
-        "Cải thiện": "green",
-        "Lỗi - Vi phạm quy tắc": "red",
-        "Không cải thiện": "orange"
-    }
-    colors = [mau.get(s, "gray") for s in trang_thai]
+    # Vẽ 4 biểu đồ
+    fig, axs = plt.subplots(2, 2, figsize=(12, 7))
+    fig.suptitle("PHÂN TÍCH GIẢI SUDOKU BẰNG HILL CLIMBING", fontsize=16, fontweight='bold')
 
-    plt.figure(figsize=(10, 6))
-    plt.scatter(buoc, conflicts, c=colors, label="Số xung đột")
-    plt.plot(buoc, conflicts, color="blue", linewidth=1, alpha=0.5)
+    # 1. Thời gian theo bước
+    axs[0, 0].plot(steps, times, marker='o', color='purple')
+    axs[0, 0].set_title("Thời gian tích lũy theo bước")
+    axs[0, 0].set_xlabel("Bước")
+    axs[0, 0].set_ylabel("Thời gian (s)")
+    axs[0, 0].grid(True)
 
-    plt.title("Phân tích quá trình giải Sudoku bằng Hill Climbing")
-    plt.xlabel("Bước thực hiện")
-    plt.ylabel("Số xung đột")
-    plt.grid(True)
-    plt.legend(["Số xung đột theo bước"], loc="upper right")
-    plt.tight_layout()
+    # 2. Vị trí các ô được gán
+    sc = axs[0, 1].scatter(cols, rows, c=steps, cmap='viridis', s=100)
+    axs[0, 1].invert_yaxis()
+    axs[0, 1].set_title("Vị trí các ô được gán giá trị")
+    axs[0, 1].set_xlabel("Cột")
+    axs[0, 1].set_ylabel("Hàng")
+    fig.colorbar(sc, ax=axs[0, 1], label="Bước")
+
+    # 3. Heatmap giá trị đã gán
+    grid = np.zeros((9, 9), dtype=int)
+    for r, c, v in zip(rows, cols, values):
+        grid[r][c] = v
+    sns.heatmap(grid, annot=True, fmt='d', cmap='YlGnBu', cbar=False, ax=axs[1, 0])
+    axs[1, 0].set_title("Lưới Sudoku sau các bước gán")
+
+    # 4. Số xung đột theo bước
+    axs[1, 1].plot(steps, conflicts, marker='o', color='red')
+    axs[1, 1].set_title("Số xung đột theo bước")
+    axs[1, 1].set_xlabel("Bước")
+    axs[1, 1].set_ylabel("Số xung đột")
+    axs[1, 1].grid(True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
-
