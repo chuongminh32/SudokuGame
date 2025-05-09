@@ -60,6 +60,9 @@ class SudokuGame:
         self.an_bang_da_thua = True 
         self.da_thua = False
         self.exit_btn = None
+
+        # rect sudoku  -> click ngoai bang 
+        self.rect_su = None
         
     # Hiển thị tg đang chơi 
     def hienThiTGChoi(self, screen, tg_da_troi, font):
@@ -305,8 +308,11 @@ class SudokuGame:
                     self.hien_bang_cap_do = False
                     break
         
+        elif self.rect_su and not self.rect_su.collidepoint(vitri_click):
+            self.o_chon = None
+        
     def veCauTrucBang(self):
-        ve_luoi(self.screen, 9)
+        self.rect_su = ve_luoi(self.screen, 9)
         # vẽ số khi chưa click pause hoặc (khi bảng thắng/thua hiện + cờ pause sẽ bật -> vẫn vẽ số để xem lời giải )
         if self.isPause == False or (self.isPause == True and (self.da_thang == True or self.da_thua == True)):
             ve_so(self.screen, self.bang, self.bang_goc, self.font, self.bang_giai)

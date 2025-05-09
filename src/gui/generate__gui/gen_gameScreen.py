@@ -65,6 +65,8 @@ def ve_nut(screen):
     return nut_goi_y, nut_lam_moi, nut_ai, rect_nut_back
 
 def ve_so(screen, bang, bang_goc, font, bang_giai):
+    font_size = KT_O // 2
+    font = pygame.font.SysFont("verdana", font_size)
     for i in range(KT_LUOI):
         for j in range(KT_LUOI):
             if bang[i][j]:
@@ -88,7 +90,8 @@ def ve_luoi(screen):  # Vẽ lưới Sudoku
     for i in range(KT_LUOI + 1):  # Duyệt qua tất cả các đường
         duongVien = 3 if i % 3 == 0 else 1  # Đường viền dày hơn cho mỗi khối 3x3
         pygame.draw.line(screen, DEN, (DEM + i * KT_O, DEM), (DEM + i * KT_O, DEM + 9 * KT_O), duongVien)  # Vẽ đường dọc
-        pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)  # Vẽ đường ngang
+        pygame.draw.line(screen, DEN, (DEM, DEM + i * KT_O), (DEM + 9 * KT_O, DEM + i * KT_O), duongVien)  # Vẽ đường ngang\
+    return pygame.Rect(DEM, DEM, KT_O * 9, KT_O * 9)
 
 def ve_nut_phan_chia_cap_do(screen, ten_cap_do):
     """Vẽ combobox chọn cấp độ khó dễ (Dễ, Trung bình, Khó)."""

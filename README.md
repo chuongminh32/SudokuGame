@@ -52,7 +52,7 @@
 |   |   |   simulated_annealing.py  
 |   |   |
 |   |   |
-|   +---assets  # Chứa ảnh/icon 
+|   +---assets  # Chứa ảnh/icon (src: https://icons8.com/)
 |   |   |
 |   |   |
 |   +---gui  # Chứa các thành phần giao diện

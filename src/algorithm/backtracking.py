@@ -25,6 +25,16 @@ def backtracking_core(bang, kich_thuoc, ham_goi_ve=None, tre=0):
     cot = [set() for _ in range(kich_thuoc)]
     o_vuong = [[set() for _ in range(kich_thuoc_o)] for _ in range(kich_thuoc_o)]
 
+    """ [[set(), set(), set()],
+        [set(), set(), set()],
+        [set(), set(), set()]]
+        |     |     |     |
+        | --- | --- | --- |
+        | 0,0 | 0,1 | 0,2 |
+        | 1,0 | 1,1 | 1,2 |
+        | 2,0 | 2,1 | 2,2 |
+    """
+
     # Khởi tạo các tập hợp từ bảng ban đầu
     for i in range(kich_thuoc):
         for j in range(kich_thuoc):
