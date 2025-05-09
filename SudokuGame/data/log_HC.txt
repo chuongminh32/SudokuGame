@@ -1,3 +1,0 @@
-0:0.0000s | Conflicts: 4 | (3,3) <- 1 --> Không cải thiện
-
-==> Lời giải KHÔNG hợp lệ sau 0.0002s
